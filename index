@@ -5,11 +5,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>みんなでつくる　リンバスTier表</title>
     <style>
+      body { font-family: sans-serif; margin: 24px; }
+      .controls { margin-bottom: 12px; }
+      input[type="number"] { width: 90px; }
+      table { border-collapse: collapse; width: 100%; max-width: 760px; }
+      th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: right; }
+      th:first-child, td:first-child { text-align: left; }
+      .error { color: #b00020; }
     </style>
 </head>
 <body>
   <h2>みんなでつくる　リンバスTier表</h2>
+  <div class="controls">
+    <label for="xInput">x:</label>
+    <input id="xInput" type="number" value="1" step="0.1">
+    <button id="reloadButton" type="button">再計算</button>
+  </div>
+  <p id="status"></p>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>(point + 0.01 × x × Xpoint) / (vote + 0.01 × x × Xvote)</th>
+      </tr>
+    </thead>
+    <tbody id="resultBody"></tbody>
+  </table>
+
   <script>
+    const statusEl = document.getElementById('status');
+    const bodyEl = document.getElementById('resultBody');
+    const xInput = document.getElementById('xInput');
+    const reloadButton = document.getElementById('reloadButton');
+
+    function parseTierlist(rawText) {
+      const match = rawText.match(/const\s+tierlist\s*=\s*(\[[\s\S]*\]);?/);
+      if (!match) {
+        throw new Error('table0 から tierlist を読み取れませんでした。');
+      }
+      return JSON.parse(match[1]);
+    }
+
+    function calcValue(row, x) {
+      const numerator = row.point + 0.01 * x * row.Xpoint;
+      const denominator = row.vote + 0.01 * x * row.Xvote;
+      return denominator === 0 ? NaN : numerator / denominator;
+    }
+
+    function renderRows(tierlist, x) {
+      const rows = tierlist.map((row) => {
+        const value = calcValue(row, x);
+        return {
+          id: row.id,
+          value,
+        };
+      });
+
+      bodyEl.innerHTML = rows.map(({ id, value }) => {
+        const display = Number.isFinite(value) ? value.toFixed(6) : 'NaN';
+        return `<tr><td>${id}</td><td>${display}</td></tr>`;
+      }).join('');
+    }
+
+    async function loadAndRender() {
+      const x = Number(xInput.value);
+      if (!Number.isFinite(x)) {
+        statusEl.textContent = 'x には数値を入力してください。';
+        statusEl.className = 'error';
+        return;
+      }
+
+      try {
+        const response = await fetch('./data/table0');
+        if (!response.ok) {
+          throw new Error(`table0 の取得に失敗しました: ${response.status}`);
+        }
+        const text = await response.text();
+        const tierlist = parseTierlist(text);
+        renderRows(tierlist, x);
+        statusEl.textContent = `table0 読み込み完了（件数: ${tierlist.length}）`;
+        statusEl.className = '';
+      } catch (err) {
+        statusEl.textContent = `エラー: ${err.message}`;
+        statusEl.className = 'error';
+        bodyEl.innerHTML = '';
+      }
+    }
+
+    reloadButton.addEventListener('click', loadAndRender);
+    xInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        loadAndRender();
+      }
+    });
+
+    loadAndRender();
   </script>
 </body>
 </html>
