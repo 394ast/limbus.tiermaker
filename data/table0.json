@@ -1,4 +1,4 @@
-const tierlist = [
+[
   {"id":1001,"point":0,"vote":0,"Xpoint":1,"Xvote":1},
   {"id":1002,"point":0,"vote":0,"Xpoint":1,"Xvote":1},
   {"id":1003,"point":0,"vote":0,"Xpoint":1,"Xvote":1},
@@ -271,4 +271,3 @@ const tierlist = [
   {"id":24008,"point":0,"vote":0,"Xpoint":1,"Xvote":1},
   {"id":24009,"point":0,"vote":0,"Xpoint":1,"Xvote":1}
 ]
-
