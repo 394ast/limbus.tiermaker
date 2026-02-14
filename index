@@ -62,7 +62,22 @@
       }).join('');
     }
 
+    function getQuerySettings() {
+      const params = new URLSearchParams(window.location.search);
+      const tableParam = params.get('T');
+      const xParam = params.get('X') ?? params.get('?X');
+
+      const tableIndex = Number.parseInt(tableParam ?? '0', 10);
+      const xValue = xParam !== null ? Number(xParam) : null;
+
+      return {
+        tableIndex: Number.isInteger(tableIndex) && tableIndex >= 0 ? tableIndex : 0,
+        xValue,
+      };
+    }
+
     async function loadAndRender() {
+      const { tableIndex } = getQuerySettings();
       const x = Number(xInput.value);
 
       if (!Number.isFinite(x)) {
@@ -72,15 +87,15 @@
       }
 
       try {
-        const response = await fetch('./data/table0.json');
+        const response = await fetch(`./data/table${tableIndex}.json`);
         if (!response.ok) {
-          throw new Error(`table0 の取得に失敗しました: ${response.status}`);
+          throw new Error(`table${tableIndex} の取得に失敗しました: ${response.status}`);
         }
 
         const tierlist = await response.json();
         renderRows(tierlist, x);
 
-        statusEl.textContent = `読み込み完了（件数: ${tierlist.length}）`;
+        statusEl.textContent = `読み込み完了（table${tableIndex} / 件数: ${tierlist.length}）`;
         statusEl.className = '';
 
       } catch (err) {
@@ -98,7 +113,13 @@
       }
     });
 
+    const { xValue } = getQuerySettings();
+    if (Number.isFinite(xValue)) {
+      xInput.value = String(xValue);
+    }
+
     loadAndRender();
   </script>
 </body>
 </html>
+
