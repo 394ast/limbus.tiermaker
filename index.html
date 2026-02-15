@@ -211,6 +211,20 @@
       return `<div class="id-items">${items}</div>`;
     }
 
+    function getGroupLabel(groupValue) {
+      if (groupValue === 9) return 'SS';
+      if (groupValue === 8) return 'S+';
+      if (groupValue === 7) return 'S';
+      if (groupValue === 6) return 'S-';
+      if (groupValue === 5) return 'A';
+      if (groupValue === 4) return 'B';
+      if (groupValue === 3) return 'C';
+      if (groupValue === 2) return 'D';
+      if (groupValue === 1) return 'E';
+      if (groupValue === 0) return '除外';
+      return String(groupValue);
+    }
+
     function renderRows(tierlist, x) {
       const identityRows = tierlist.filter((row) => row[0] < 13001);
       const egoRows = tierlist.filter((row) => row[0] >= 13001);
@@ -222,12 +236,12 @@
       applyManualAndExceptOverrides(egoData.grouped, egoData.idToGroup, 'ego');
 
       bodyIdentityEl.innerHTML = Array.from(identityData.grouped.entries()).map(([groupValue, ids]) => {
-        const label = groupValue === 0 ? 'except' : groupValue;
+        const label = getGroupLabel(groupValue);
         return `<tr><td>${label}</td><td>${renderImageCells(ids, groupValue, 'identity')}</td></tr>`;
       }).join('');
 
       bodyEgoEl.innerHTML = Array.from(egoData.grouped.entries()).map(([groupValue, ids]) => {
-        const label = groupValue === 0 ? 'except' : groupValue;
+        const label = getGroupLabel(groupValue);
         return `<tr><td>${label}</td><td>${renderImageCells(ids, groupValue, 'ego')}</td></tr>`;
       }).join('');
     }
