@@ -58,7 +58,7 @@
     const bodyIdentityEl = document.getElementById('resultBodyIdentity');
     const bodyEgoEl = document.getElementById('resultBodyEgo');
     const syncModeInputs = document.querySelectorAll('input[name="syncMode"]');
-    const imgSizeInputs = document.querySelectorAll('input[name="imgSize"]');
+    const imgSizeForm = document.getElementById('imgSizeForm');
     const customWidthInput = document.getElementById('customWidth');
 
     const state = {
@@ -324,38 +324,53 @@
     bodyIdentityEl.addEventListener('change', onControlChange);
     bodyEgoEl.addEventListener('change', onControlChange);
 
-    function resolveImageSizePx(mode) {
-      if (mode === 'size1') return 40;
-      if (mode === 'size2') return 56;
-      if (mode === 'size3') return 72;
-      if (mode === 'size4') return 96;
-      if (mode === 'custom') {
-        const value = Number.parseInt(customWidthInput.value ?? '', 10);
-        return Number.isInteger(value) && value > 0 ? value : 56;
+    function applyCustomSize(width) {
+      document.documentElement.style.setProperty('--img-size', `${width}px`);
+    }
+
+    imgSizeForm.addEventListener('change', (event) => {
+      if (event.target.type !== 'radio') {
+        return;
       }
-      return 56;
-    }
 
-    function applyImageSize() {
-      const checked = document.querySelector('input[name="imgSize"]:checked');
-      const mode = checked ? checked.value : 'size2';
-      customWidthInput.disabled = mode !== 'custom';
-      const px = resolveImageSizePx(mode);
-      document.documentElement.style.setProperty('--img-size', `${px}px`);
-    }
+      const selectedSize = event.target.value;
+      if (selectedSize === 'custom') {
+        const currentSize = Number.parseInt(
+          getComputedStyle(document.documentElement).getPropertyValue('--img-size') ?? '',
+          10
+        );
+        customWidthInput.value = Number.isInteger(currentSize) && currentSize > 0 ? currentSize : 80;
+        customWidthInput.disabled = false;
+        customWidthInput.focus();
+        applyCustomSize(Number.parseInt(customWidthInput.value, 10));
+        return;
+      }
 
-    imgSizeInputs.forEach((input) => {
-      input.addEventListener('change', applyImageSize);
+      customWidthInput.value = '';
+      customWidthInput.disabled = true;
+
+      if (selectedSize === 'size1') applyCustomSize(60);
+      if (selectedSize === 'size2') applyCustomSize(80);
+      if (selectedSize === 'size3') applyCustomSize(120);
+      if (selectedSize === 'size4') applyCustomSize(200);
     });
 
     customWidthInput.addEventListener('input', () => {
-      const checked = document.querySelector('input[name="imgSize"]:checked');
-      if (checked && checked.value === 'custom') {
-        applyImageSize();
+      const selected = document.querySelector('input[name="imgSize"]:checked');
+      if (!selected || selected.value !== 'custom') {
+        return;
       }
+
+      let customWidth = Number.parseInt(customWidthInput.value ?? '', 10);
+      if (!Number.isInteger(customWidth)) {
+        return;
+      }
+
+      customWidth = Math.max(20, Math.min(customWidth, 1000));
+      setTimeout(() => applyCustomSize(customWidth), 100);
     });
 
-    applyImageSize();
+    applyCustomSize(80);
 
     const DEFAULT_T = 0;
     const DEFAULT_X = 1;
