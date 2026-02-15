@@ -58,7 +58,7 @@
         }
 
         if (value <= 0 || value >= 10) {
-          throw new Error(`ID ${row[0]} の計算結果が範囲外です: ${value.toFixed(6)}（0より大きく10未満である必要があります）`);
+          throw new Error(`ID ${row[0]} の計算結果が範囲外です: ${value}（0より大きく10未満である必要があります）`);
         }
 
         const rounded = Math.round(value);
