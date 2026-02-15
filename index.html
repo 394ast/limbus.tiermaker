@@ -42,8 +42,8 @@
   <div class="grid-line">
     <span class="indent">画像サイズ:</span><div id="imgSizeForm">
       <input type="radio" name="imgSize" value="size1">小
-      <input type="radio" name="imgSize" value="size2" checked>中
-      <input type="radio" name="imgSize" value="size3">大
+      <input type="radio" name="imgSize" value="size2">中
+      <input type="radio" name="imgSize" value="size3" checked>大
       <input type="radio" name="imgSize" value="size4">特大<br>
       <input type="radio" name="imgSize" value="custom">カスタム <input type="number" id="customWidth" disabled>px
     </div>
@@ -56,6 +56,10 @@
 
   <div class="sync-mode">
     <label><input type="checkbox" id="toggleAdjustControls" checked> Tierの移動ボタンを表示</label>
+  </div>
+
+  <div class="sync-mode">
+    <label><input type="checkbox" id="toggleExceptRows" checked> 除外を表示する</label>
   </div>
 
   <p id="status"></p>
@@ -78,6 +82,7 @@
     const imgSizeForm = document.getElementById('imgSizeForm');
     const customWidthInput = document.getElementById('customWidth');
     const toggleAdjustControlsInput = document.getElementById('toggleAdjustControls');
+    const toggleExceptRowsInput = document.getElementById('toggleExceptRows');
 
     const state = {
       tierlist: null,
@@ -257,6 +262,10 @@
       return '';
     }
 
+    function shouldShowExceptRows() {
+      return !toggleExceptRowsInput || toggleExceptRowsInput.checked;
+    }
+
     function renderRows(tierlist, x) {
       const identityRows = tierlist.filter((row) => row[0] < 13001);
       const egoRows = tierlist.filter((row) => row[0] >= 13001);
@@ -267,13 +276,19 @@
       applyManualAndExceptOverrides(identityData.grouped, identityData.idToGroup, 'identity');
       applyManualAndExceptOverrides(egoData.grouped, egoData.idToGroup, 'ego');
 
-      bodyIdentityEl.innerHTML = Array.from(identityData.grouped.entries()).map(([groupValue, ids]) => {
+      const showExceptRows = shouldShowExceptRows();
+
+      bodyIdentityEl.innerHTML = Array.from(identityData.grouped.entries())
+        .filter(([groupValue]) => showExceptRows || groupValue !== 0)
+        .map(([groupValue, ids]) => {
         const label = getGroupLabel(groupValue);
         const tierClass = getGroupClass(groupValue);
         return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(ids, groupValue, 'identity')}</td></tr>`;
       }).join('');
 
-      bodyEgoEl.innerHTML = Array.from(egoData.grouped.entries()).map(([groupValue, ids]) => {
+      bodyEgoEl.innerHTML = Array.from(egoData.grouped.entries())
+        .filter(([groupValue]) => showExceptRows || groupValue !== 0)
+        .map(([groupValue, ids]) => {
         const label = getGroupLabel(groupValue);
         const tierClass = getGroupClass(groupValue);
         return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(ids, groupValue, 'ego')}</td></tr>`;
@@ -384,6 +399,14 @@
       applyAdjustControlVisibility(toggleAdjustControlsInput.checked);
     }
 
+    if (toggleExceptRowsInput) {
+      toggleExceptRowsInput.addEventListener('change', () => {
+        if (state.tierlist && Number.isFinite(state.x)) {
+          renderRows(state.tierlist, state.x);
+        }
+      });
+    }
+
     function applyCustomSize(width) {
       document.documentElement.style.setProperty('--img-size', `${width}px`);
     }
@@ -430,7 +453,7 @@
       setTimeout(() => applyCustomSize(customWidth), 100);
     });
 
-    applyCustomSize(80);
+    applyCustomSize(120);
 
     const DEFAULT_T = 0;
     const DEFAULT_X = 1;
