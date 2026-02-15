@@ -6,9 +6,7 @@
     <title>みんなでつくる　リンバスTier表</title>
     <style>
       body { font-family: sans-serif; margin: 24px; }
-      .controls { margin-bottom: 12px; }
-      input[type="number"] { width: 90px; }
-      table { border-collapse: collapse; width: 100%; max-width: 760px; }
+      table { border-collapse: collapse; width: 100%; max-width: 760px; margin-bottom: 20px; }
       th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: right; }
       th:first-child, td:first-child { text-align: left; }
       .error { color: #b00020; }
@@ -17,29 +15,34 @@
 <body>
   <h2>みんなでつくる　リンバスTier表</h2>
 
-  <div class="controls">
-    <label for="xInput">x:</label>
-    <input id="xInput" type="number" value="1" step="0.1">
-    <button id="reloadButton" type="button">再計算</button>
-  </div>
-
   <p id="status"></p>
 
+  <h3>ID 13001 未満</h3>
   <table>
     <thead>
       <tr>
-        <th>ID</th>
-        <th>(point + 0.01 × x × Xpoint) / (vote + 0.01 × x × Xvote)</th>
+        <th>グループ（四捨五入）</th>
+        <th>ID一覧</th>
       </tr>
     </thead>
-    <tbody id="resultBody"></tbody>
+    <tbody id="resultBodyLow"></tbody>
+  </table>
+
+  <h3>ID 13001 以上</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>グループ（四捨五入）</th>
+        <th>ID一覧</th>
+      </tr>
+    </thead>
+    <tbody id="resultBodyHigh"></tbody>
   </table>
 
   <script>
     const statusEl = document.getElementById('status');
-    const bodyEl = document.getElementById('resultBody');
-    const xInput = document.getElementById('xInput');
-    const reloadButton = document.getElementById('reloadButton');
+    const bodyLowEl = document.getElementById('resultBodyLow');
+    const bodyHighEl = document.getElementById('resultBodyHigh');
 
     function calcValue(row, x) {
       const numerator = row[1] + 0.01 * x * row[3];
@@ -47,28 +50,55 @@
       return denominator === 0 ? NaN : numerator / denominator;
     }
 
-    function renderRows(tierlist, x) {
-      const rows = tierlist.map((row) => {
+    function buildGroupedRows(rows, x) {
+      const grouped = new Map();
+
+      rows.forEach((row) => {
         const value = calcValue(row, x);
-        return {
-          id: row[0],
-          value,
-        };
+
+        if (!Number.isFinite(value)) {
+          throw new Error(`ID ${row[0]} の計算結果が不正です。`);
+        }
+
+        if (value <= 0 || value >= 10) {
+          throw new Error(`ID ${row[0]} の計算結果が範囲外です: ${value}（0より大きく10未満である必要があります）`);
+        }
+
+        const rounded = Math.round(value);
+        const ids = grouped.get(rounded) ?? [];
+        ids.push(row[0]);
+        grouped.set(rounded, ids);
       });
 
-      bodyEl.innerHTML = rows.map(({ id, value }) => {
-        const display = Number.isFinite(value) ? value.toFixed(6) : 'NaN';
-        return `<tr><td>${id}</td><td>${display}</td></tr>`;
+      return Array.from(grouped.entries())
+        .sort((a, b) => b[0] - a[0]);
+    }
+
+    function renderRows(tierlist, x) {
+      const lowerRows = tierlist.filter((row) => row[0] < 13001);
+      const higherRows = tierlist.filter((row) => row[0] >= 13001);
+
+      const lowerGroupedRows = buildGroupedRows(lowerRows, x);
+      const higherGroupedRows = buildGroupedRows(higherRows, x);
+
+      bodyLowEl.innerHTML = lowerGroupedRows.map(([groupValue, ids]) => {
+        return `<tr><td>${groupValue}</td><td>${ids.join(', ')}</td></tr>`;
+      }).join('');
+
+      bodyHighEl.innerHTML = higherGroupedRows.map(([groupValue, ids]) => {
+        return `<tr><td>${groupValue}</td><td>${ids.join(', ')}</td></tr>`;
       }).join('');
     }
+
+    const DEFAULT_X = 1;
 
     function getQuerySettings() {
       const params = new URLSearchParams(window.location.search);
       const tableParam = params.get('T');
-      const xParam = params.get('X') ?? params.get('?X');
+      const xParam = params.get('X');
 
       const tableIndex = Number.parseInt(tableParam ?? '0', 10);
-      const xValue = xParam !== null ? Number(xParam) : null;
+      const xValue = xParam !== null ? Number(xParam) : DEFAULT_X;
 
       return {
         tableIndex: Number.isInteger(tableIndex) && tableIndex >= 0 ? tableIndex : 0,
@@ -77,11 +107,11 @@
     }
 
     async function loadAndRender() {
-      const { tableIndex } = getQuerySettings();
-      const x = Number(xInput.value);
+      const { tableIndex, xValue } = getQuerySettings();
+      const x = xValue;
 
       if (!Number.isFinite(x)) {
-        statusEl.textContent = 'x には数値を入力してください。';
+        statusEl.textContent = 'URLクエリ X は数値で指定してください。例: ?T=0&X=1';
         statusEl.className = 'error';
         return;
       }
@@ -95,31 +125,18 @@
         const tierlist = await response.json();
         renderRows(tierlist, x);
 
-        statusEl.textContent = `読み込み完了（table${tableIndex} / 件数: ${tierlist.length}）`;
+        statusEl.textContent = `読み込み完了（table${tableIndex} / 件数: ${tierlist.length} / X: ${x}）`;
         statusEl.className = '';
 
       } catch (err) {
         statusEl.textContent = `エラー: ${err.message}`;
         statusEl.className = 'error';
-        bodyEl.innerHTML = '';
+        bodyLowEl.innerHTML = '';
+        bodyHighEl.innerHTML = '';
       }
-    }
-
-    reloadButton.addEventListener('click', loadAndRender);
-
-    xInput.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        loadAndRender();
-      }
-    });
-
-    const { xValue } = getQuerySettings();
-    if (Number.isFinite(xValue)) {
-      xInput.value = String(xValue);
     }
 
     loadAndRender();
   </script>
 </body>
 </html>
-
