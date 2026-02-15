@@ -105,19 +105,10 @@
         identity: null,
         ego: null,
       },
-    };
-
-    const GROUP_META = {
-      9: { label: 'SS', className: 'tier-ss' },
-      8: { label: 'S+', className: 'tier-s-plus' },
-      7: { label: 'S', className: 'tier-s' },
-      6: { label: 'S-', className: 'tier-s-minus' },
-      5: { label: 'A', className: 'tier-a' },
-      4: { label: 'B', className: 'tier-b' },
-      3: { label: 'C', className: 'tier-c' },
-      2: { label: 'D', className: 'tier-d' },
-      1: { label: 'E', className: 'tier-e' },
-      0: { label: '除外', className: 'tier-except' },
+      baseGroupedSnapshot: {
+        tierlist: null,
+        x: null,
+      },
     };
 
     const GROUP_META = {
@@ -208,6 +199,8 @@
 
       state.baseGroupedByType.identity = buildGroupedData(identityRows, x);
       state.baseGroupedByType.ego = buildGroupedData(egoRows, x);
+      state.baseGroupedSnapshot.tierlist = tierlist;
+      state.baseGroupedSnapshot.x = x;
     }
 
     function moveIdBetweenGroups(grouped, idToGroup, id, targetGroup) {
@@ -410,7 +403,14 @@
     }
 
     function renderRows(tierlist, x) {
-      if (!state.baseGroupedByType.identity || !state.baseGroupedByType.ego) {
+      const needsRebuild = (
+        !state.baseGroupedByType.identity
+        || !state.baseGroupedByType.ego
+        || state.baseGroupedSnapshot.tierlist !== tierlist
+        || state.baseGroupedSnapshot.x !== x
+      );
+
+      if (needsRebuild) {
         initializeBaseGroupedData(tierlist, x);
       }
 
@@ -658,6 +658,10 @@
         statusEl.className = 'error';
         bodyIdentityEl.innerHTML = '';
         bodyEgoEl.innerHTML = '';
+        state.baseGroupedByType.identity = null;
+        state.baseGroupedByType.ego = null;
+        state.baseGroupedSnapshot.tierlist = null;
+        state.baseGroupedSnapshot.x = null;
       }
     }
 
