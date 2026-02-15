@@ -81,8 +81,8 @@
           throw new Error(`ID ${row[0]} の計算結果が不正です。`);
         }
 
-        if (value <= 1 || value >= 10) {
-          throw new Error(`ID ${row[0]} の計算結果が範囲外です: ${value}（1より大きく10未満である必要があります）`);
+        if (value < 1 || value > 9) {
+          throw new Error(`ID ${row[0]} の計算結果が範囲外です: ${value}（1以上9以下である必要があります）`);
         }
 
         const rounded = Math.round(value);
