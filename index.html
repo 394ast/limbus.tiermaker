@@ -24,31 +24,19 @@
   <h2>みんなでつくる　リンバスTier表</h2>
 
   <div class="sync-mode">
-    <label><input type="radio" name="syncMode" value="before" checked> 同期前</label>
-    <label><input type="radio" name="syncMode" value="after"> 同期後</label>
+    <label><input type="radio" name="syncMode" value="before"> 同期前</label>
+    <label><input type="radio" name="syncMode" value="after" checked> 同期後</label>
   </div>
 
   <p id="status"></p>
 
   <h3>Identity</h3>
   <table>
-    <thead>
-      <tr>
-        <th>グループ（四捨五入）</th>
-        <th>画像</th>
-      </tr>
-    </thead>
     <tbody id="resultBodyIdentity"></tbody>
   </table>
 
   <h3>EGO</h3>
   <table>
-    <thead>
-      <tr>
-        <th>グループ（四捨五入）</th>
-        <th>画像</th>
-      </tr>
-    </thead>
     <tbody id="resultBodyEgo"></tbody>
   </table>
 
@@ -172,7 +160,7 @@
       const exceptChecked = getExceptSet(type).has(id) ? 'checked' : '';
 
       if (isExcept) {
-        return `<label><input type="checkbox" data-action="toggle-except" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${exceptChecked}> except</label>`;
+        return `<label><input type="checkbox" data-action="toggle-except" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${exceptChecked}> </label>`;
       }
 
       const disablePlus2 = groupValue >= 8;
@@ -181,11 +169,11 @@
       const disableMinus2 = groupValue <= 2;
 
       return [
-        `<button type="button" data-action="move" data-delta="2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus2 ? 'disabled' : ''}>group +2</button>`,
-        `<button type="button" data-action="move" data-delta="1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus1 ? 'disabled' : ''}>group +1</button>`,
-        `<label><input type="checkbox" data-action="toggle-except" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${exceptChecked}> except</label>`,
-        `<button type="button" data-action="move" data-delta="-1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus1 ? 'disabled' : ''}>group -1</button>`,
-        `<button type="button" data-action="move" data-delta="-2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus2 ? 'disabled' : ''}>group -2</button>`
+        `<button type="button" data-action="move" data-delta="2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus2 ? 'disabled' : ''}>+2</button>`,
+        `<button type="button" data-action="move" data-delta="1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus1 ? 'disabled' : ''}>+1</button>`,
+        `<label><input type="checkbox" data-action="toggle-except" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${exceptChecked}> </label>`,
+        `<button type="button" data-action="move" data-delta="-1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus1 ? 'disabled' : ''}>-1</button>`,
+        `<button type="button" data-action="move" data-delta="-2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus2 ? 'disabled' : ''}>-2</button>`
       ].join('');
     }
 
