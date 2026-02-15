@@ -17,7 +17,7 @@
 
   <p id="status"></p>
 
-  <h3>ID 13001 未満</h3>
+  <h3>Identity</h3>
   <table>
     <thead>
       <tr>
@@ -25,10 +25,10 @@
         <th>ID一覧</th>
       </tr>
     </thead>
-    <tbody id="resultBodyLow"></tbody>
+    <tbody id="resultBodyIdentity"></tbody>
   </table>
 
-  <h3>ID 13001 以上</h3>
+  <h3>EGO</h3>
   <table>
     <thead>
       <tr>
@@ -36,13 +36,13 @@
         <th>ID一覧</th>
       </tr>
     </thead>
-    <tbody id="resultBodyHigh"></tbody>
+    <tbody id="resultBodyEgo"></tbody>
   </table>
 
   <script>
     const statusEl = document.getElementById('status');
-    const bodyLowEl = document.getElementById('resultBodyLow');
-    const bodyHighEl = document.getElementById('resultBodyHigh');
+    const bodyIdentityEl = document.getElementById('resultBodyIdentity');
+    const bodyEgoEl = document.getElementById('resultBodyEgo');
 
     function calcValue(row, x) {
       const numerator = row[1] + 0.01 * x * row[3];
@@ -75,17 +75,17 @@
     }
 
     function renderRows(tierlist, x) {
-      const lowerRows = tierlist.filter((row) => row[0] < 13001);
-      const higherRows = tierlist.filter((row) => row[0] >= 13001);
+      const identityRows = tierlist.filter((row) => row[0] < 13001);
+      const egoRows = tierlist.filter((row) => row[0] >= 13001);
 
-      const lowerGroupedRows = buildGroupedRows(lowerRows, x);
-      const higherGroupedRows = buildGroupedRows(higherRows, x);
+      const identityGroupedRows = buildGroupedRows(identityRows, x);
+      const egoGroupedRows = buildGroupedRows(egoRows, x);
 
-      bodyLowEl.innerHTML = lowerGroupedRows.map(([groupValue, ids]) => {
+      bodyIdentityEl.innerHTML = identityGroupedRows.map(([groupValue, ids]) => {
         return `<tr><td>${groupValue}</td><td>${ids.join(', ')}</td></tr>`;
       }).join('');
 
-      bodyHighEl.innerHTML = higherGroupedRows.map(([groupValue, ids]) => {
+      bodyEgoEl.innerHTML = egoGroupedRows.map(([groupValue, ids]) => {
         return `<tr><td>${groupValue}</td><td>${ids.join(', ')}</td></tr>`;
       }).join('');
     }
@@ -131,8 +131,8 @@
       } catch (err) {
         statusEl.textContent = `エラー: ${err.message}`;
         statusEl.className = 'error';
-        bodyLowEl.innerHTML = '';
-        bodyHighEl.innerHTML = '';
+        bodyIdentityEl.innerHTML = '';
+        bodyEgoEl.innerHTML = '';
       }
     }
 
