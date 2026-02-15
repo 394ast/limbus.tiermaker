@@ -8,6 +8,8 @@
       body { font-family: sans-serif; margin: 24px; }
       .sync-mode { margin: 8px 0 12px; }
       .sync-mode label { margin-right: 12px; }
+      .id-images { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+      .id-images img { width: 56px; height: 56px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
       table { border-collapse: collapse; width: 100%; max-width: 760px; margin-bottom: 20px; }
       th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: right; }
       th:first-child, td:first-child { text-align: left; }
@@ -18,8 +20,8 @@
   <h2>みんなでつくる　リンバスTier表</h2>
 
   <div class="sync-mode">
-    <label><input type="radio" name="syncMode" value="before" > 同期前</label>
-    <label><input type="radio" name="syncMode" value="after" checked> 同期後</label>
+    <label><input type="radio" name="syncMode" value="before" checked> 同期前</label>
+    <label><input type="radio" name="syncMode" value="after"> 同期後</label>
   </div>
 
   <p id="status"></p>
@@ -29,7 +31,7 @@
     <thead>
       <tr>
         <th>グループ（四捨五入）</th>
-        <th>ID一覧</th>
+        <th>画像</th>
       </tr>
     </thead>
     <tbody id="resultBodyIdentity"></tbody>
@@ -40,7 +42,7 @@
     <thead>
       <tr>
         <th>グループ（四捨五入）</th>
-        <th>ID一覧</th>
+        <th>画像</th>
       </tr>
     </thead>
     <tbody id="resultBodyEgo"></tbody>
@@ -50,6 +52,10 @@
     const statusEl = document.getElementById('status');
     const bodyIdentityEl = document.getElementById('resultBodyIdentity');
     const bodyEgoEl = document.getElementById('resultBodyEgo');
+    const syncModeInputs = document.querySelectorAll('input[name="syncMode"]');
+
+    let currentTierlist = null;
+    let currentX = null;
 
     function calcValue(row, x) {
       const numerator = row[1] + 0.01 * x * row[3];
@@ -81,6 +87,30 @@
         .sort((a, b) => b[0] - a[0]);
     }
 
+    function getIdentityImageUrl(id) {
+      const checked = document.querySelector('input[name="syncMode"]:checked');
+      const syncMode = checked ? checked.value : 'before';
+
+      if (syncMode === 'after') {
+        return `https://raw.githubusercontent.com/394ast/limbus.sharetool/main/Identities.After/${id}.3.jpg`;
+      }
+
+      return `https://raw.githubusercontent.com/394ast/limbus.sharetool/main/Identities.Before/${id}.1.jpg`;
+    }
+
+    function getEgoImageUrl(id) {
+      return `https://raw.githubusercontent.com/394ast/limbus.sharetool/main/EGO/${id}.jpg`;
+    }
+
+    function renderImageCells(ids, type) {
+      const images = ids.map((id) => {
+        const src = type === 'identity' ? getIdentityImageUrl(id) : getEgoImageUrl(id);
+        return `<img src="${src}" alt="${id}" loading="lazy">`;
+      }).join('');
+
+      return `<div class="id-images">${images}</div>`;
+    }
+
     function renderRows(tierlist, x) {
       const identityRows = tierlist.filter((row) => row[0] < 13001);
       const egoRows = tierlist.filter((row) => row[0] >= 13001);
@@ -89,11 +119,11 @@
       const egoGroupedRows = buildGroupedRows(egoRows, x);
 
       bodyIdentityEl.innerHTML = identityGroupedRows.map(([groupValue, ids]) => {
-        return `<tr><td>${groupValue}</td><td>${ids.join(', ')}</td></tr>`;
+        return `<tr><td>${groupValue}</td><td>${renderImageCells(ids, 'identity')}</td></tr>`;
       }).join('');
 
       bodyEgoEl.innerHTML = egoGroupedRows.map(([groupValue, ids]) => {
-        return `<tr><td>${groupValue}</td><td>${ids.join(', ')}</td></tr>`;
+        return `<tr><td>${groupValue}</td><td>${renderImageCells(ids, 'ego')}</td></tr>`;
       }).join('');
     }
 
@@ -130,6 +160,8 @@
         }
 
         const tierlist = await response.json();
+        currentTierlist = tierlist;
+        currentX = x;
         renderRows(tierlist, x);
 
         statusEl.textContent = `読み込み完了（table${tableIndex} / 件数: ${tierlist.length} / X: ${x}）`;
@@ -142,6 +174,14 @@
         bodyEgoEl.innerHTML = '';
       }
     }
+
+    syncModeInputs.forEach((input) => {
+      input.addEventListener('change', () => {
+        if (currentTierlist && Number.isFinite(currentX)) {
+          renderRows(currentTierlist, currentX);
+        }
+      });
+    });
 
     loadAndRender();
   </script>
