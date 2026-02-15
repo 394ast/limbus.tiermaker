@@ -11,6 +11,8 @@
       #imgSizeForm input[type="number"] { width: 72px; }
       .sync-mode { margin: 8px 0 12px; }
       .sync-mode label { margin-right: 12px; }
+      .id-range-filters { margin: 8px 0 12px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px 8px; }
+      .id-range-filter { font-size: 12px; white-space: nowrap; }
       table { border-collapse: collapse; width: 100%; max-width: none; margin-bottom: 20px; }
       th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: right; }
       th:first-child, td:first-child { text-align: center; }
@@ -38,6 +40,8 @@
 </head>
 <body>
   <h2>みんなでつくる　リンバスTier表</h2>
+
+  <div id="idRangeFilters" class="id-range-filters"></div>
 
   <div class="grid-line">
     <span class="indent">画像サイズ:</span><div id="imgSizeForm">
@@ -83,6 +87,7 @@
     const customWidthInput = document.getElementById('customWidth');
     const toggleAdjustControlsInput = document.getElementById('toggleAdjustControls');
     const toggleExceptRowsInput = document.getElementById('toggleExceptRows');
+    const idRangeFiltersEl = document.getElementById('idRangeFilters');
 
     const state = {
       tierlist: null,
@@ -262,6 +267,44 @@
       return '';
     }
 
+    function getIdRangeFilters() {
+      const displayNames = [
+        'イサン', 'ファウスト', 'ドンキホーテ', '良秀', 'ムルソー', 'ホンル',
+        'ヒースクリフ', 'イシュメール', 'ロージャ', 'シンクレア', 'ウーティス', 'グレゴール',
+        'イサン', 'ファウスト', 'ドンキホーテ', '良秀', 'ムルソー', 'ホンル',
+        'ヒースクリフ', 'イシュメール', 'ロージャ', 'シンクレア', 'ウーティス', 'グレゴール'
+      ];
+
+      return Array.from({ length: 24 }, (_, i) => {
+        const bucket = i + 1;
+        return { bucket, name: displayNames[i] };
+      });
+    }
+
+    function renderIdRangeFilters() {
+      if (!idRangeFiltersEl) {
+        return;
+      }
+
+      idRangeFiltersEl.innerHTML = getIdRangeFilters().map(({ bucket, name }) => {
+        return `<label class="id-range-filter"><input type="checkbox" data-action="toggle-id-range" data-bucket="${bucket}" checked> ${name}</label>`;
+      }).join('');
+    }
+
+    function isIdVisibleByRange(id) {
+      if (!idRangeFiltersEl) {
+        return true;
+      }
+
+      const bucket = Math.floor(id / 1000);
+      if (bucket < 1 || bucket > 24) {
+        return true;
+      }
+
+      const checkbox = idRangeFiltersEl.querySelector(`input[data-action="toggle-id-range"][data-bucket="${bucket}"]`);
+      return !checkbox || checkbox.checked;
+    }
+
     function shouldShowExceptRows() {
       return !toggleExceptRowsInput || toggleExceptRowsInput.checked;
     }
@@ -281,17 +324,19 @@
       bodyIdentityEl.innerHTML = Array.from(identityData.grouped.entries())
         .filter(([groupValue]) => showExceptRows || groupValue !== 0)
         .map(([groupValue, ids]) => {
+        const visibleIds = ids.filter((id) => isIdVisibleByRange(id));
         const label = getGroupLabel(groupValue);
         const tierClass = getGroupClass(groupValue);
-        return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(ids, groupValue, 'identity')}</td></tr>`;
+        return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(visibleIds, groupValue, 'identity')}</td></tr>`;
       }).join('');
 
       bodyEgoEl.innerHTML = Array.from(egoData.grouped.entries())
         .filter(([groupValue]) => showExceptRows || groupValue !== 0)
         .map(([groupValue, ids]) => {
+        const visibleIds = ids.filter((id) => isIdVisibleByRange(id));
         const label = getGroupLabel(groupValue);
         const tierClass = getGroupClass(groupValue);
-        return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(ids, groupValue, 'ego')}</td></tr>`;
+        return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(visibleIds, groupValue, 'ego')}</td></tr>`;
       }).join('');
     }
 
@@ -401,6 +446,21 @@
 
     if (toggleExceptRowsInput) {
       toggleExceptRowsInput.addEventListener('change', () => {
+        if (state.tierlist && Number.isFinite(state.x)) {
+          renderRows(state.tierlist, state.x);
+        }
+      });
+    }
+
+    renderIdRangeFilters();
+
+    if (idRangeFiltersEl) {
+      idRangeFiltersEl.addEventListener('change', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLInputElement) || target.dataset.action !== 'toggle-id-range') {
+          return;
+        }
+
         if (state.tierlist && Number.isFinite(state.x)) {
           renderRows(state.tierlist, state.x);
         }
