@@ -11,11 +11,12 @@
       #imgSizeForm input[type="number"] { width: 72px; }
       .sync-mode { margin: 8px 0 12px; }
       .sync-mode label { margin-right: 12px; }
-      .id-range-filters { margin: 8px 0 12px; }
+      .id-range-filters { margin: 8px 0 12px; border: 1px solid #ccc; border-radius: 6px; padding: 8px; }
       .id-range-group { margin-bottom: 8px; }
       .id-range-title { font-weight: 600; margin: 0 0 4px; }
       .id-range-options { display: flex; flex-wrap: wrap; gap: 4px 12px; }
       .id-range-filter { font-size: 12px; white-space: nowrap; }
+      .id-range-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
       table { border-collapse: collapse; width: 100%; max-width: none; margin-bottom: 20px; }
       th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: right; }
       th:first-child, td:first-child { text-align: center; }
@@ -295,8 +296,24 @@
 
       idRangeFiltersEl.innerHTML = [
         `<div class="id-range-group"><p class="id-range-title">表示する人格</p><div class="id-range-options">${renderOptions(identity)}</div></div>`,
-        `<div class="id-range-group"><p class="id-range-title">表示するE.G.O.</p><div class="id-range-options">${renderOptions(ego)}</div></div>`
+        `<div class="id-range-group"><p class="id-range-title">表示するE.G.O.</p><div class="id-range-options">${renderOptions(ego)}</div></div>`,
+        '<div class="id-range-actions"><button type="button" data-action="clear-all-ranges">全解除</button><button type="button" data-action="check-all-ranges">全表示</button></div>'
       ].join('');
+    }
+
+    function setAllRangeFilters(checked) {
+      if (!idRangeFiltersEl) {
+        return;
+      }
+
+      const checkboxes = idRangeFiltersEl.querySelectorAll('input[data-action="toggle-id-range"]');
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = checked;
+      });
+
+      if (state.tierlist && Number.isFinite(state.x)) {
+        renderRows(state.tierlist, state.x);
+      }
     }
 
     function isIdVisibleByRange(id) {
@@ -471,6 +488,21 @@
 
         if (state.tierlist && Number.isFinite(state.x)) {
           renderRows(state.tierlist, state.x);
+        }
+      });
+
+      idRangeFiltersEl.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-action]');
+        if (!button) {
+          return;
+        }
+
+        if (button.dataset.action === 'clear-all-ranges') {
+          setAllRangeFilters(false);
+        }
+
+        if (button.dataset.action === 'check-all-ranges') {
+          setAllRangeFilters(true);
         }
       });
     }
