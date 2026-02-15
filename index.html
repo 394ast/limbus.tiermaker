@@ -11,6 +11,11 @@
       #imgSizeForm input[type="number"] { width: 72px; }
       .sync-mode { margin: 8px 0 12px; }
       .sync-mode label { margin-right: 12px; }
+      .id-range-filters { margin: 8px 0 12px; }
+      .id-range-group { margin-bottom: 8px; }
+      .id-range-title { font-weight: 600; margin: 0 0 4px; }
+      .id-range-options { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+      .id-range-filter { font-size: 12px; white-space: nowrap; }
       table { border-collapse: collapse; width: 100%; max-width: none; margin-bottom: 20px; }
       th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: right; }
       th:first-child, td:first-child { text-align: center; }
@@ -27,22 +32,25 @@
       .tier-e { background-color: #c8d4ee; }
       .tier-except { background-color: #ececec; color: #555; }
       .error { color: #b00020; }
-      .id-items { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+      .id-items { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-start; }
       .id-item { display: flex; align-items: center; gap: 6px; border: 1px solid #ddd; border-radius: 4px; padding: 4px; background: #fff; }
       .id-item img { width: var(--img-size, 56px); height: var(--img-size, 56px); object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
       .id-controls { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
       .id-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
       .id-controls label { font-size: 12px; }
+      .hide-adjust-controls .id-controls { display: none; }
     </style>
 </head>
 <body>
   <h2>みんなでつくる　リンバスTier表</h2>
 
+  <div id="idRangeFilters" class="id-range-filters"></div>
+
   <div class="grid-line">
     <span class="indent">画像サイズ:</span><div id="imgSizeForm">
       <input type="radio" name="imgSize" value="size1">小
-      <input type="radio" name="imgSize" value="size2" checked>中
-      <input type="radio" name="imgSize" value="size3">大
+      <input type="radio" name="imgSize" value="size2">中
+      <input type="radio" name="imgSize" value="size3" checked>大
       <input type="radio" name="imgSize" value="size4">特大<br>
       <input type="radio" name="imgSize" value="custom">カスタム <input type="number" id="customWidth" disabled>px
     </div>
@@ -51,6 +59,14 @@
   <div class="sync-mode">
     <label><input type="radio" name="syncMode" value="before"> 同期前</label>
     <label><input type="radio" name="syncMode" value="after" checked> 同期後</label>
+  </div>
+
+  <div class="sync-mode">
+    <label><input type="checkbox" id="toggleAdjustControls" checked> Tierの移動ボタンを表示</label>
+  </div>
+
+  <div class="sync-mode">
+    <label><input type="checkbox" id="toggleExceptRows" checked> 除外を表示する</label>
   </div>
 
   <p id="status"></p>
@@ -72,6 +88,9 @@
     const syncModeInputs = document.querySelectorAll('input[name="syncMode"]');
     const imgSizeForm = document.getElementById('imgSizeForm');
     const customWidthInput = document.getElementById('customWidth');
+    const toggleAdjustControlsInput = document.getElementById('toggleAdjustControls');
+    const toggleExceptRowsInput = document.getElementById('toggleExceptRows');
+    const idRangeFiltersEl = document.getElementById('idRangeFilters');
 
     const state = {
       tierlist: null,
@@ -184,10 +203,10 @@
     }
 
     function renderControlButtons(id, groupValue, isExcept, type) {
-      const exceptChecked = getExceptSet(type).has(id) ? 'checked' : '';
+      const includeChecked = getExceptSet(type).has(id) ? '' : 'checked';
 
       if (isExcept) {
-        return `<label><input type="checkbox" data-action="toggle-except" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${exceptChecked}> </label>`;
+        return `<label><input type="checkbox" data-action="toggle-except" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${includeChecked}> </label>`;
       }
 
       const disablePlus2 = groupValue >= 8;
@@ -198,7 +217,7 @@
       return [
         `<button type="button" data-action="move" data-delta="2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus2 ? 'disabled' : ''}>+2</button>`,
         `<button type="button" data-action="move" data-delta="1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus1 ? 'disabled' : ''}>+1</button>`,
-        `<label><input type="checkbox" data-action="toggle-except" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${exceptChecked}> </label>`,
+        `<label><input type="checkbox" data-action="toggle-except" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${includeChecked}> </label>`,
         `<button type="button" data-action="move" data-delta="-1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus1 ? 'disabled' : ''}>-1</button>`,
         `<button type="button" data-action="move" data-delta="-2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus2 ? 'disabled' : ''}> -2</button>`
       ].join('');
@@ -251,6 +270,53 @@
       return '';
     }
 
+    function getIdRangeFilters() {
+      const displayNames = [
+        'イサン', 'ファウスト', 'ドンキホーテ', '良秀', 'ムルソー', 'ホンル',
+        'ヒースクリフ', 'イシュメール', 'ロージャ', 'シンクレア', 'ウーティス', 'グレゴール'
+      ];
+
+      const identity = displayNames.map((name, i) => ({ bucket: i + 1, name }));
+      const ego = displayNames.map((name, i) => ({ bucket: i + 13, name }));
+
+      return { identity, ego };
+    }
+
+    function renderIdRangeFilters() {
+      if (!idRangeFiltersEl) {
+        return;
+      }
+
+      const { identity, ego } = getIdRangeFilters();
+
+      const renderOptions = (items) => items.map(({ bucket, name }) => {
+        return `<label class="id-range-filter"><input type="checkbox" data-action="toggle-id-range" data-bucket="${bucket}" checked> ${name}</label>`;
+      }).join('');
+
+      idRangeFiltersEl.innerHTML = [
+        `<div class="id-range-group"><p class="id-range-title">表示する人格</p><div class="id-range-options">${renderOptions(identity)}</div></div>`,
+        `<div class="id-range-group"><p class="id-range-title">表示するE.G.O.</p><div class="id-range-options">${renderOptions(ego)}</div></div>`
+      ].join('');
+    }
+
+    function isIdVisibleByRange(id) {
+      if (!idRangeFiltersEl) {
+        return true;
+      }
+
+      const bucket = Math.floor(id / 1000);
+      if (bucket < 1 || bucket > 24) {
+        return true;
+      }
+
+      const checkbox = idRangeFiltersEl.querySelector(`input[data-action="toggle-id-range"][data-bucket="${bucket}"]`);
+      return !checkbox || checkbox.checked;
+    }
+
+    function shouldShowExceptRows() {
+      return !toggleExceptRowsInput || toggleExceptRowsInput.checked;
+    }
+
     function renderRows(tierlist, x) {
       const identityRows = tierlist.filter((row) => row[0] < 13001);
       const egoRows = tierlist.filter((row) => row[0] >= 13001);
@@ -261,16 +327,24 @@
       applyManualAndExceptOverrides(identityData.grouped, identityData.idToGroup, 'identity');
       applyManualAndExceptOverrides(egoData.grouped, egoData.idToGroup, 'ego');
 
-      bodyIdentityEl.innerHTML = Array.from(identityData.grouped.entries()).map(([groupValue, ids]) => {
+      const showExceptRows = shouldShowExceptRows();
+
+      bodyIdentityEl.innerHTML = Array.from(identityData.grouped.entries())
+        .filter(([groupValue]) => showExceptRows || groupValue !== 0)
+        .map(([groupValue, ids]) => {
+        const visibleIds = ids.filter((id) => isIdVisibleByRange(id));
         const label = getGroupLabel(groupValue);
         const tierClass = getGroupClass(groupValue);
-        return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(ids, groupValue, 'identity')}</td></tr>`;
+        return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(visibleIds, groupValue, 'identity')}</td></tr>`;
       }).join('');
 
-      bodyEgoEl.innerHTML = Array.from(egoData.grouped.entries()).map(([groupValue, ids]) => {
+      bodyEgoEl.innerHTML = Array.from(egoData.grouped.entries())
+        .filter(([groupValue]) => showExceptRows || groupValue !== 0)
+        .map(([groupValue, ids]) => {
+        const visibleIds = ids.filter((id) => isIdVisibleByRange(id));
         const label = getGroupLabel(groupValue);
         const tierClass = getGroupClass(groupValue);
-        return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(ids, groupValue, 'ego')}</td></tr>`;
+        return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(visibleIds, groupValue, 'ego')}</td></tr>`;
       }).join('');
     }
 
@@ -301,18 +375,18 @@
       const exceptIds = getExceptSet(type);
 
       if (checked) {
-        if (currentGroup > 0) {
-          state.exceptRestoreGroupById.set(id, currentGroup);
-        }
-
-        exceptIds.add(id);
-      } else {
         exceptIds.delete(id);
 
         const restoreGroup = state.exceptRestoreGroupById.get(id);
         if (Number.isInteger(restoreGroup) && restoreGroup >= 1 && restoreGroup <= 9) {
           state.manualGroupById.set(id, restoreGroup);
         }
+      } else {
+        if (currentGroup > 0) {
+          state.exceptRestoreGroupById.set(id, currentGroup);
+        }
+
+        exceptIds.add(id);
       }
 
       if (state.tierlist && Number.isFinite(state.x)) {
@@ -366,6 +440,41 @@
     bodyIdentityEl.addEventListener('change', onControlChange);
     bodyEgoEl.addEventListener('change', onControlChange);
 
+    function applyAdjustControlVisibility(show) {
+      document.body.classList.toggle('hide-adjust-controls', !show);
+    }
+
+    if (toggleAdjustControlsInput) {
+      toggleAdjustControlsInput.addEventListener('change', () => {
+        applyAdjustControlVisibility(toggleAdjustControlsInput.checked);
+      });
+
+      applyAdjustControlVisibility(toggleAdjustControlsInput.checked);
+    }
+
+    if (toggleExceptRowsInput) {
+      toggleExceptRowsInput.addEventListener('change', () => {
+        if (state.tierlist && Number.isFinite(state.x)) {
+          renderRows(state.tierlist, state.x);
+        }
+      });
+    }
+
+    renderIdRangeFilters();
+
+    if (idRangeFiltersEl) {
+      idRangeFiltersEl.addEventListener('change', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLInputElement) || target.dataset.action !== 'toggle-id-range') {
+          return;
+        }
+
+        if (state.tierlist && Number.isFinite(state.x)) {
+          renderRows(state.tierlist, state.x);
+        }
+      });
+    }
+
     function applyCustomSize(width) {
       document.documentElement.style.setProperty('--img-size', `${width}px`);
     }
@@ -412,7 +521,7 @@
       setTimeout(() => applyCustomSize(customWidth), 100);
     });
 
-    applyCustomSize(80);
+    applyCustomSize(120);
 
     const DEFAULT_T = 0;
     const DEFAULT_X = 1;
