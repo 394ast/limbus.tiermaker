@@ -47,8 +47,8 @@
     </thead>
     <tbody id="resultBodyEgo"></tbody>
   </table>
-
-  <script>
+    
+<script>
     const statusEl = document.getElementById('status');
     const bodyIdentityEl = document.getElementById('resultBodyIdentity');
     const bodyEgoEl = document.getElementById('resultBodyEgo');
@@ -66,6 +66,10 @@
     function buildGroupedRows(rows, x) {
       const grouped = new Map();
 
+      for (let group = 9; group >= 0; group -= 1) {
+        grouped.set(group, []);
+      }
+
       rows.forEach((row) => {
         const value = calcValue(row, x);
 
@@ -78,13 +82,15 @@
         }
 
         const rounded = Math.round(value);
-        const ids = grouped.get(rounded) ?? [];
-        ids.push(row[0]);
-        grouped.set(rounded, ids);
+
+        if (!grouped.has(rounded)) {
+          throw new Error(`ID ${row[0]} の丸め後グループが範囲外です: ${rounded}`);
+        }
+
+        grouped.get(rounded).push(row[0]);
       });
 
-      return Array.from(grouped.entries())
-        .sort((a, b) => b[0] - a[0]);
+      return Array.from(grouped.entries());
     }
 
     function getIdentityImageUrl(id) {
