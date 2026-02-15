@@ -8,12 +8,16 @@
       body { font-family: sans-serif; margin: 24px; }
       .sync-mode { margin: 8px 0 12px; }
       .sync-mode label { margin-right: 12px; }
-      .id-images { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
-      .id-images img { width: 56px; height: 56px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
-      table { border-collapse: collapse; width: 100%; max-width: 760px; margin-bottom: 20px; }
+      table { border-collapse: collapse; width: 100%; max-width: 980px; margin-bottom: 20px; }
       th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: right; }
       th:first-child, td:first-child { text-align: left; }
       .error { color: #b00020; }
+      .id-items { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+      .id-item { display: flex; align-items: center; gap: 6px; border: 1px solid #ddd; border-radius: 4px; padding: 4px; background: #fff; }
+      .id-item img { width: 56px; height: 56px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
+      .id-controls { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+      .id-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
+      .id-controls label { font-size: 12px; }
     </style>
 </head>
 <body>
@@ -48,7 +52,7 @@
     <tbody id="resultBodyEgo"></tbody>
   </table>
 
-    <script>
+  <script>
     const statusEl = document.getElementById('status');
     const bodyIdentityEl = document.getElementById('resultBodyIdentity');
     const bodyEgoEl = document.getElementById('resultBodyEgo');
@@ -57,8 +61,10 @@
     const state = {
       tierlist: null,
       x: null,
+      manualGroupById: new Map(),
       exceptIdentityIds: new Set(),
       exceptEgoIds: new Set(),
+      exceptRestoreGroupById: new Map(),
     };
 
     function calcValue(row, x) {
@@ -67,72 +73,85 @@
       return denominator === 0 ? NaN : numerator / denominator;
     }
 
-    function buildGroupedRows(rows, x) {
+    function belongsToType(id, type) {
+      return type === 'identity' ? id < 13001 : id >= 13001;
+    }
+
+    function getExceptSet(type) {
+      return type === 'identity' ? state.exceptIdentityIds : state.exceptEgoIds;
+    }
+
+    function buildGroupedData(rows, x) {
       const grouped = new Map();
+      const idToGroup = new Map();
 
       for (let group = 9; group >= 0; group -= 1) {
         grouped.set(group, []);
       }
 
       rows.forEach((row) => {
+        const id = row[0];
         const value = calcValue(row, x);
 
         if (!Number.isFinite(value)) {
-          throw new Error(`ID ${row[0]} の計算結果が不正です。`);
+          throw new Error(`ID ${id} の計算結果が不正です。`);
         }
 
         if (value < 1 || value > 9) {
-          throw new Error(`ID ${row[0]} の計算結果が範囲外です: ${value}（1以上9以下である必要があります）`);
+          throw new Error(`ID ${id} の計算結果が範囲外です: ${value}（1以上9以下である必要があります）`);
         }
 
         const rounded = Math.round(value);
 
         if (!grouped.has(rounded)) {
-          throw new Error(`ID ${row[0]} の丸め後グループが範囲外です: ${rounded}`);
+          throw new Error(`ID ${id} の丸め後グループが範囲外です: ${rounded}`);
         }
 
-        grouped.get(rounded).push(row[0]);
+        grouped.get(rounded).push(id);
+        idToGroup.set(id, rounded);
       });
 
-      return Array.from(grouped.entries());
+      return { grouped, idToGroup };
     }
 
-    function applyExceptOverrides(groupedRows, exceptIds) {
-      const grouped = new Map(groupedRows.map(([groupValue, ids]) => [groupValue, [...ids]]));
+    function moveIdBetweenGroups(grouped, idToGroup, id, targetGroup) {
+      const fromGroup = idToGroup.get(id);
 
-      if (!grouped.has(0)) {
-        grouped.set(0, []);
+      if (!Number.isInteger(fromGroup) || !grouped.has(fromGroup) || !grouped.has(targetGroup)) {
+        return;
       }
 
-      for (let group = 1; group <= 9; group += 1) {
-        const ids = grouped.get(group) ?? [];
-        grouped.set(group, ids.filter((id) => !exceptIds.has(id)));
+      if (fromGroup === targetGroup) {
+        return;
       }
 
-      const exceptFromRows = grouped.get(0) ?? [];
-      const mergedExcept = new Set(exceptFromRows);
-      exceptIds.forEach((id) => mergedExcept.add(id));
-      grouped.set(0, Array.from(mergedExcept));
-
-      return Array.from(grouped.entries());
+      grouped.set(fromGroup, grouped.get(fromGroup).filter((currentId) => currentId !== id));
+      grouped.get(targetGroup).push(id);
+      idToGroup.set(id, targetGroup);
     }
 
-    function moveIdToExcept(id) {
-      if (!Number.isInteger(id)) {
-        throw new Error(`except へ移動するIDが不正です: ${id}`);
-      }
+    function applyManualAndExceptOverrides(grouped, idToGroup, type) {
+      state.manualGroupById.forEach((targetGroup, id) => {
+        if (!belongsToType(id, type)) {
+          return;
+        }
 
-      if (id < 13001) {
-        state.exceptIdentityIds.add(id);
-      } else {
-        state.exceptEgoIds.add(id);
-      }
+        if (!idToGroup.has(id) || targetGroup < 1 || targetGroup > 9) {
+          return;
+        }
 
-      if (state.tierlist && Number.isFinite(state.x)) {
-        renderRows(state.tierlist, state.x);
-      }
+        moveIdBetweenGroups(grouped, idToGroup, id, targetGroup);
+      });
+
+      const exceptIds = getExceptSet(type);
+      exceptIds.forEach((id) => {
+        if (!idToGroup.has(id)) {
+          return;
+        }
+
+        moveIdBetweenGroups(grouped, idToGroup, id, 0);
+      });
     }
-
 
     function getIdentityImageUrl(id) {
       const checked = document.querySelector('input[name="syncMode"]:checked');
@@ -149,32 +168,158 @@
       return `https://raw.githubusercontent.com/394ast/limbus.sharetool/main/EGO/${id}.jpg`;
     }
 
-    function renderImageCells(ids, type) {
-      const images = ids.map((id) => {
+    function renderControlButtons(id, groupValue, isExcept, type) {
+      const exceptChecked = getExceptSet(type).has(id) ? 'checked' : '';
+
+      if (isExcept) {
+        return `<label><input type="checkbox" data-action="toggle-except" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${exceptChecked}> except</label>`;
+      }
+
+      const disablePlus2 = groupValue >= 8;
+      const disablePlus1 = groupValue >= 8;
+      const disableMinus1 = groupValue <= 2;
+      const disableMinus2 = groupValue <= 2;
+
+      return [
+        `<button type="button" data-action="move" data-delta="2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus2 ? 'disabled' : ''}>group +2</button>`,
+        `<button type="button" data-action="move" data-delta="1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus1 ? 'disabled' : ''}>group +1</button>`,
+        `<label><input type="checkbox" data-action="toggle-except" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${exceptChecked}> except</label>`,
+        `<button type="button" data-action="move" data-delta="-1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus1 ? 'disabled' : ''}>group -1</button>`,
+        `<button type="button" data-action="move" data-delta="-2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus2 ? 'disabled' : ''}>group -2</button>`
+      ].join('');
+    }
+
+    function renderImageCells(ids, groupValue, type) {
+      const isExcept = groupValue === 0;
+
+      const items = ids.map((id) => {
         const src = type === 'identity' ? getIdentityImageUrl(id) : getEgoImageUrl(id);
-        return `<img src="${src}" alt="${id}" loading="lazy">`;
+
+        return `
+          <div class="id-item">
+            <img src="${src}" alt="${id}" loading="lazy">
+            <div class="id-controls">
+              ${renderControlButtons(id, groupValue, isExcept, type)}
+            </div>
+          </div>
+        `;
       }).join('');
 
-      return `<div class="id-images">${images}</div>`;
+      return `<div class="id-items">${items}</div>`;
     }
 
     function renderRows(tierlist, x) {
       const identityRows = tierlist.filter((row) => row[0] < 13001);
       const egoRows = tierlist.filter((row) => row[0] >= 13001);
 
-      const identityGroupedRows = applyExceptOverrides(buildGroupedRows(identityRows, x), state.exceptIdentityIds);
-      const egoGroupedRows = applyExceptOverrides(buildGroupedRows(egoRows, x), state.exceptEgoIds);
+      const identityData = buildGroupedData(identityRows, x);
+      const egoData = buildGroupedData(egoRows, x);
 
-      bodyIdentityEl.innerHTML = identityGroupedRows.map(([groupValue, ids]) => {
+      applyManualAndExceptOverrides(identityData.grouped, identityData.idToGroup, 'identity');
+      applyManualAndExceptOverrides(egoData.grouped, egoData.idToGroup, 'ego');
+
+      bodyIdentityEl.innerHTML = Array.from(identityData.grouped.entries()).map(([groupValue, ids]) => {
         const label = groupValue === 0 ? 'except' : groupValue;
-        return `<tr><td>${label}</td><td>${renderImageCells(ids, 'identity')}</td></tr>`;
+        return `<tr><td>${label}</td><td>${renderImageCells(ids, groupValue, 'identity')}</td></tr>`;
       }).join('');
 
-      bodyEgoEl.innerHTML = egoGroupedRows.map(([groupValue, ids]) => {
+      bodyEgoEl.innerHTML = Array.from(egoData.grouped.entries()).map(([groupValue, ids]) => {
         const label = groupValue === 0 ? 'except' : groupValue;
-        return `<tr><td>${label}</td><td>${renderImageCells(ids, 'ego')}</td></tr>`;
+        return `<tr><td>${label}</td><td>${renderImageCells(ids, groupValue, 'ego')}</td></tr>`;
       }).join('');
     }
+
+    function handleMove(id, type, currentGroup, delta) {
+      if (!Number.isInteger(id) || !Number.isInteger(currentGroup) || !Number.isInteger(delta)) {
+        return;
+      }
+
+      const target = currentGroup + delta;
+      if (target < 1 || target > 9) {
+        return;
+      }
+
+      getExceptSet(type).delete(id);
+      state.exceptRestoreGroupById.delete(id);
+      state.manualGroupById.set(id, target);
+
+      if (state.tierlist && Number.isFinite(state.x)) {
+        renderRows(state.tierlist, state.x);
+      }
+    }
+
+    function handleExceptToggle(id, type, currentGroup, checked) {
+      if (!Number.isInteger(id) || !Number.isInteger(currentGroup)) {
+        return;
+      }
+
+      const exceptIds = getExceptSet(type);
+
+      if (checked) {
+        if (currentGroup > 0) {
+          state.exceptRestoreGroupById.set(id, currentGroup);
+        }
+
+        exceptIds.add(id);
+      } else {
+        exceptIds.delete(id);
+
+        const restoreGroup = state.exceptRestoreGroupById.get(id);
+        if (Number.isInteger(restoreGroup) && restoreGroup >= 1 && restoreGroup <= 9) {
+          state.manualGroupById.set(id, restoreGroup);
+        }
+      }
+
+      if (state.tierlist && Number.isFinite(state.x)) {
+        renderRows(state.tierlist, state.x);
+      }
+    }
+
+    function parseControlPayload(el) {
+      const id = Number.parseInt(el.dataset.id ?? '', 10);
+      const type = el.dataset.type;
+      const group = Number.parseInt(el.dataset.group ?? '', 10);
+
+      if (!Number.isInteger(id) || !Number.isInteger(group) || (type !== 'identity' && type !== 'ego')) {
+        return null;
+      }
+
+      return { id, type, group };
+    }
+
+    function onControlClick(event) {
+      const moveButton = event.target.closest('button[data-action="move"]');
+      if (!moveButton) {
+        return;
+      }
+
+      const payload = parseControlPayload(moveButton);
+      if (!payload) {
+        return;
+      }
+
+      const delta = Number.parseInt(moveButton.dataset.delta ?? '', 10);
+      handleMove(payload.id, payload.type, payload.group, delta);
+    }
+
+    function onControlChange(event) {
+      const exceptCheckbox = event.target.closest('input[data-action="toggle-except"]');
+      if (!exceptCheckbox) {
+        return;
+      }
+
+      const payload = parseControlPayload(exceptCheckbox);
+      if (!payload) {
+        return;
+      }
+
+      handleExceptToggle(payload.id, payload.type, payload.group, exceptCheckbox.checked);
+    }
+
+    bodyIdentityEl.addEventListener('click', onControlClick);
+    bodyEgoEl.addEventListener('click', onControlClick);
+    bodyIdentityEl.addEventListener('change', onControlChange);
+    bodyEgoEl.addEventListener('change', onControlChange);
 
     const DEFAULT_X = 1;
 
@@ -201,12 +346,7 @@
         statusEl.className = 'error';
         return;
       }
-
-      try {
-        const response = await fetch(`./data/table${tableIndex}.json`);
-        if (!response.ok) {
-          throw new Error(`table${tableIndex} の取得に失敗しました: ${response.status}`);
-        }
+@@ -210,31 +355,29 @@
 
         const tierlist = await response.json();
         state.tierlist = tierlist;
@@ -231,8 +371,6 @@
         }
       });
     });
-
-    window.moveIdToExcept = moveIdToExcept;
 
     loadAndRender();
   </script>
