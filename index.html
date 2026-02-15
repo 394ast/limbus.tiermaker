@@ -320,7 +320,8 @@
     bodyEgoEl.addEventListener('click', onControlClick);
     bodyIdentityEl.addEventListener('change', onControlChange);
     bodyEgoEl.addEventListener('change', onControlChange);
-
+    
+    const DEFAULT_T = 0;
     const DEFAULT_X = 1;
 
     function getQuerySettings() {
@@ -328,11 +329,11 @@
       const tableParam = params.get('T');
       const xParam = params.get('X');
 
-      const tableIndex = Number.parseInt(tableParam ?? '0', 10);
+      const tableIndex = Number.parseInt(tableParam ?? String(DEFAULT_T), 10);
       const xValue = xParam !== null ? Number(xParam) : DEFAULT_X;
 
       return {
-        tableIndex: Number.isInteger(tableIndex) && tableIndex >= 0 ? tableIndex : 0,
+        tableIndex: Number.isInteger(tableIndex) && tableIndex >= 0 ? tableIndex : DEFAULT_T,
         xValue,
       };
     }
