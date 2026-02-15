@@ -6,6 +6,8 @@
     <title>みんなでつくる　リンバスTier表</title>
     <style>
       body { font-family: sans-serif; margin: 24px; }
+      .sync-mode { margin: 8px 0 12px; }
+      .sync-mode label { margin-right: 12px; }
       table { border-collapse: collapse; width: 100%; max-width: 760px; margin-bottom: 20px; }
       th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: right; }
       th:first-child, td:first-child { text-align: left; }
@@ -14,6 +16,11 @@
 </head>
 <body>
   <h2>みんなでつくる　リンバスTier表</h2>
+
+  <div class="sync-mode">
+    <label><input type="radio" name="syncMode" value="before" > 同期前</label>
+    <label><input type="radio" name="syncMode" value="after" checked> 同期後</label>
+  </div>
 
   <p id="status"></p>
 
