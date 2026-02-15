@@ -11,7 +11,10 @@
       #imgSizeForm input[type="number"] { width: 72px; }
       .sync-mode { margin: 8px 0 12px; }
       .sync-mode label { margin-right: 12px; }
-      .id-range-filters { margin: 8px 0 12px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px 8px; }
+      .id-range-filters { margin: 8px 0 12px; }
+      .id-range-group { margin-bottom: 8px; }
+      .id-range-title { font-weight: 600; margin: 0 0 4px; }
+      .id-range-options { display: flex; flex-wrap: wrap; gap: 4px 12px; }
       .id-range-filter { font-size: 12px; white-space: nowrap; }
       table { border-collapse: collapse; width: 100%; max-width: none; margin-bottom: 20px; }
       th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: right; }
@@ -270,15 +273,13 @@
     function getIdRangeFilters() {
       const displayNames = [
         'イサン', 'ファウスト', 'ドンキホーテ', '良秀', 'ムルソー', 'ホンル',
-        'ヒースクリフ', 'イシュメール', 'ロージャ', 'シンクレア', 'ウーティス', 'グレゴール',
-        'イサン', 'ファウスト', 'ドンキホーテ', '良秀', 'ムルソー', 'ホンル',
         'ヒースクリフ', 'イシュメール', 'ロージャ', 'シンクレア', 'ウーティス', 'グレゴール'
       ];
 
-      return Array.from({ length: 24 }, (_, i) => {
-        const bucket = i + 1;
-        return { bucket, name: displayNames[i] };
-      });
+      const identity = displayNames.map((name, i) => ({ bucket: i + 1, name }));
+      const ego = displayNames.map((name, i) => ({ bucket: i + 13, name }));
+
+      return { identity, ego };
     }
 
     function renderIdRangeFilters() {
@@ -286,9 +287,16 @@
         return;
       }
 
-      idRangeFiltersEl.innerHTML = getIdRangeFilters().map(({ bucket, name }) => {
+      const { identity, ego } = getIdRangeFilters();
+
+      const renderOptions = (items) => items.map(({ bucket, name }) => {
         return `<label class="id-range-filter"><input type="checkbox" data-action="toggle-id-range" data-bucket="${bucket}" checked> ${name}</label>`;
       }).join('');
+
+      idRangeFiltersEl.innerHTML = [
+        `<div class="id-range-group"><p class="id-range-title">表示する人格</p><div class="id-range-options">${renderOptions(identity)}</div></div>`,
+        `<div class="id-range-group"><p class="id-range-title">表示するE.G.O.</p><div class="id-range-options">${renderOptions(ego)}</div></div>`
+      ].join('');
     }
 
     function isIdVisibleByRange(id) {
