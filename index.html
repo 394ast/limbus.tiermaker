@@ -6,8 +6,6 @@
     <title>みんなでつくる　リンバスTier表</title>
     <style>
       body { font-family: sans-serif; margin: 24px; }
-      .controls { margin-bottom: 12px; }
-      input[type="number"] { width: 90px; }
       table { border-collapse: collapse; width: 100%; max-width: 760px; margin-bottom: 20px; }
       th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: right; }
       th:first-child, td:first-child { text-align: left; }
@@ -16,12 +14,6 @@
 </head>
 <body>
   <h2>みんなでつくる　リンバスTier表</h2>
-
-  <div class="controls">
-    <label for="xInput">x:</label>
-    <input id="xInput" type="number" value="1" step="0.1">
-    <button id="reloadButton" type="button">再計算</button>
-  </div>
 
   <p id="status"></p>
 
@@ -51,8 +43,6 @@
     const statusEl = document.getElementById('status');
     const bodyLowEl = document.getElementById('resultBodyLow');
     const bodyHighEl = document.getElementById('resultBodyHigh');
-    const xInput = document.getElementById('xInput');
-    const reloadButton = document.getElementById('reloadButton');
 
     function calcValue(row, x) {
       const numerator = row[1] + 0.01 * x * row[3];
@@ -100,13 +90,15 @@
       }).join('');
     }
 
+    const DEFAULT_X = 1;
+
     function getQuerySettings() {
       const params = new URLSearchParams(window.location.search);
       const tableParam = params.get('T');
-      const xParam = params.get('X') ?? params.get('?X');
+      const xParam = params.get('X');
 
       const tableIndex = Number.parseInt(tableParam ?? '0', 10);
-      const xValue = xParam !== null ? Number(xParam) : null;
+      const xValue = xParam !== null ? Number(xParam) : DEFAULT_X;
 
       return {
         tableIndex: Number.isInteger(tableIndex) && tableIndex >= 0 ? tableIndex : 0,
@@ -115,11 +107,11 @@
     }
 
     async function loadAndRender() {
-      const { tableIndex } = getQuerySettings();
-      const x = Number(xInput.value);
+      const { tableIndex, xValue } = getQuerySettings();
+      const x = xValue;
 
       if (!Number.isFinite(x)) {
-        statusEl.textContent = 'x には数値を入力してください。';
+        statusEl.textContent = 'URLクエリ X は数値で指定してください。例: ?T=0&X=1';
         statusEl.className = 'error';
         return;
       }
@@ -133,7 +125,7 @@
         const tierlist = await response.json();
         renderRows(tierlist, x);
 
-        statusEl.textContent = `読み込み完了（table${tableIndex} / 件数: ${tierlist.length}）`;
+        statusEl.textContent = `読み込み完了（table${tableIndex} / 件数: ${tierlist.length} / X: ${x}）`;
         statusEl.className = '';
 
       } catch (err) {
@@ -142,19 +134,6 @@
         bodyLowEl.innerHTML = '';
         bodyHighEl.innerHTML = '';
       }
-    }
-
-    reloadButton.addEventListener('click', loadAndRender);
-
-    xInput.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        loadAndRender();
-      }
-    });
-
-    const { xValue } = getQuerySettings();
-    if (Number.isFinite(xValue)) {
-      xInput.value = String(xValue);
     }
 
     loadAndRender();
