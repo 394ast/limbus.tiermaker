@@ -8,7 +8,7 @@
       body { font-family: sans-serif; margin: 24px; }
       .controls { margin-bottom: 12px; }
       input[type="number"] { width: 90px; }
-      table { border-collapse: collapse; width: 100%; max-width: 760px; }
+      table { border-collapse: collapse; width: 100%; max-width: 760px; margin-bottom: 20px; }
       th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: right; }
       th:first-child, td:first-child { text-align: left; }
       .error { color: #b00020; }
@@ -25,6 +25,7 @@
 
   <p id="status"></p>
 
+  <h3>ID 13001 未満</h3>
   <table>
     <thead>
       <tr>
@@ -32,12 +33,24 @@
         <th>ID一覧</th>
       </tr>
     </thead>
-    <tbody id="resultBody"></tbody>
+    <tbody id="resultBodyLow"></tbody>
+  </table>
+
+  <h3>ID 13001 以上</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>グループ（四捨五入）</th>
+        <th>ID一覧</th>
+      </tr>
+    </thead>
+    <tbody id="resultBodyHigh"></tbody>
   </table>
 
   <script>
     const statusEl = document.getElementById('status');
-    const bodyEl = document.getElementById('resultBody');
+    const bodyLowEl = document.getElementById('resultBodyLow');
+    const bodyHighEl = document.getElementById('resultBodyHigh');
     const xInput = document.getElementById('xInput');
     const reloadButton = document.getElementById('reloadButton');
 
@@ -47,10 +60,10 @@
       return denominator === 0 ? NaN : numerator / denominator;
     }
 
-    function renderRows(tierlist, x) {
+    function buildGroupedRows(rows, x) {
       const grouped = new Map();
 
-      tierlist.forEach((row) => {
+      rows.forEach((row) => {
         const value = calcValue(row, x);
 
         if (!Number.isFinite(value)) {
@@ -67,10 +80,22 @@
         grouped.set(rounded, ids);
       });
 
-      const groupRows = Array.from(grouped.entries())
+      return Array.from(grouped.entries())
         .sort((a, b) => b[0] - a[0]);
+    }
 
-      bodyEl.innerHTML = groupRows.map(([groupValue, ids]) => {
+    function renderRows(tierlist, x) {
+      const lowerRows = tierlist.filter((row) => row[0] < 13001);
+      const higherRows = tierlist.filter((row) => row[0] >= 13001);
+
+      const lowerGroupedRows = buildGroupedRows(lowerRows, x);
+      const higherGroupedRows = buildGroupedRows(higherRows, x);
+
+      bodyLowEl.innerHTML = lowerGroupedRows.map(([groupValue, ids]) => {
+        return `<tr><td>${groupValue}</td><td>${ids.join(', ')}</td></tr>`;
+      }).join('');
+
+      bodyHighEl.innerHTML = higherGroupedRows.map(([groupValue, ids]) => {
         return `<tr><td>${groupValue}</td><td>${ids.join(', ')}</td></tr>`;
       }).join('');
     }
@@ -114,7 +139,8 @@
       } catch (err) {
         statusEl.textContent = `エラー: ${err.message}`;
         statusEl.className = 'error';
-        bodyEl.innerHTML = '';
+        bodyLowEl.innerHTML = '';
+        bodyHighEl.innerHTML = '';
       }
     }
 
