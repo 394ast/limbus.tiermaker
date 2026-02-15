@@ -27,12 +27,13 @@
       .tier-e { background-color: #c8d4ee; }
       .tier-except { background-color: #ececec; color: #555; }
       .error { color: #b00020; }
-      .id-items { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; }
+      .id-items { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-start; }
       .id-item { display: flex; align-items: center; gap: 6px; border: 1px solid #ddd; border-radius: 4px; padding: 4px; background: #fff; }
       .id-item img { width: var(--img-size, 56px); height: var(--img-size, 56px); object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
       .id-controls { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
       .id-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
       .id-controls label { font-size: 12px; }
+      .hide-adjust-controls .id-controls { display: none; }
     </style>
 </head>
 <body>
@@ -51,6 +52,10 @@
   <div class="sync-mode">
     <label><input type="radio" name="syncMode" value="before"> 同期前</label>
     <label><input type="radio" name="syncMode" value="after" checked> 同期後</label>
+  </div>
+
+  <div class="sync-mode">
+    <label><input type="checkbox" id="toggleAdjustControls" checked> Tierの移動ボタンを表示</label>
   </div>
 
   <p id="status"></p>
@@ -72,6 +77,7 @@
     const syncModeInputs = document.querySelectorAll('input[name="syncMode"]');
     const imgSizeForm = document.getElementById('imgSizeForm');
     const customWidthInput = document.getElementById('customWidth');
+    const toggleAdjustControlsInput = document.getElementById('toggleAdjustControls');
 
     const state = {
       tierlist: null,
@@ -365,6 +371,18 @@
     bodyEgoEl.addEventListener('click', onControlClick);
     bodyIdentityEl.addEventListener('change', onControlChange);
     bodyEgoEl.addEventListener('change', onControlChange);
+
+    function applyAdjustControlVisibility(show) {
+      document.body.classList.toggle('hide-adjust-controls', !show);
+    }
+
+    if (toggleAdjustControlsInput) {
+      toggleAdjustControlsInput.addEventListener('change', () => {
+        applyAdjustControlVisibility(toggleAdjustControlsInput.checked);
+      });
+
+      applyAdjustControlVisibility(toggleAdjustControlsInput.checked);
+    }
 
     function applyCustomSize(width) {
       document.documentElement.style.setProperty('--img-size', `${width}px`);
