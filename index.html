@@ -6,6 +6,9 @@
     <title>みんなでつくる　リンバスTier表</title>
     <style>
       body { font-family: sans-serif; margin: 24px; }
+      .grid-line { margin: 8px 0 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+      .indent { font-weight: 600; }
+      #imgSizeForm input[type="number"] { width: 72px; }
       .sync-mode { margin: 8px 0 12px; }
       .sync-mode label { margin-right: 12px; }
       table { border-collapse: collapse; width: 100%; max-width: 980px; margin-bottom: 20px; }
@@ -14,8 +17,8 @@
       .error { color: #b00020; }
       .id-items { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
       .id-item { display: flex; align-items: center; gap: 6px; border: 1px solid #ddd; border-radius: 4px; padding: 4px; background: #fff; }
-      .id-item img { width: 56px; height: 56px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
-      .id-controls { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+      .id-item img { width: var(--img-size, 56px); height: var(--img-size, 56px); object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
+      .id-controls { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
       .id-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
       .id-controls label { font-size: 12px; }
     </style>
@@ -23,32 +26,30 @@
 <body>
   <h2>みんなでつくる　リンバスTier表</h2>
 
+  <div class="grid-line">
+    <span class="indent">画像サイズ:</span><div id="imgSizeForm">
+      <input type="radio" name="imgSize" value="size1">小
+      <input type="radio" name="imgSize" value="size2" checked>中
+      <input type="radio" name="imgSize" value="size3">大
+      <input type="radio" name="imgSize" value="size4">特大<br>
+      <input type="radio" name="imgSize" value="custom">カスタム <input type="number" id="customWidth" disabled>px
+    </div>
+  </div>
+
   <div class="sync-mode">
-    <label><input type="radio" name="syncMode" value="before" checked> 同期前</label>
-    <label><input type="radio" name="syncMode" value="after"> 同期後</label>
+    <label><input type="radio" name="syncMode" value="before"> 同期前</label>
+    <label><input type="radio" name="syncMode" value="after" checked> 同期後</label>
   </div>
 
   <p id="status"></p>
 
   <h3>Identity</h3>
   <table>
-    <thead>
-      <tr>
-        <th>グループ（四捨五入）</th>
-        <th>画像</th>
-      </tr>
-    </thead>
     <tbody id="resultBodyIdentity"></tbody>
   </table>
 
   <h3>EGO</h3>
   <table>
-    <thead>
-      <tr>
-        <th>グループ（四捨五入）</th>
-        <th>画像</th>
-      </tr>
-    </thead>
     <tbody id="resultBodyEgo"></tbody>
   </table>
 
@@ -57,6 +58,8 @@
     const bodyIdentityEl = document.getElementById('resultBodyIdentity');
     const bodyEgoEl = document.getElementById('resultBodyEgo');
     const syncModeInputs = document.querySelectorAll('input[name="syncMode"]');
+    const imgSizeForm = document.getElementById('imgSizeForm');
+    const customWidthInput = document.getElementById('customWidth');
 
     const state = {
       tierlist: null,
@@ -172,20 +175,20 @@
       const exceptChecked = getExceptSet(type).has(id) ? 'checked' : '';
 
       if (isExcept) {
-        return `<label><input type="checkbox" data-action="toggle-except" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${exceptChecked}> except</label>`;
+        return `<label><input type="checkbox" data-action="toggle-except" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${exceptChecked}> </label>`;
       }
 
       const disablePlus2 = groupValue >= 8;
-      const disablePlus1 = groupValue >= 8;
-      const disableMinus1 = groupValue <= 2;
+      const disablePlus1 = groupValue >= 9;
+      const disableMinus1 = groupValue <= 1;
       const disableMinus2 = groupValue <= 2;
 
       return [
-        `<button type="button" data-action="move" data-delta="2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus2 ? 'disabled' : ''}>group +2</button>`,
-        `<button type="button" data-action="move" data-delta="1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus1 ? 'disabled' : ''}>group +1</button>`,
-        `<label><input type="checkbox" data-action="toggle-except" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${exceptChecked}> except</label>`,
-        `<button type="button" data-action="move" data-delta="-1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus1 ? 'disabled' : ''}>group -1</button>`,
-        `<button type="button" data-action="move" data-delta="-2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus2 ? 'disabled' : ''}>group -2</button>`
+        `<button type="button" data-action="move" data-delta="2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus2 ? 'disabled' : ''}>+2</button>`,
+        `<button type="button" data-action="move" data-delta="1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus1 ? 'disabled' : ''}>+1</button>`,
+        `<label><input type="checkbox" data-action="toggle-except" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${exceptChecked}> </label>`,
+        `<button type="button" data-action="move" data-delta="-1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus1 ? 'disabled' : ''}>-1</button>`,
+        `<button type="button" data-action="move" data-delta="-2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus2 ? 'disabled' : ''}> -2</button>`
       ].join('');
     }
 
@@ -321,6 +324,55 @@
     bodyIdentityEl.addEventListener('change', onControlChange);
     bodyEgoEl.addEventListener('change', onControlChange);
 
+    function applyCustomSize(width) {
+      document.documentElement.style.setProperty('--img-size', `${width}px`);
+    }
+
+    imgSizeForm.addEventListener('change', (event) => {
+      if (event.target.type !== 'radio') {
+        return;
+      }
+
+      const selectedSize = event.target.value;
+      if (selectedSize === 'custom') {
+        const currentSize = Number.parseInt(
+          getComputedStyle(document.documentElement).getPropertyValue('--img-size') ?? '',
+          10
+        );
+        customWidthInput.value = Number.isInteger(currentSize) && currentSize > 0 ? currentSize : 80;
+        customWidthInput.disabled = false;
+        customWidthInput.focus();
+        applyCustomSize(Number.parseInt(customWidthInput.value, 10));
+        return;
+      }
+
+      customWidthInput.value = '';
+      customWidthInput.disabled = true;
+
+      if (selectedSize === 'size1') applyCustomSize(60);
+      if (selectedSize === 'size2') applyCustomSize(80);
+      if (selectedSize === 'size3') applyCustomSize(120);
+      if (selectedSize === 'size4') applyCustomSize(200);
+    });
+
+    customWidthInput.addEventListener('input', () => {
+      const selected = document.querySelector('input[name="imgSize"]:checked');
+      if (!selected || selected.value !== 'custom') {
+        return;
+      }
+
+      let customWidth = Number.parseInt(customWidthInput.value ?? '', 10);
+      if (!Number.isInteger(customWidth)) {
+        return;
+      }
+
+      customWidth = Math.max(20, Math.min(customWidth, 1000));
+      setTimeout(() => applyCustomSize(customWidth), 100);
+    });
+
+    applyCustomSize(80);
+
+    const DEFAULT_T = 0;
     const DEFAULT_X = 1;
 
     function getQuerySettings() {
@@ -328,11 +380,11 @@
       const tableParam = params.get('T');
       const xParam = params.get('X');
 
-      const tableIndex = Number.parseInt(tableParam ?? '0', 10);
+      const tableIndex = Number.parseInt(tableParam ?? String(DEFAULT_T), 10);
       const xValue = xParam !== null ? Number(xParam) : DEFAULT_X;
 
       return {
-        tableIndex: Number.isInteger(tableIndex) && tableIndex >= 0 ? tableIndex : 0,
+        tableIndex: Number.isInteger(tableIndex) && tableIndex >= 0 ? tableIndex : DEFAULT_T,
         xValue,
       };
     }
@@ -346,6 +398,12 @@
         statusEl.className = 'error';
         return;
       }
+
+      try {
+        const response = await fetch(`data/table${tableIndex}.json`, { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(`data/table${tableIndex}.json の取得に失敗しました (HTTP ${response.status})`);
+        }
 
         const tierlist = await response.json();
         state.tierlist = tierlist;
