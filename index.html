@@ -28,8 +28,8 @@
   <table>
     <thead>
       <tr>
-        <th>ID</th>
-        <th>(point + 0.01 × x × Xpoint) / (vote + 0.01 × x × Xvote)</th>
+        <th>グループ（四捨五入）</th>
+        <th>ID一覧</th>
       </tr>
     </thead>
     <tbody id="resultBody"></tbody>
@@ -48,17 +48,30 @@
     }
 
     function renderRows(tierlist, x) {
-      const rows = tierlist.map((row) => {
+      const grouped = new Map();
+
+      tierlist.forEach((row) => {
         const value = calcValue(row, x);
-        return {
-          id: row[0],
-          value,
-        };
+
+        if (!Number.isFinite(value)) {
+          throw new Error(`ID ${row[0]} の計算結果が不正です。`);
+        }
+
+        if (value <= 0 || value >= 10) {
+          throw new Error(`ID ${row[0]} の計算結果が範囲外です: ${value.toFixed(6)}（0より大きく10未満である必要があります）`);
+        }
+
+        const rounded = Math.round(value);
+        const ids = grouped.get(rounded) ?? [];
+        ids.push(row[0]);
+        grouped.set(rounded, ids);
       });
 
-      bodyEl.innerHTML = rows.map(({ id, value }) => {
-        const display = Number.isFinite(value) ? value.toFixed(6) : 'NaN';
-        return `<tr><td>${id}</td><td>${display}</td></tr>`;
+      const groupRows = Array.from(grouped.entries())
+        .sort((a, b) => b[0] - a[0]);
+
+      bodyEl.innerHTML = groupRows.map(([groupValue, ids]) => {
+        return `<tr><td>${groupValue}</td><td>${ids.join(', ')}</td></tr>`;
       }).join('');
     }
 
@@ -122,4 +135,3 @@
   </script>
 </body>
 </html>
-
