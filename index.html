@@ -14,6 +14,17 @@
       table { border-collapse: collapse; width: 100%; max-width: 980px; margin-bottom: 20px; }
       th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: right; }
       th:first-child, td:first-child { text-align: left; }
+      .tier-label { font-weight: 700; }
+      .tier-ss { background-color: #f0c7c7; }
+      .tier-s-plus { background-color: #f1d0c5; }
+      .tier-s { background-color: #f1dcc9; }
+      .tier-s-minus { background-color: #eee8cd; }
+      .tier-a { background-color: #e2edcf; }
+      .tier-b { background-color: #d5eade; }
+      .tier-c { background-color: #d0e6ee; }
+      .tier-d { background-color: #ccddf0; }
+      .tier-e { background-color: #c8d4ee; }
+      .tier-except { background-color: #ececec; color: #555; }
       .error { color: #b00020; }
       .id-items { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
       .id-item { display: flex; align-items: center; gap: 6px; border: 1px solid #ddd; border-radius: 4px; padding: 4px; background: #fff; }
@@ -225,6 +236,20 @@
       return String(groupValue);
     }
 
+    function getGroupClass(groupValue) {
+      if (groupValue === 9) return 'tier-ss';
+      if (groupValue === 8) return 'tier-s-plus';
+      if (groupValue === 7) return 'tier-s';
+      if (groupValue === 6) return 'tier-s-minus';
+      if (groupValue === 5) return 'tier-a';
+      if (groupValue === 4) return 'tier-b';
+      if (groupValue === 3) return 'tier-c';
+      if (groupValue === 2) return 'tier-d';
+      if (groupValue === 1) return 'tier-e';
+      if (groupValue === 0) return 'tier-except';
+      return '';
+    }
+
     function renderRows(tierlist, x) {
       const identityRows = tierlist.filter((row) => row[0] < 13001);
       const egoRows = tierlist.filter((row) => row[0] >= 13001);
@@ -237,12 +262,14 @@
 
       bodyIdentityEl.innerHTML = Array.from(identityData.grouped.entries()).map(([groupValue, ids]) => {
         const label = getGroupLabel(groupValue);
-        return `<tr><td>${label}</td><td>${renderImageCells(ids, groupValue, 'identity')}</td></tr>`;
+        const tierClass = getGroupClass(groupValue);
+        return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(ids, groupValue, 'identity')}</td></tr>`;
       }).join('');
 
       bodyEgoEl.innerHTML = Array.from(egoData.grouped.entries()).map(([groupValue, ids]) => {
         const label = getGroupLabel(groupValue);
-        return `<tr><td>${label}</td><td>${renderImageCells(ids, groupValue, 'ego')}</td></tr>`;
+        const tierClass = getGroupClass(groupValue);
+        return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(ids, groupValue, 'ego')}</td></tr>`;
       }).join('');
     }
 
