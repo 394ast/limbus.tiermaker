@@ -47,15 +47,19 @@
     </thead>
     <tbody id="resultBodyEgo"></tbody>
   </table>
-    
-<script>
+
+    <script>
     const statusEl = document.getElementById('status');
     const bodyIdentityEl = document.getElementById('resultBodyIdentity');
     const bodyEgoEl = document.getElementById('resultBodyEgo');
     const syncModeInputs = document.querySelectorAll('input[name="syncMode"]');
 
-    let currentTierlist = null;
-    let currentX = null;
+    const state = {
+      tierlist: null,
+      x: null,
+      exceptIdentityIds: new Set(),
+      exceptEgoIds: new Set(),
+    };
 
     function calcValue(row, x) {
       const numerator = row[1] + 0.01 * x * row[3];
@@ -77,8 +81,8 @@
           throw new Error(`ID ${row[0]} の計算結果が不正です。`);
         }
 
-        if (value <= 0 || value >= 10) {
-          throw new Error(`ID ${row[0]} の計算結果が範囲外です: ${value}（0より大きく10未満である必要があります）`);
+        if (value <= 1 || value >= 10) {
+          throw new Error(`ID ${row[0]} の計算結果が範囲外です: ${value}（1より大きく10未満である必要があります）`);
         }
 
         const rounded = Math.round(value);
@@ -92,6 +96,43 @@
 
       return Array.from(grouped.entries());
     }
+
+    function applyExceptOverrides(groupedRows, exceptIds) {
+      const grouped = new Map(groupedRows.map(([groupValue, ids]) => [groupValue, [...ids]]));
+
+      if (!grouped.has(0)) {
+        grouped.set(0, []);
+      }
+
+      for (let group = 1; group <= 9; group += 1) {
+        const ids = grouped.get(group) ?? [];
+        grouped.set(group, ids.filter((id) => !exceptIds.has(id)));
+      }
+
+      const exceptFromRows = grouped.get(0) ?? [];
+      const mergedExcept = new Set(exceptFromRows);
+      exceptIds.forEach((id) => mergedExcept.add(id));
+      grouped.set(0, Array.from(mergedExcept));
+
+      return Array.from(grouped.entries());
+    }
+
+    function moveIdToExcept(id) {
+      if (!Number.isInteger(id)) {
+        throw new Error(`except へ移動するIDが不正です: ${id}`);
+      }
+
+      if (id < 13001) {
+        state.exceptIdentityIds.add(id);
+      } else {
+        state.exceptEgoIds.add(id);
+      }
+
+      if (state.tierlist && Number.isFinite(state.x)) {
+        renderRows(state.tierlist, state.x);
+      }
+    }
+
 
     function getIdentityImageUrl(id) {
       const checked = document.querySelector('input[name="syncMode"]:checked');
@@ -121,15 +162,17 @@
       const identityRows = tierlist.filter((row) => row[0] < 13001);
       const egoRows = tierlist.filter((row) => row[0] >= 13001);
 
-      const identityGroupedRows = buildGroupedRows(identityRows, x);
-      const egoGroupedRows = buildGroupedRows(egoRows, x);
+      const identityGroupedRows = applyExceptOverrides(buildGroupedRows(identityRows, x), state.exceptIdentityIds);
+      const egoGroupedRows = applyExceptOverrides(buildGroupedRows(egoRows, x), state.exceptEgoIds);
 
       bodyIdentityEl.innerHTML = identityGroupedRows.map(([groupValue, ids]) => {
-        return `<tr><td>${groupValue}</td><td>${renderImageCells(ids, 'identity')}</td></tr>`;
+        const label = groupValue === 0 ? 'except' : groupValue;
+        return `<tr><td>${label}</td><td>${renderImageCells(ids, 'identity')}</td></tr>`;
       }).join('');
 
       bodyEgoEl.innerHTML = egoGroupedRows.map(([groupValue, ids]) => {
-        return `<tr><td>${groupValue}</td><td>${renderImageCells(ids, 'ego')}</td></tr>`;
+        const label = groupValue === 0 ? 'except' : groupValue;
+        return `<tr><td>${label}</td><td>${renderImageCells(ids, 'ego')}</td></tr>`;
       }).join('');
     }
 
@@ -166,8 +209,8 @@
         }
 
         const tierlist = await response.json();
-        currentTierlist = tierlist;
-        currentX = x;
+        state.tierlist = tierlist;
+        state.x = x;
         renderRows(tierlist, x);
 
         statusEl.textContent = `読み込み完了（table${tableIndex} / 件数: ${tierlist.length} / X: ${x}）`;
@@ -183,11 +226,13 @@
 
     syncModeInputs.forEach((input) => {
       input.addEventListener('change', () => {
-        if (currentTierlist && Number.isFinite(currentX)) {
-          renderRows(currentTierlist, currentX);
+        if (state.tierlist && Number.isFinite(state.x)) {
+          renderRows(state.tierlist, state.x);
         }
       });
     });
+
+    window.moveIdToExcept = moveIdToExcept;
 
     loadAndRender();
   </script>
