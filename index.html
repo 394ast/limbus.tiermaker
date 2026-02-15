@@ -347,6 +347,12 @@
         return;
       }
 
+        try {
+        const response = await fetch(`data/table${tableIndex}.json`, { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(`data/table${tableIndex}.json の取得に失敗しました (HTTP ${response.status})`);
+        }
+        
         const tierlist = await response.json();
         state.tierlist = tierlist;
         state.x = x;
