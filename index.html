@@ -654,6 +654,13 @@
       return result;
     }
 
+    function toBase64Url(input) {
+      return btoa(input)
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/g, '');
+    }
+
     function buildCompressedDiffParam() {
       const idsByGroup = new Map();
       for (let group = 0; group <= 9; group += 1) {
@@ -679,7 +686,7 @@
         sections.push(compressEncodedIds(idsByGroup.get(group)));
       }
 
-      return btoa(sections.join('.'));
+      return toBase64Url(sections.join('.'));
     }
 
     function generateShareUrl() {
@@ -689,7 +696,7 @@
 
       try {
         const compressed = buildCompressedDiffParam();
-        const url = `https://394ast.github.io/limbus.tiermaker/?T=${state.tableIndex}&X=${state.x}&C=${encodeURIComponent(compressed)}`;
+        const url = `https://394ast.github.io/limbus.tiermaker/?T=${state.tableIndex}&X=${state.x}&C=${compressed}`;
 
         if (generatedUrlInput) {
           generatedUrlInput.value = url;
