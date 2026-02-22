@@ -234,6 +234,13 @@
       state.manualGroupById.set(id, targetGroup);
     }
 
+    function resetDiffState() {
+      state.manualGroupById.clear();
+      state.exceptIdentityIds.clear();
+      state.exceptEgoIds.clear();
+      state.exceptRestoreGroupById.clear();
+    }
+
     function moveIdBetweenGroups(grouped, idToGroup, id, targetGroup) {
       const fromGroup = idToGroup.get(id);
 
@@ -661,6 +668,94 @@
         .replace(/=+$/g, '');
     }
 
+    function fromBase64Url(input) {
+      const normalized = input
+        .replace(/-/g, '+')
+        .replace(/_/g, '/');
+
+      const padLength = (4 - (normalized.length % 4)) % 4;
+      return atob(`${normalized}${'='.repeat(padLength)}`);
+    }
+
+    function decodeSection(section) {
+      if (!section) {
+        return [];
+      }
+
+      const ids = [];
+      let i = 0;
+
+      while (i < section.length) {
+        const highChar = section[i];
+        const lowChar = section[i + 1];
+
+        if (!highChar || !lowChar) {
+          throw new Error('Cパラメータの形式が不正です（ID桁不足）');
+        }
+
+        const high = Number.parseInt(highChar, 36);
+        const lowStart = Number.parseInt(lowChar, 36);
+
+        if (!Number.isInteger(high) || !Number.isInteger(lowStart)) {
+          throw new Error('Cパラメータの形式が不正です（base36変換失敗）');
+        }
+
+        const rangeMark = section[i + 2];
+        if (rangeMark === '~') {
+          const lowEndChar = section[i + 3];
+          const lowEnd = Number.parseInt(lowEndChar ?? '', 36);
+
+          if (!Number.isInteger(lowEnd) || lowEnd < lowStart) {
+            throw new Error('Cパラメータの形式が不正です（範囲指定）');
+          }
+
+          for (let low = lowStart; low <= lowEnd; low += 1) {
+            ids.push(high * 1000 + low);
+          }
+
+          i += 4;
+          continue;
+        }
+
+        ids.push(high * 1000 + lowStart);
+        i += 2;
+      }
+
+      return ids;
+    }
+
+    function applyCompressedDiffParam(cParam) {
+      resetDiffState();
+
+      if (!cParam) {
+        return;
+      }
+
+      const decoded = fromBase64Url(cParam);
+      const sections = decoded.split('.');
+      if (sections.length !== 10) {
+        throw new Error('Cパラメータの形式が不正です（セクション数）');
+      }
+
+      for (let sectionIndex = 0; sectionIndex < sections.length; sectionIndex += 1) {
+        const group = 9 - sectionIndex;
+        const ids = decodeSection(sections[sectionIndex]);
+
+        ids.forEach((id) => {
+          if (group === 0) {
+            if (belongsToType(id, 'identity')) {
+              state.exceptIdentityIds.add(id);
+            } else {
+              state.exceptEgoIds.add(id);
+            }
+            return;
+          }
+
+          setManualGroupOverride(id, belongsToType(id, 'identity') ? 'identity' : 'ego', group);
+        });
+      }
+    }
+
     function buildCompressedDiffParam() {
       const idsByGroup = new Map();
       for (let group = 0; group <= 9; group += 1) {
@@ -766,6 +861,7 @@
       const tableParam = params.get('T');
       const xParam = params.get('X');
       const changeParam = params.get('S');
+      const compressedParam = params.get('C');
 
       state.changeParam = changeParam;
 
@@ -779,11 +875,12 @@
       return {
         tableIndex: Number.isInteger(tableIndex) && tableIndex >= 0 ? tableIndex : DEFAULT_T,
         xValue,
+        compressedParam,
       };
     }
 
     async function loadAndRender() {
-      const { tableIndex, xValue } = getQuerySettings();
+      const { tableIndex, xValue, compressedParam } = getQuerySettings();
       const x = xValue;
 
       if (!Number.isFinite(x)) {
@@ -803,6 +900,7 @@
         state.x = x;
         state.tableIndex = tableIndex;
         initializeBaseGroupedData(tierlist, x);
+        applyCompressedDiffParam(compressedParam);
         renderRows(tierlist, x);
 
         statusEl.textContent = `読み込み完了（table${tableIndex} / 件数: ${tierlist.length} / X: ${x}）`;
