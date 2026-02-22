@@ -41,6 +41,8 @@
       .id-controls label { font-size: 12px; }
       .hide-adjust-controls .id-controls { display: none; }
       .share-url-tools { margin: 8px 0 12px; display: grid; gap: 6px; }
+      #generateUrlButton { width: fit-content; font-size: 13px; padding: 4px 10px; }
+      .hide-except-move-controls button[data-action="toggle-except"][data-include="0"] { display: none; }
       #generatedUrl { width: 100%; max-width: 900px; }
     </style>
 </head>
@@ -72,6 +74,10 @@
   </div>
 
   <div class="sync-mode">
+    <label><input type="checkbox" id="toggleExceptMoveControls" checked> 除外ランクへの移動ボタンを表示する</label>
+  </div>
+
+  <div class="sync-mode">
     <label><input type="checkbox" id="toggleExceptRows" checked> 除外ランクを表示する</label>
   </div>
 
@@ -99,6 +105,7 @@
     const customWidthInput = document.getElementById('customWidth');
     const toggleAdjustControlsInput = document.getElementById('toggleAdjustControls');
     const toggleExceptRowsInput = document.getElementById('toggleExceptRows');
+    const toggleExceptMoveControlsInput = document.getElementById('toggleExceptMoveControls');
     const idRangeFiltersEl = document.getElementById('idRangeFilters');
     const generateUrlButton = document.getElementById('generateUrlButton');
     const generatedUrlInput = document.getElementById('generatedUrl');
@@ -561,12 +568,24 @@
       document.body.classList.toggle('hide-adjust-controls', !show);
     }
 
+    function applyExceptMoveControlVisibility(show) {
+      document.body.classList.toggle('hide-except-move-controls', !show);
+    }
+
     if (toggleAdjustControlsInput) {
       toggleAdjustControlsInput.addEventListener('change', () => {
         applyAdjustControlVisibility(toggleAdjustControlsInput.checked);
       });
 
       applyAdjustControlVisibility(toggleAdjustControlsInput.checked);
+    }
+
+    if (toggleExceptMoveControlsInput) {
+      toggleExceptMoveControlsInput.addEventListener('change', () => {
+        applyExceptMoveControlVisibility(toggleExceptMoveControlsInput.checked);
+      });
+
+      applyExceptMoveControlVisibility(toggleExceptMoveControlsInput.checked);
     }
 
     if (toggleExceptRowsInput) {
