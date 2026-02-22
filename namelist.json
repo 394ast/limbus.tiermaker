@@ -3,21 +3,21 @@
     "id": 1001,
     "name": "LCB 囚人 イサン",
     "season": "恒常",
-    "star": 1,
+    "rank": 1,
     "time": 0
   },
   {
     "id": 1002,
     "name": "南部セブン協会 6課 イサン",
     "season": "恒常",
-    "star": 2,
+    "rank": 2,
     "time": 0
   },
   {
     "id": 1003,
     "name": "剣契 殺手 イサン",
     "season": "恒常",
-    "star": 3,
+    "rank": 3,
     "time": 0
   }
 ]
