@@ -296,10 +296,8 @@
     }
 
     function renderControlButtons(id, groupValue, isExcept, type) {
-      const includeChecked = getExceptSet(type).has(id) ? '' : 'checked';
-
       if (isExcept) {
-        return `<label><input type="checkbox" data-action="toggle-except" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${includeChecked}> </label>`;
+        return `<button type="button" data-action="toggle-except" data-include="1" data-id="${id}" data-type="${type}" data-group="${groupValue}">戻す</button>`;
       }
 
       const disablePlus2 = groupValue >= 8;
@@ -310,7 +308,7 @@
       return [
         `<button type="button" data-action="move" data-delta="2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus2 ? 'disabled' : ''}>+2</button>`,
         `<button type="button" data-action="move" data-delta="1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus1 ? 'disabled' : ''}>+1</button>`,
-        `<label><input type="checkbox" data-action="toggle-except" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${includeChecked}> </label>`,
+        `<button type="button" data-action="toggle-except" data-include="0" data-id="${id}" data-type="${type}" data-group="${groupValue}">除外</button>`,
         `<button type="button" data-action="move" data-delta="-1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus1 ? 'disabled' : ''}>-1</button>`,
         `<button type="button" data-action="move" data-delta="-2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus2 ? 'disabled' : ''}> -2</button>`
       ].join('');
@@ -483,14 +481,14 @@
       }
     }
 
-    function handleExceptToggle(id, type, currentGroup, checked) {
+    function handleExceptToggle(id, type, currentGroup, include) {
       if (!Number.isInteger(id) || !Number.isInteger(currentGroup)) {
         return;
       }
 
       const exceptIds = getExceptSet(type);
 
-      if (checked) {
+      if (include) {
         exceptIds.delete(id);
 
         const restoreGroup = state.exceptRestoreGroupById.get(id);
@@ -523,38 +521,30 @@
     }
 
     function onControlClick(event) {
-      const moveButton = event.target.closest('button[data-action="move"]');
-      if (!moveButton) {
+      const controlButton = event.target.closest('button[data-action]');
+      if (!controlButton) {
         return;
       }
 
-      const payload = parseControlPayload(moveButton);
+      const payload = parseControlPayload(controlButton);
       if (!payload) {
         return;
       }
 
-      const delta = Number.parseInt(moveButton.dataset.delta ?? '', 10);
-      handleMove(payload.id, payload.type, payload.group, delta);
-    }
-
-    function onControlChange(event) {
-      const exceptCheckbox = event.target.closest('input[data-action="toggle-except"]');
-      if (!exceptCheckbox) {
+      if (controlButton.dataset.action === 'move') {
+        const delta = Number.parseInt(controlButton.dataset.delta ?? '', 10);
+        handleMove(payload.id, payload.type, payload.group, delta);
         return;
       }
 
-      const payload = parseControlPayload(exceptCheckbox);
-      if (!payload) {
-        return;
+      if (controlButton.dataset.action === 'toggle-except') {
+        const include = controlButton.dataset.include === '1';
+        handleExceptToggle(payload.id, payload.type, payload.group, include);
       }
-
-      handleExceptToggle(payload.id, payload.type, payload.group, exceptCheckbox.checked);
     }
 
     bodyIdentityEl.addEventListener('click', onControlClick);
     bodyEgoEl.addEventListener('click', onControlClick);
-    bodyIdentityEl.addEventListener('change', onControlChange);
-    bodyEgoEl.addEventListener('change', onControlChange);
 
     function applyAdjustControlVisibility(show) {
       document.body.classList.toggle('hide-adjust-controls', !show);
