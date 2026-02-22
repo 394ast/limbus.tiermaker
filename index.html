@@ -127,6 +127,7 @@
         tierlist: null,
         x: null,
       },
+      baseValueById: new Map(),
       changeParam: null,
     };
 
@@ -210,9 +211,13 @@
     function initializeBaseGroupedData(tierlist, x) {
       const identityRows = [];
       const egoRows = [];
+      const baseValueById = new Map();
 
       tierlist.forEach((row) => {
-        if (row[0] < 13001) {
+        const id = row[0];
+        baseValueById.set(id, calcValue(row, x));
+
+        if (id < 13001) {
           identityRows.push(row);
           return;
         }
@@ -224,6 +229,7 @@
       state.baseGroupedByType.ego = buildGroupedData(egoRows, x);
       state.baseGroupedSnapshot.tierlist = tierlist;
       state.baseGroupedSnapshot.x = x;
+      state.baseValueById = baseValueById;
     }
 
     function getBaseGroupForId(type, id) {
@@ -434,12 +440,28 @@
       return !toggleExceptRowsInput || toggleExceptRowsInput.checked;
     }
 
-    function shouldSortIdsAscending() {
-      return state.changeParam !== '1';
+    function shouldSortByCalcValueDesc() {
+      return state.changeParam === '1';
     }
 
     function shouldShowDiffOnly() {
       return state.changeParam === '2';
+    }
+
+    function orderVisibleIds(ids) {
+      if (shouldSortByCalcValueDesc()) {
+        return [...ids].sort((a, b) => {
+          const valueA = state.baseValueById.get(a) ?? Number.NEGATIVE_INFINITY;
+          const valueB = state.baseValueById.get(b) ?? Number.NEGATIVE_INFINITY;
+          if (valueB !== valueA) {
+            return valueB - valueA;
+          }
+
+          return a - b;
+        });
+      }
+
+      return [...ids].sort((a, b) => a - b);
     }
 
     function buildDiffOnlyGroupedData(type) {
@@ -486,7 +508,7 @@
         .filter(([groupValue]) => showExceptRows || groupValue !== 0)
         .map(([groupValue, ids]) => {
           const visibleIds = ids.filter((id) => isIdVisibleByRange(id, visibleBuckets));
-          const orderedIds = shouldSortIdsAscending() ? [...visibleIds].sort((a, b) => a - b) : visibleIds;
+          const orderedIds = orderVisibleIds(visibleIds);
           const label = getGroupLabel(groupValue);
           const tierClass = getGroupClass(groupValue);
           return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(orderedIds, groupValue, type)}</td></tr>`;
@@ -939,9 +961,14 @@
       const tableParam = params.get('T');
       const xParam = params.get('X');
       const changeParam = params.get('S');
-      const compressedParam = params.get('C');
+      const compressedParam = changeParam === '1' ? null : params.get('C');
 
       state.changeParam = changeParam;
+
+      if (toggleAdjustControlsInput && changeParam === '1') {
+        toggleAdjustControlsInput.checked = false;
+        applyAdjustControlVisibility(false);
+      }
 
       if (statusEl) {
         statusEl.hidden = !(changeParam !== null && changeParam !== '');
