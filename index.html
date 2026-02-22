@@ -204,6 +204,26 @@
       state.baseGroupedSnapshot.x = x;
     }
 
+    function getBaseGroupForId(type, id) {
+      const baseData = state.baseGroupedByType[type];
+      if (!baseData) {
+        return null;
+      }
+
+      const baseGroup = baseData.idToGroup.get(id);
+      return Number.isInteger(baseGroup) ? baseGroup : null;
+    }
+
+    function setManualGroupOverride(id, type, targetGroup) {
+      const baseGroup = getBaseGroupForId(type, id);
+      if (baseGroup !== null && targetGroup === baseGroup) {
+        state.manualGroupById.delete(id);
+        return;
+      }
+
+      state.manualGroupById.set(id, targetGroup);
+    }
+
     function moveIdBetweenGroups(grouped, idToGroup, id, targetGroup) {
       const fromGroup = idToGroup.get(id);
 
@@ -439,7 +459,7 @@
 
       getExceptSet(type).delete(id);
       state.exceptRestoreGroupById.delete(id);
-      state.manualGroupById.set(id, target);
+      setManualGroupOverride(id, type, target);
 
       if (state.tierlist && Number.isFinite(state.x)) {
         renderRows(state.tierlist, state.x);
@@ -458,7 +478,7 @@
 
         const restoreGroup = state.exceptRestoreGroupById.get(id);
         if (Number.isInteger(restoreGroup) && restoreGroup >= 1 && restoreGroup <= 9) {
-          state.manualGroupById.set(id, restoreGroup);
+          setManualGroupOverride(id, type, restoreGroup);
         }
       } else {
         if (currentGroup > 0) {
