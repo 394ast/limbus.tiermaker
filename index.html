@@ -438,15 +438,51 @@
       return state.changeParam !== '1';
     }
 
-    function renderTypeRows(type, baseData, showExceptRows, visibleBuckets) {
-      if (!baseData) {
-        return '';
+    function shouldShowDiffOnly() {
+      return state.changeParam === '2';
+    }
+
+    function buildDiffOnlyGroupedData(type) {
+      const grouped = new Map();
+      for (let group = 9; group >= 0; group -= 1) {
+        grouped.set(group, []);
       }
 
-      const workingData = cloneGroupedData(baseData);
-      applyManualAndExceptOverrides(workingData.grouped, workingData.idToGroup, type);
+      state.manualGroupById.forEach((groupValue, id) => {
+        if (!belongsToType(id, type)) {
+          return;
+        }
 
-      return Array.from(workingData.grouped.entries())
+        if (groupValue < 1 || groupValue > 9) {
+          return;
+        }
+
+        grouped.get(groupValue).push(id);
+      });
+
+      getExceptSet(type).forEach((id) => {
+        grouped.get(0).push(id);
+      });
+
+      return grouped;
+    }
+
+    function renderTypeRows(type, baseData, showExceptRows, visibleBuckets) {
+      let grouped;
+
+      if (shouldShowDiffOnly()) {
+        grouped = buildDiffOnlyGroupedData(type);
+      } else {
+        if (!baseData) {
+          return '';
+        }
+
+        const workingData = cloneGroupedData(baseData);
+        applyManualAndExceptOverrides(workingData.grouped, workingData.idToGroup, type);
+        grouped = workingData.grouped;
+      }
+
+      return Array.from(grouped.entries())
         .filter(([groupValue]) => showExceptRows || groupValue !== 0)
         .map(([groupValue, ids]) => {
           const visibleIds = ids.filter((id) => isIdVisibleByRange(id, visibleBuckets));
