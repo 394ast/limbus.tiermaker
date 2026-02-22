@@ -45,7 +45,7 @@
 <body>
   <h2>みんなでつくる　リンバスTier表</h2>
 
-  <div id="status" aria-live="polite"></div>
+  <div id="status" aria-live="polite" hidden></div>
 
   <div id="idRangeFilters" class="id-range-filters"></div>
 
@@ -618,6 +618,11 @@
       const params = new URLSearchParams(window.location.search);
       const tableParam = params.get('T');
       const xParam = params.get('X');
+      const changeParam = params.get('S');
+
+      if (statusEl) {
+        statusEl.hidden = !(changeParam !== null && changeParam !== '');
+      }
 
       const tableIndex = Number.parseInt(tableParam ?? String(DEFAULT_T), 10);
       const xValue = xParam !== null ? Number(xParam) : DEFAULT_X;
