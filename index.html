@@ -559,59 +559,101 @@
       return checked ? checked.value : 'group-relative';
     }
 
-    function renderRowsWithScrollFix(targetId, sourceGroup, type, cursorY) {
+    function buildCursorAnchor(controlButton, event) {
+      if (!controlButton || !event || !Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)) {
+        return null;
+      }
+
+      const rect = controlButton.getBoundingClientRect();
+      const action = controlButton.dataset.action;
+      const id = controlButton.dataset.id;
+      const type = controlButton.dataset.type;
+      const sourceGroup = Number.parseInt(controlButton.dataset.group ?? '', 10);
+      const row = controlButton.closest('tr');
+      const rowTop = row ? row.getBoundingClientRect().top : null;
+      const mode = getSelectedScrollFixMode();
+
+      let selector = '';
+      if (action === 'move') {
+        const delta = controlButton.dataset.delta;
+        selector = `button[data-action="move"][data-id="${id}"][data-delta="${delta}"]`;
+      }
+
+      if (action === 'toggle-except') {
+        const include = controlButton.dataset.include;
+        const nextInclude = include === '0' ? '1' : '0';
+        selector = `button[data-action="toggle-except"][data-id="${id}"][data-include="${nextInclude}"]`;
+      }
+
+      return {
+        id,
+        type,
+        action,
+        sourceGroup,
+        mode,
+        selector,
+        cursorX: event.clientX,
+        cursorY: event.clientY,
+        offsetX: event.clientX - rect.left,
+        offsetY: event.clientY - rect.top,
+        rowOffsetY: rowTop === null ? null : event.clientY - rowTop,
+      };
+    }
+
+    function renderRowsWithCursorAnchor(anchor) {
       if (!state.tierlist || !Number.isFinite(state.x)) {
         return;
       }
 
-      const beforeImg = document.querySelector(`img[alt="${targetId}"]`);
-      if (!beforeImg) {
-        renderRows(state.tierlist, state.x);
-        return;
-      }
+      renderRows(state.tierlist, state.x);
+      setTimeout(() => {
+        if (!anchor) {
+          return;
+        }
 
-      const mode = getSelectedScrollFixMode();
-      state.scrollFixMode = mode;
-
-      if (mode === 'group-relative') {
-        const beforeRow = beforeImg.closest('tr');
-        if (beforeRow && Number.isFinite(cursorY) && Number.isInteger(sourceGroup)) {
-          const beforeCursorOffset = cursorY - beforeRow.getBoundingClientRect().top;
-
-          renderRows(state.tierlist, state.x);
-
-          const tbody = type === 'identity' ? bodyIdentityEl : bodyEgoEl;
-          const sourceLabel = getGroupLabel(sourceGroup);
+        if (
+          anchor.mode === 'group-relative'
+          && anchor.action === 'move'
+          && Number.isInteger(anchor.sourceGroup)
+          && Number.isFinite(anchor.rowOffsetY)
+        ) {
+          const tbody = anchor.type === 'identity' ? bodyIdentityEl : bodyEgoEl;
+          const sourceLabel = getGroupLabel(anchor.sourceGroup);
           const afterSourceRow = tbody
             ? Array.from(tbody.querySelectorAll('tr')).find((row) => row.querySelector('td')?.textContent === sourceLabel)
             : null;
 
           if (afterSourceRow) {
-            const afterRowTop = afterSourceRow.getBoundingClientRect().top;
-            const desiredTop = cursorY - beforeCursorOffset;
-            window.scrollBy(0, afterRowTop - desiredTop);
+            const rowTop = afterSourceRow.getBoundingClientRect().top;
+            const desiredTop = anchor.cursorY - anchor.rowOffsetY;
+            window.scrollBy(0, rowTop - desiredTop);
             return;
           }
         }
-      }
 
-      const beforeRect = beforeImg.getBoundingClientRect();
-      renderRows(state.tierlist, state.x);
-      setTimeout(() => {
-        const afterImg = document.querySelector(`img[alt="${targetId}"]`);
-        if (!afterImg) {
+        let afterEl = null;
+        if (anchor.selector) {
+          const candidates = Array.from(document.querySelectorAll(anchor.selector));
+          afterEl = candidates.find((el) => el.getClientRects().length > 0) ?? candidates[0] ?? null;
+        }
+
+        if (!afterEl && anchor.id) {
+          afterEl = document.querySelector(`img[alt="${anchor.id}"]`);
+        }
+
+        if (!afterEl) {
           return;
         }
 
-        const afterRect = afterImg.getBoundingClientRect();
-        window.scrollBy(
-          afterRect.left - beforeRect.left,
-          afterRect.top - beforeRect.top
-        );
+        const afterRect = afterEl.getBoundingClientRect();
+        const targetX = afterRect.left + Math.min(afterRect.width - 2, 4);
+        const targetY = afterRect.top + Math.min(afterRect.height - 2, 4);
+
+        window.scrollBy(targetX - anchor.cursorX, targetY - anchor.cursorY);
       }, 0);
     }
 
-    function handleMove(id, type, currentGroup, delta, cursorY) {
+    function handleMove(id, type, currentGroup, delta, anchor) {
       if (!Number.isInteger(id) || !Number.isInteger(currentGroup) || !Number.isInteger(delta)) {
         return;
       }
@@ -626,10 +668,10 @@
       setManualGroupOverride(id, type, target);
       clearGeneratedUrl();
 
-      renderRowsWithScrollFix(id, currentGroup, type, cursorY);
+      renderRowsWithCursorAnchor(anchor);
     }
 
-    function handleExceptToggle(id, type, currentGroup, include) {
+    function handleExceptToggle(id, type, currentGroup, include, anchor) {
       if (!Number.isInteger(id) || !Number.isInteger(currentGroup)) {
         return;
       }
@@ -652,10 +694,7 @@
       }
 
       clearGeneratedUrl();
-
-      if (state.tierlist && Number.isFinite(state.x)) {
-        renderRows(state.tierlist, state.x);
-      }
+      renderRowsWithCursorAnchor(anchor);
     }
 
     function parseControlPayload(el) {
@@ -683,13 +722,15 @@
 
       if (controlButton.dataset.action === 'move') {
         const delta = Number.parseInt(controlButton.dataset.delta ?? '', 10);
-        handleMove(payload.id, payload.type, payload.group, delta, event.clientY);
+        const anchor = buildCursorAnchor(controlButton, event);
+        handleMove(payload.id, payload.type, payload.group, delta, anchor);
         return;
       }
 
       if (controlButton.dataset.action === 'toggle-except') {
         const include = controlButton.dataset.include === '1';
-        handleExceptToggle(payload.id, payload.type, payload.group, include);
+        const anchor = buildCursorAnchor(controlButton, event);
+        handleExceptToggle(payload.id, payload.type, payload.group, include, anchor);
       }
     }
 
