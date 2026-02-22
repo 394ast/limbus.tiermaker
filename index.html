@@ -559,7 +559,7 @@
       return checked ? checked.value : 'group-relative';
     }
 
-    function renderRowsWithScrollFix(targetId) {
+    function renderRowsWithScrollFix(targetId, sourceGroup, type, cursorY) {
       if (!state.tierlist || !Number.isFinite(state.x)) {
         return;
       }
@@ -575,22 +575,23 @@
 
       if (mode === 'group-relative') {
         const beforeRow = beforeImg.closest('tr');
-        if (beforeRow) {
-          const itemRect = beforeImg.getBoundingClientRect();
-          const rowRect = beforeRow.getBoundingClientRect();
-          const relativeOffset = itemRect.top - rowRect.top;
+        if (beforeRow && Number.isFinite(cursorY) && Number.isInteger(sourceGroup)) {
+          const beforeCursorOffset = cursorY - beforeRow.getBoundingClientRect().top;
 
           renderRows(state.tierlist, state.x);
 
-          const afterImg = document.querySelector(`img[alt="${targetId}"]`);
-          const afterRow = afterImg ? afterImg.closest('tr') : null;
-          if (afterImg && afterRow) {
-            const afterRowRect = afterRow.getBoundingClientRect();
-            const targetTop = afterRowRect.top + relativeOffset;
-            const delta = afterImg.getBoundingClientRect().top - targetTop;
-            window.scrollBy(0, delta);
+          const tbody = type === 'identity' ? bodyIdentityEl : bodyEgoEl;
+          const sourceLabel = getGroupLabel(sourceGroup);
+          const afterSourceRow = tbody
+            ? Array.from(tbody.querySelectorAll('tr')).find((row) => row.querySelector('td')?.textContent === sourceLabel)
+            : null;
+
+          if (afterSourceRow) {
+            const afterRowTop = afterSourceRow.getBoundingClientRect().top;
+            const desiredTop = cursorY - beforeCursorOffset;
+            window.scrollBy(0, afterRowTop - desiredTop);
+            return;
           }
-          return;
         }
       }
 
@@ -607,7 +608,7 @@
       }, 0);
     }
 
-    function handleMove(id, type, currentGroup, delta) {
+    function handleMove(id, type, currentGroup, delta, cursorY) {
       if (!Number.isInteger(id) || !Number.isInteger(currentGroup) || !Number.isInteger(delta)) {
         return;
       }
@@ -622,7 +623,7 @@
       setManualGroupOverride(id, type, target);
       clearGeneratedUrl();
 
-      renderRowsWithScrollFix(id);
+      renderRowsWithScrollFix(id, currentGroup, type, cursorY);
     }
 
     function handleExceptToggle(id, type, currentGroup, include) {
@@ -679,7 +680,7 @@
 
       if (controlButton.dataset.action === 'move') {
         const delta = Number.parseInt(controlButton.dataset.delta ?? '', 10);
-        handleMove(payload.id, payload.type, payload.group, delta);
+        handleMove(payload.id, payload.type, payload.group, delta, event.clientY);
         return;
       }
 
