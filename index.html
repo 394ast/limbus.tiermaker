@@ -40,6 +40,8 @@
       .id-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
       .id-controls label { font-size: 12px; }
       .hide-adjust-controls .id-controls { display: none; }
+      .share-url-tools { margin: 8px 0 12px; display: grid; gap: 6px; }
+      #generatedUrl { width: 100%; max-width: 900px; }
     </style>
 </head>
 <body>
@@ -73,6 +75,11 @@
     <label><input type="checkbox" id="toggleExceptRows" checked> 除外ランクを表示する</label>
   </div>
 
+  <div class="share-url-tools">
+    <button type="button" id="generateUrlButton">URLを生成する</button>
+    <input type="text" id="generatedUrl" readonly placeholder="生成されたURLがここに表示されます">
+  </div>
+
   <h3>人格Tier</h3>
   <table>
     <tbody id="resultBodyIdentity"></tbody>
@@ -93,10 +100,13 @@
     const toggleAdjustControlsInput = document.getElementById('toggleAdjustControls');
     const toggleExceptRowsInput = document.getElementById('toggleExceptRows');
     const idRangeFiltersEl = document.getElementById('idRangeFilters');
+    const generateUrlButton = document.getElementById('generateUrlButton');
+    const generatedUrlInput = document.getElementById('generatedUrl');
 
     const state = {
       tierlist: null,
       x: null,
+      tableIndex: 0,
       manualGroupById: new Map(),
       exceptIdentityIds: new Set(),
       exceptEgoIds: new Set(),
@@ -589,6 +599,110 @@
       });
     }
 
+    function encodeDiffId(id) {
+      const high = Math.floor(id / 1000);
+      const low = id % 100;
+
+      if (high > 35 || low > 35) {
+        throw new Error(`ID ${id} は圧縮形式の範囲外です（上位・下位とも35以下が必要）`);
+      }
+
+      return {
+        id,
+        high,
+        low,
+        highChar: high.toString(36),
+        lowChar: low.toString(36),
+      };
+    }
+
+    function compressEncodedIds(ids) {
+      const encoded = ids
+        .slice()
+        .sort((a, b) => a - b)
+        .map((id) => encodeDiffId(id));
+
+      let result = '';
+      let index = 0;
+
+      while (index < encoded.length) {
+        const start = encoded[index];
+        let endIndex = index;
+
+        while (
+          endIndex + 1 < encoded.length
+          && encoded[endIndex + 1].high === start.high
+          && encoded[endIndex + 1].low === encoded[endIndex].low + 1
+        ) {
+          endIndex += 1;
+        }
+
+        const runLength = endIndex - index + 1;
+        if (runLength >= 3) {
+          result += `${start.highChar}${start.lowChar}~${encoded[endIndex].lowChar}`;
+          index = endIndex + 1;
+          continue;
+        }
+
+        for (let i = index; i <= endIndex; i += 1) {
+          result += `${encoded[i].highChar}${encoded[i].lowChar}`;
+        }
+
+        index = endIndex + 1;
+      }
+
+      return result;
+    }
+
+    function buildCompressedDiffParam() {
+      const idsByGroup = new Map();
+      for (let group = 0; group <= 9; group += 1) {
+        idsByGroup.set(group, []);
+      }
+
+      const exceptAll = new Set([...state.exceptIdentityIds, ...state.exceptEgoIds]);
+
+      state.manualGroupById.forEach((group, id) => {
+        if (exceptAll.has(id)) {
+          return;
+        }
+
+        if (group >= 1 && group <= 9) {
+          idsByGroup.get(group).push(id);
+        }
+      });
+
+      exceptAll.forEach((id) => idsByGroup.get(0).push(id));
+
+      const sections = [];
+      for (let group = 9; group >= 0; group -= 1) {
+        sections.push(compressEncodedIds(idsByGroup.get(group)));
+      }
+
+      return btoa(sections.join('.'));
+    }
+
+    function generateShareUrl() {
+      if (!state.tierlist || !Number.isFinite(state.x)) {
+        return;
+      }
+
+      try {
+        const compressed = buildCompressedDiffParam();
+        const url = `https://394ast.github.io/limbus.tiermaker/?T=${state.tableIndex}&X=${state.x}&C=${encodeURIComponent(compressed)}`;
+
+        if (generatedUrlInput) {
+          generatedUrlInput.value = url;
+          generatedUrlInput.focus();
+          generatedUrlInput.select();
+        }
+      } catch (err) {
+        if (generatedUrlInput) {
+          generatedUrlInput.value = `URL生成エラー: ${err.message}`;
+        }
+      }
+    }
+
     function applyCustomSize(width) {
       document.documentElement.style.setProperty('--img-size', `${width}px`);
     }
@@ -680,6 +794,7 @@
         const tierlist = await response.json();
         state.tierlist = tierlist;
         state.x = x;
+        state.tableIndex = tableIndex;
         initializeBaseGroupedData(tierlist, x);
         renderRows(tierlist, x);
 
@@ -705,6 +820,10 @@
         }
       });
     });
+
+    if (generateUrlButton) {
+      generateUrlButton.addEventListener('click', generateShareUrl);
+    }
 
     loadAndRender();
   </script>
