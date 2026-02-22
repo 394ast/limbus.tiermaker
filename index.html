@@ -542,7 +542,7 @@
       const groupRect = row.getBoundingClientRect();
       const buttonRect = controlButton.getBoundingClientRect();
       return {
-        mode: getCursorSyncMode(),
+        mode: state.cursorSyncMode,
         type: payload.type,
         group: payload.group,
         id: payload.id,
@@ -612,11 +612,7 @@
 
       let targetButton = null;
 
-      if (context.mode === 'follow-button') {
-        targetButton = findFollowButton(context);
-      }
-
-      if (!targetButton && context.mode === 'group-relative') {
+      if (context.mode === 'group-relative') {
         const row = document.querySelector(`tr[data-type="${context.type}"][data-group="${context.group}"]`);
         if (row) {
           const groupRect = row.getBoundingClientRect();
@@ -624,9 +620,7 @@
           const targetTop = groupRect.top + context.offsetTop;
           targetButton = findClosestButtonInGroup(context.type, context.group, targetLeft, targetTop);
         }
-      }
-
-      if (!targetButton) {
+      } else if (context.mode === 'follow-button') {
         targetButton = findFollowButton(context);
       }
 
