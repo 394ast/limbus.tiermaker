@@ -11,6 +11,8 @@
       #imgSizeForm input[type="number"] { width: 72px; }
       .sync-mode { margin: 8px 0 12px; }
       .sync-mode label { margin-right: 12px; }
+      .scroll-fix-options { margin: 8px 0 12px; }
+      .scroll-fix-options label { margin-right: 12px; }
       .id-range-filters { margin: 8px 0 12px; border: 1px solid #d7d7d7; border-radius: 4px; padding: 4px 6px; width: fit-content; max-width: 100%; }
       .id-range-group { margin-bottom: 8px; }
       .id-range-title { font-weight: 600; margin: 0 0 4px; }
@@ -71,11 +73,17 @@
   </div>
 
   <div class="sync-mode">
-    <label><input type="checkbox" id="toggleAdjustControls" checked> Tierの移動ボタンを表示する</label>
+    <label><input type="checkbox" id="toggleAdjustControls" checked> Tierの移動ボタンを表示</label>
   </div>
 
   <div class="sync-mode">
     <label><input type="checkbox" id="toggleExceptMoveControls" checked> 除外ランクへの移動ボタンを表示する</label>
+  </div>
+
+  <div class="scroll-fix-options">
+    <span class="indent">スクロール補正:</span>
+    <label><input type="radio" name="scrollFixMode" value="group-relative" checked> グループ基準で相対位置を固定</label>
+    <label><input type="radio" name="scrollFixMode" value="item-delta"> 押したIDの位置差分で補正</label>
   </div>
 
   <div class="sync-mode">
@@ -110,6 +118,7 @@
     const idRangeFiltersEl = document.getElementById('idRangeFilters');
     const generateUrlButton = document.getElementById('generateUrlButton');
     const generatedUrlInput = document.getElementById('generatedUrl');
+    const scrollFixModeInputs = document.querySelectorAll('input[name="scrollFixMode"]');
 
     const state = {
       tierlist: null,
@@ -129,6 +138,7 @@
       },
       baseValueById: new Map(),
       changeParam: null,
+      scrollFixMode: 'group-relative',
     };
 
     const GROUP_META = {
@@ -544,7 +554,61 @@
       }
     }
 
-    function handleMove(id, type, currentGroup, delta) {
+    function getSelectedScrollFixMode() {
+      const checked = document.querySelector('input[name="scrollFixMode"]:checked');
+      return checked ? checked.value : 'group-relative';
+    }
+
+    function renderRowsWithScrollFix(targetId, sourceGroup, type, cursorY) {
+      if (!state.tierlist || !Number.isFinite(state.x)) {
+        return;
+      }
+
+      const beforeImg = document.querySelector(`img[alt="${targetId}"]`);
+      if (!beforeImg) {
+        renderRows(state.tierlist, state.x);
+        return;
+      }
+
+      const mode = getSelectedScrollFixMode();
+      state.scrollFixMode = mode;
+
+      if (mode === 'group-relative') {
+        const beforeRow = beforeImg.closest('tr');
+        if (beforeRow && Number.isFinite(cursorY) && Number.isInteger(sourceGroup)) {
+          const beforeCursorOffset = cursorY - beforeRow.getBoundingClientRect().top;
+
+          renderRows(state.tierlist, state.x);
+
+          const tbody = type === 'identity' ? bodyIdentityEl : bodyEgoEl;
+          const sourceLabel = getGroupLabel(sourceGroup);
+          const afterSourceRow = tbody
+            ? Array.from(tbody.querySelectorAll('tr')).find((row) => row.querySelector('td')?.textContent === sourceLabel)
+            : null;
+
+          if (afterSourceRow) {
+            const afterRowTop = afterSourceRow.getBoundingClientRect().top;
+            const desiredTop = cursorY - beforeCursorOffset;
+            window.scrollBy(0, afterRowTop - desiredTop);
+            return;
+          }
+        }
+      }
+
+      const beforeTop = beforeImg.getBoundingClientRect().top;
+      renderRows(state.tierlist, state.x);
+      setTimeout(() => {
+        const afterImg = document.querySelector(`img[alt="${targetId}"]`);
+        if (!afterImg) {
+          return;
+        }
+
+        const afterTop = afterImg.getBoundingClientRect().top;
+        window.scrollBy(0, afterTop - beforeTop);
+      }, 0);
+    }
+
+    function handleMove(id, type, currentGroup, delta, cursorY) {
       if (!Number.isInteger(id) || !Number.isInteger(currentGroup) || !Number.isInteger(delta)) {
         return;
       }
@@ -559,9 +623,7 @@
       setManualGroupOverride(id, type, target);
       clearGeneratedUrl();
 
-      if (state.tierlist && Number.isFinite(state.x)) {
-        renderRows(state.tierlist, state.x);
-      }
+      renderRowsWithScrollFix(id, currentGroup, type, cursorY);
     }
 
     function handleExceptToggle(id, type, currentGroup, include) {
@@ -618,7 +680,7 @@
 
       if (controlButton.dataset.action === 'move') {
         const delta = Number.parseInt(controlButton.dataset.delta ?? '', 10);
-        handleMove(payload.id, payload.type, payload.group, delta);
+        handleMove(payload.id, payload.type, payload.group, delta, event.clientY);
         return;
       }
 
@@ -1028,6 +1090,12 @@
         if (state.tierlist && Number.isFinite(state.x)) {
           renderRows(state.tierlist, state.x);
         }
+      });
+    });
+
+    scrollFixModeInputs.forEach((input) => {
+      input.addEventListener('change', () => {
+        state.scrollFixMode = input.value;
       });
     });
 
