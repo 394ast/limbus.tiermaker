@@ -82,6 +82,12 @@
     <label><input type="checkbox" id="toggleExceptRows" checked> 除外ランクを表示する</label>
   </div>
 
+  <div class="sync-mode">
+    <span class="indent">カーソル移動:</span>
+    <label><input type="radio" name="cursorSyncMode" value="group-relative" checked> グループ基準で相対位置を固定</label>
+    <label><input type="radio" name="cursorSyncMode" value="follow-button"> ボタンに追従する</label>
+  </div>
+
   <div class="share-url-tools">
     <button type="button" id="generateUrlButton">URLを生成する</button>
     <textarea id="generatedUrl" readonly rows="2" placeholder="生成されたURLがここに表示されます"></textarea>
@@ -107,6 +113,7 @@
     const toggleAdjustControlsInput = document.getElementById('toggleAdjustControls');
     const toggleExceptRowsInput = document.getElementById('toggleExceptRows');
     const toggleExceptMoveControlsInput = document.getElementById('toggleExceptMoveControls');
+    const cursorSyncModeInputs = document.querySelectorAll('input[name="cursorSyncMode"]');
     const idRangeFiltersEl = document.getElementById('idRangeFilters');
     const generateUrlButton = document.getElementById('generateUrlButton');
     const generatedUrlInput = document.getElementById('generatedUrl');
@@ -129,6 +136,7 @@
       },
       baseValueById: new Map(),
       changeParam: null,
+      cursorSyncMode: 'group-relative',
     };
 
     const GROUP_META = {
@@ -511,8 +519,120 @@
           const orderedIds = orderVisibleIds(visibleIds);
           const label = getGroupLabel(groupValue);
           const tierClass = getGroupClass(groupValue);
-          return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(orderedIds, groupValue, type)}</td></tr>`;
+          return `<tr data-type="${type}" data-group="${groupValue}"><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(orderedIds, groupValue, type)}</td></tr>`;
         }).join('');
+    }
+
+    function getCursorSyncMode() {
+      const checked = document.querySelector('input[name="cursorSyncMode"]:checked');
+      const mode = checked?.value;
+      return mode === 'follow-button' ? mode : 'group-relative';
+    }
+
+    function captureFocusContext(controlButton, payload) {
+      if (!(controlButton instanceof HTMLButtonElement) || !payload) {
+        return null;
+      }
+
+      const row = controlButton.closest(`tr[data-type="${payload.type}"][data-group="${payload.group}"]`);
+      if (!row) {
+        return null;
+      }
+
+      const groupRect = row.getBoundingClientRect();
+      const buttonRect = controlButton.getBoundingClientRect();
+      return {
+        mode: getCursorSyncMode(),
+        type: payload.type,
+        group: payload.group,
+        id: payload.id,
+        action: controlButton.dataset.action,
+        delta: controlButton.dataset.delta ?? null,
+        include: controlButton.dataset.include ?? null,
+        offsetLeft: buttonRect.left - groupRect.left,
+        offsetTop: buttonRect.top - groupRect.top,
+      };
+    }
+
+    function findClosestButtonInGroup(type, group, targetLeft, targetTop) {
+      const row = document.querySelector(`tr[data-type="${type}"][data-group="${group}"]`);
+      if (!row) {
+        return null;
+      }
+
+      const buttons = row.querySelectorAll('button[data-action]');
+      if (!buttons.length) {
+        return null;
+      }
+
+      let closestButton = null;
+      let minDistance = Number.POSITIVE_INFINITY;
+
+      buttons.forEach((button) => {
+        if (!(button instanceof HTMLButtonElement) || button.disabled) {
+          return;
+        }
+
+        const rect = button.getBoundingClientRect();
+        const centerLeft = rect.left + rect.width / 2;
+        const centerTop = rect.top + rect.height / 2;
+        const distance = (centerLeft - targetLeft) ** 2 + (centerTop - targetTop) ** 2;
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestButton = button;
+        }
+      });
+
+      return closestButton;
+    }
+
+    function findFollowButton(context) {
+      if (!context) {
+        return null;
+      }
+
+      const baseSelector = `button[data-id="${context.id}"][data-type="${context.type}"]`;
+      if (context.action === 'move' && context.delta !== null) {
+        return document.querySelector(`${baseSelector}[data-action="move"][data-delta="${context.delta}"]`);
+      }
+
+      if (context.action === 'toggle-except' && context.include !== null) {
+        const nextInclude = context.include === '1' ? '0' : '1';
+        return document.querySelector(`${baseSelector}[data-action="toggle-except"][data-include="${nextInclude}"]`);
+      }
+
+      return null;
+    }
+
+    function restoreFocus(context) {
+      if (!context) {
+        return;
+      }
+
+      let targetButton = null;
+
+      if (context.mode === 'follow-button') {
+        targetButton = findFollowButton(context);
+      }
+
+      if (!targetButton && context.mode === 'group-relative') {
+        const row = document.querySelector(`tr[data-type="${context.type}"][data-group="${context.group}"]`);
+        if (row) {
+          const groupRect = row.getBoundingClientRect();
+          const targetLeft = groupRect.left + context.offsetLeft;
+          const targetTop = groupRect.top + context.offsetTop;
+          targetButton = findClosestButtonInGroup(context.type, context.group, targetLeft, targetTop);
+        }
+      }
+
+      if (!targetButton) {
+        targetButton = findFollowButton(context);
+      }
+
+      if (targetButton instanceof HTMLButtonElement) {
+        targetButton.focus();
+      }
     }
 
     function renderRows(tierlist, x) {
@@ -616,15 +736,19 @@
         return;
       }
 
+      const focusContext = captureFocusContext(controlButton, payload);
+
       if (controlButton.dataset.action === 'move') {
         const delta = Number.parseInt(controlButton.dataset.delta ?? '', 10);
         handleMove(payload.id, payload.type, payload.group, delta);
+        restoreFocus(focusContext);
         return;
       }
 
       if (controlButton.dataset.action === 'toggle-except') {
         const include = controlButton.dataset.include === '1';
         handleExceptToggle(payload.id, payload.type, payload.group, include);
+        restoreFocus(focusContext);
       }
     }
 
@@ -1033,6 +1157,16 @@
 
     if (generateUrlButton) {
       generateUrlButton.addEventListener('click', generateShareUrl);
+    }
+
+    if (cursorSyncModeInputs.length) {
+      cursorSyncModeInputs.forEach((input) => {
+        input.addEventListener('change', () => {
+          state.cursorSyncMode = getCursorSyncMode();
+        });
+      });
+
+      state.cursorSyncMode = getCursorSyncMode();
     }
 
     loadAndRender();
