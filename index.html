@@ -45,6 +45,8 @@
 <body>
   <h2>みんなでつくる　リンバスTier表</h2>
 
+  <div id="status" aria-live="polite" hidden></div>
+
   <div id="idRangeFilters" class="id-range-filters"></div>
 
   <div class="grid-line">
@@ -99,6 +101,28 @@
       exceptIdentityIds: new Set(),
       exceptEgoIds: new Set(),
       exceptRestoreGroupById: new Map(),
+      baseGroupedByType: {
+        identity: null,
+        ego: null,
+      },
+      baseGroupedSnapshot: {
+        tierlist: null,
+        x: null,
+      },
+      changeParam: null,
+    };
+
+    const GROUP_META = {
+      9: { label: 'SS', className: 'tier-ss' },
+      8: { label: 'S+', className: 'tier-s-plus' },
+      7: { label: 'S', className: 'tier-s' },
+      6: { label: 'S-', className: 'tier-s-minus' },
+      5: { label: 'A', className: 'tier-a' },
+      4: { label: 'B', className: 'tier-b' },
+      3: { label: 'C', className: 'tier-c' },
+      2: { label: 'D', className: 'tier-d' },
+      1: { label: 'E', className: 'tier-e' },
+      0: { label: '除外', className: 'tier-except' },
     };
 
     function calcValue(row, x) {
@@ -146,6 +170,58 @@
       });
 
       return { grouped, idToGroup };
+    }
+
+
+    function cloneGroupedData(baseData) {
+      const grouped = new Map();
+      baseData.grouped.forEach((ids, groupValue) => {
+        grouped.set(groupValue, [...ids]);
+      });
+
+      return {
+        grouped,
+        idToGroup: new Map(baseData.idToGroup),
+      };
+    }
+
+    function initializeBaseGroupedData(tierlist, x) {
+      const identityRows = [];
+      const egoRows = [];
+
+      tierlist.forEach((row) => {
+        if (row[0] < 13001) {
+          identityRows.push(row);
+          return;
+        }
+
+        egoRows.push(row);
+      });
+
+      state.baseGroupedByType.identity = buildGroupedData(identityRows, x);
+      state.baseGroupedByType.ego = buildGroupedData(egoRows, x);
+      state.baseGroupedSnapshot.tierlist = tierlist;
+      state.baseGroupedSnapshot.x = x;
+    }
+
+    function getBaseGroupForId(type, id) {
+      const baseData = state.baseGroupedByType[type];
+      if (!baseData) {
+        return null;
+      }
+
+      const baseGroup = baseData.idToGroup.get(id);
+      return Number.isInteger(baseGroup) ? baseGroup : null;
+    }
+
+    function setManualGroupOverride(id, type, targetGroup) {
+      const baseGroup = getBaseGroupForId(type, id);
+      if (baseGroup !== null && targetGroup === baseGroup) {
+        state.manualGroupById.delete(id);
+        return;
+      }
+
+      state.manualGroupById.set(id, targetGroup);
     }
 
     function moveIdBetweenGroups(grouped, idToGroup, id, targetGroup) {
@@ -243,31 +319,11 @@
     }
 
     function getGroupLabel(groupValue) {
-      if (groupValue === 9) return 'SS';
-      if (groupValue === 8) return 'S+';
-      if (groupValue === 7) return 'S';
-      if (groupValue === 6) return 'S-';
-      if (groupValue === 5) return 'A';
-      if (groupValue === 4) return 'B';
-      if (groupValue === 3) return 'C';
-      if (groupValue === 2) return 'D';
-      if (groupValue === 1) return 'E';
-      if (groupValue === 0) return '除外';
-      return String(groupValue);
+      return GROUP_META[groupValue]?.label ?? String(groupValue);
     }
 
     function getGroupClass(groupValue) {
-      if (groupValue === 9) return 'tier-ss';
-      if (groupValue === 8) return 'tier-s-plus';
-      if (groupValue === 7) return 'tier-s';
-      if (groupValue === 6) return 'tier-s-minus';
-      if (groupValue === 5) return 'tier-a';
-      if (groupValue === 4) return 'tier-b';
-      if (groupValue === 3) return 'tier-c';
-      if (groupValue === 2) return 'tier-d';
-      if (groupValue === 1) return 'tier-e';
-      if (groupValue === 0) return 'tier-except';
-      return '';
+      return GROUP_META[groupValue]?.className ?? '';
     }
 
     function getIdRangeFilters() {
@@ -315,8 +371,25 @@
       }
     }
 
-    function isIdVisibleByRange(id) {
+    function getVisibleBuckets() {
       if (!idRangeFiltersEl) {
+        return null;
+      }
+
+      const visibleBuckets = new Set();
+      const checkboxes = idRangeFiltersEl.querySelectorAll('input[data-action="toggle-id-range"]:checked');
+      checkboxes.forEach((checkbox) => {
+        const bucket = Number.parseInt(checkbox.dataset.bucket ?? '', 10);
+        if (Number.isInteger(bucket)) {
+          visibleBuckets.add(bucket);
+        }
+      });
+
+      return visibleBuckets;
+    }
+
+    function isIdVisibleByRange(id, visibleBuckets) {
+      if (!visibleBuckets) {
         return true;
       }
 
@@ -325,43 +398,53 @@
         return true;
       }
 
-      const checkbox = idRangeFiltersEl.querySelector(`input[data-action="toggle-id-range"][data-bucket="${bucket}"]`);
-      return !checkbox || checkbox.checked;
+      return visibleBuckets.has(bucket);
     }
 
     function shouldShowExceptRows() {
       return !toggleExceptRowsInput || toggleExceptRowsInput.checked;
     }
 
+    function shouldSortIdsAscending() {
+      return state.changeParam !== '1';
+    }
+
+    function renderTypeRows(type, baseData, showExceptRows, visibleBuckets) {
+      if (!baseData) {
+        return '';
+      }
+
+      const workingData = cloneGroupedData(baseData);
+      applyManualAndExceptOverrides(workingData.grouped, workingData.idToGroup, type);
+
+      return Array.from(workingData.grouped.entries())
+        .filter(([groupValue]) => showExceptRows || groupValue !== 0)
+        .map(([groupValue, ids]) => {
+          const visibleIds = ids.filter((id) => isIdVisibleByRange(id, visibleBuckets));
+          const orderedIds = shouldSortIdsAscending() ? [...visibleIds].sort((a, b) => a - b) : visibleIds;
+          const label = getGroupLabel(groupValue);
+          const tierClass = getGroupClass(groupValue);
+          return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(orderedIds, groupValue, type)}</td></tr>`;
+        }).join('');
+    }
+
     function renderRows(tierlist, x) {
-      const identityRows = tierlist.filter((row) => row[0] < 13001);
-      const egoRows = tierlist.filter((row) => row[0] >= 13001);
+      const needsRebuild = (
+        !state.baseGroupedByType.identity
+        || !state.baseGroupedByType.ego
+        || state.baseGroupedSnapshot.tierlist !== tierlist
+        || state.baseGroupedSnapshot.x !== x
+      );
 
-      const identityData = buildGroupedData(identityRows, x);
-      const egoData = buildGroupedData(egoRows, x);
-
-      applyManualAndExceptOverrides(identityData.grouped, identityData.idToGroup, 'identity');
-      applyManualAndExceptOverrides(egoData.grouped, egoData.idToGroup, 'ego');
+      if (needsRebuild) {
+        initializeBaseGroupedData(tierlist, x);
+      }
 
       const showExceptRows = shouldShowExceptRows();
+      const visibleBuckets = getVisibleBuckets();
 
-      bodyIdentityEl.innerHTML = Array.from(identityData.grouped.entries())
-        .filter(([groupValue]) => showExceptRows || groupValue !== 0)
-        .map(([groupValue, ids]) => {
-        const visibleIds = ids.filter((id) => isIdVisibleByRange(id));
-        const label = getGroupLabel(groupValue);
-        const tierClass = getGroupClass(groupValue);
-        return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(visibleIds, groupValue, 'identity')}</td></tr>`;
-      }).join('');
-
-      bodyEgoEl.innerHTML = Array.from(egoData.grouped.entries())
-        .filter(([groupValue]) => showExceptRows || groupValue !== 0)
-        .map(([groupValue, ids]) => {
-        const visibleIds = ids.filter((id) => isIdVisibleByRange(id));
-        const label = getGroupLabel(groupValue);
-        const tierClass = getGroupClass(groupValue);
-        return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(visibleIds, groupValue, 'ego')}</td></tr>`;
-      }).join('');
+      bodyIdentityEl.innerHTML = renderTypeRows('identity', state.baseGroupedByType.identity, showExceptRows, visibleBuckets);
+      bodyEgoEl.innerHTML = renderTypeRows('ego', state.baseGroupedByType.ego, showExceptRows, visibleBuckets);
     }
 
     function handleMove(id, type, currentGroup, delta) {
@@ -376,7 +459,7 @@
 
       getExceptSet(type).delete(id);
       state.exceptRestoreGroupById.delete(id);
-      state.manualGroupById.set(id, target);
+      setManualGroupOverride(id, type, target);
 
       if (state.tierlist && Number.isFinite(state.x)) {
         renderRows(state.tierlist, state.x);
@@ -395,7 +478,7 @@
 
         const restoreGroup = state.exceptRestoreGroupById.get(id);
         if (Number.isInteger(restoreGroup) && restoreGroup >= 1 && restoreGroup <= 9) {
-          state.manualGroupById.set(id, restoreGroup);
+          setManualGroupOverride(id, type, restoreGroup);
         }
       } else {
         if (currentGroup > 0) {
@@ -561,6 +644,13 @@
       const params = new URLSearchParams(window.location.search);
       const tableParam = params.get('T');
       const xParam = params.get('X');
+      const changeParam = params.get('S');
+
+      state.changeParam = changeParam;
+
+      if (statusEl) {
+        statusEl.hidden = !(changeParam !== null && changeParam !== '');
+      }
 
       const tableIndex = Number.parseInt(tableParam ?? String(DEFAULT_T), 10);
       const xValue = xParam !== null ? Number(xParam) : DEFAULT_X;
@@ -590,6 +680,7 @@
         const tierlist = await response.json();
         state.tierlist = tierlist;
         state.x = x;
+        initializeBaseGroupedData(tierlist, x);
         renderRows(tierlist, x);
 
         statusEl.textContent = `読み込み完了（table${tableIndex} / 件数: ${tierlist.length} / X: ${x}）`;
@@ -600,6 +691,10 @@
         statusEl.className = 'error';
         bodyIdentityEl.innerHTML = '';
         bodyEgoEl.innerHTML = '';
+        state.baseGroupedByType.identity = null;
+        state.baseGroupedByType.ego = null;
+        state.baseGroupedSnapshot.tierlist = null;
+        state.baseGroupedSnapshot.x = null;
       }
     }
 
