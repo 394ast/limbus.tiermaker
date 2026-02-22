@@ -57,7 +57,7 @@
   <div id="idRangeFilters" class="id-range-filters"></div>
 
   <div class="grid-line">
-    <span class="indent">画像サイズ:</span><div id="imgSizeForm">
+    <span class="indent">画像のサイズ:</span><div id="imgSizeForm">
       <input type="radio" name="imgSize" value="size1">小
       <input type="radio" name="imgSize" value="size2">中
       <input type="radio" name="imgSize" value="size3" checked>大
@@ -67,27 +67,27 @@
   </div>
 
   <div class="sync-mode">
-    <span class="indent">人格画像:</span>
+    <span class="indent">人格の画像:</span>
     <label><input type="radio" name="syncMode" value="before"> 同期前</label>
     <label><input type="radio" name="syncMode" value="after" checked> 同期後</label>
   </div>
 
   <div class="sync-mode">
-    <label><input type="checkbox" id="toggleAdjustControls" checked> Tierの移動ボタンを表示</label>
+    <label><input type="checkbox" id="toggleAdjustControls" checked> Tierの移動ボタンを表示する</label>
   </div>
 
   <div class="sync-mode">
     <label><input type="checkbox" id="toggleExceptMoveControls" checked> 除外ランクへの移動ボタンを表示する</label>
   </div>
 
-  <div class="scroll-fix-options">
-    <span class="indent">スクロール補正:</span>
-    <label><input type="radio" name="scrollFixMode" value="group-relative" checked> グループ基準で相対位置を固定</label>
-    <label><input type="radio" name="scrollFixMode" value="item-delta"> 押したIDの位置差分で補正</label>
-  </div>
-
   <div class="sync-mode">
     <label><input type="checkbox" id="toggleExceptRows" checked> 除外ランクを表示する</label>
+  </div>
+
+  <div class="scroll-fix-options">
+    <span class="indent">Tier移動後のカーソルの位置:</span>
+    <label><input type="radio" name="scrollFixMode" value="group-relative" checked> 移動前のランクのままにする</label>
+    <label><input type="radio" name="scrollFixMode" value="item-delta"> 移動後のランクにカーソルを移動する</label>
   </div>
 
   <div class="share-url-tools">
