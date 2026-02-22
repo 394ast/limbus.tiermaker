@@ -11,7 +11,9 @@
       #imgSizeForm input[type="number"] { width: 72px; }
       .sync-mode { margin: 8px 0 12px; }
       .sync-mode label { margin-right: 12px; }
-      .id-range-filters { margin: 8px 0 12px; border: 1px solid #ccc; border-radius: 6px; padding: 8px; }
+      .scroll-fix-options { margin: 8px 0 12px; }
+      .scroll-fix-options label { margin-right: 12px; }
+      .id-range-filters { margin: 8px 0 12px; border: 1px solid #d7d7d7; border-radius: 4px; padding: 4px 6px; width: fit-content; max-width: 100%; }
       .id-range-group { margin-bottom: 8px; }
       .id-range-title { font-weight: 600; margin: 0 0 4px; }
       .id-range-options { display: flex; flex-wrap: wrap; gap: 4px 12px; }
@@ -40,10 +42,17 @@
       .id-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
       .id-controls label { font-size: 12px; }
       .hide-adjust-controls .id-controls { display: none; }
+      .share-url-tools { margin: 8px 0 12px; display: grid; gap: 6px; }
+      #generateUrlButton { width: fit-content; font-size: 13px; padding: 4px 10px; }
+      .hide-except-move-controls button[data-action="toggle-except"][data-include="0"] { display: none; }
+      #generatedUrl { width: 100%; max-width: 900px; resize: vertical; white-space: pre-wrap; word-break: break-all; overflow-wrap: anywhere; line-height: 1.35; min-height: 3.2em; }
+      #generatedUrl.dynamic-width { width: min(98vw, var(--generated-url-width, 900px)); }
     </style>
 </head>
 <body>
   <h2>みんなでつくる　リンバスTier表</h2>
+
+  <div id="status" aria-live="polite" hidden></div>
 
   <div id="idRangeFilters" class="id-range-filters"></div>
 
@@ -68,7 +77,22 @@
   </div>
 
   <div class="sync-mode">
+    <label><input type="checkbox" id="toggleExceptMoveControls" checked> 除外ランクへの移動ボタンを表示する</label>
+  </div>
+
+  <div class="scroll-fix-options">
+    <span class="indent">スクロール補正:</span>
+    <label><input type="radio" name="scrollFixMode" value="group-relative" checked> グループ基準で相対位置を固定</label>
+    <label><input type="radio" name="scrollFixMode" value="item-delta"> 押したIDの位置差分で補正</label>
+  </div>
+
+  <div class="sync-mode">
     <label><input type="checkbox" id="toggleExceptRows" checked> 除外ランクを表示する</label>
+  </div>
+
+  <div class="share-url-tools">
+    <button type="button" id="generateUrlButton">URLを生成する</button>
+    <textarea id="generatedUrl" readonly rows="2" placeholder="生成されたURLがここに表示されます"></textarea>
   </div>
 
   <h3>人格Tier</h3>
@@ -90,16 +114,49 @@
     const customWidthInput = document.getElementById('customWidth');
     const toggleAdjustControlsInput = document.getElementById('toggleAdjustControls');
     const toggleExceptRowsInput = document.getElementById('toggleExceptRows');
+    const toggleExceptMoveControlsInput = document.getElementById('toggleExceptMoveControls');
     const idRangeFiltersEl = document.getElementById('idRangeFilters');
+    const generateUrlButton = document.getElementById('generateUrlButton');
+    const generatedUrlInput = document.getElementById('generatedUrl');
+    const scrollFixModeInputs = document.querySelectorAll('input[name="scrollFixMode"]');
 
     const state = {
       tierlist: null,
       x: null,
+      tableIndex: 0,
       manualGroupById: new Map(),
       exceptIdentityIds: new Set(),
       exceptEgoIds: new Set(),
       exceptRestoreGroupById: new Map(),
+      baseGroupedByType: {
+        identity: null,
+        ego: null,
+      },
+      baseGroupedSnapshot: {
+        tierlist: null,
+        x: null,
+      },
+      baseValueById: new Map(),
+      changeParam: null,
+      scrollFixMode: 'group-relative',
     };
+
+    const GROUP_META = {
+      9: { label: 'SS', className: 'tier-ss' },
+      8: { label: 'S+', className: 'tier-s-plus' },
+      7: { label: 'S', className: 'tier-s' },
+      6: { label: 'S-', className: 'tier-s-minus' },
+      5: { label: 'A', className: 'tier-a' },
+      4: { label: 'B', className: 'tier-b' },
+      3: { label: 'C', className: 'tier-c' },
+      2: { label: 'D', className: 'tier-d' },
+      1: { label: 'E', className: 'tier-e' },
+      0: { label: '除外', className: 'tier-except' },
+    };
+
+    const GENERATED_URL_BASE_WIDTH_PX = 900;
+    const GENERATED_URL_BASE_ROWS = 2;
+
 
     function calcValue(row, x) {
       const numerator = row[1] + 0.01 * x * row[3];
@@ -146,6 +203,70 @@
       });
 
       return { grouped, idToGroup };
+    }
+
+
+    function cloneGroupedData(baseData) {
+      const grouped = new Map();
+      baseData.grouped.forEach((ids, groupValue) => {
+        grouped.set(groupValue, [...ids]);
+      });
+
+      return {
+        grouped,
+        idToGroup: new Map(baseData.idToGroup),
+      };
+    }
+
+    function initializeBaseGroupedData(tierlist, x) {
+      const identityRows = [];
+      const egoRows = [];
+      const baseValueById = new Map();
+
+      tierlist.forEach((row) => {
+        const id = row[0];
+        baseValueById.set(id, calcValue(row, x));
+
+        if (id < 13001) {
+          identityRows.push(row);
+          return;
+        }
+
+        egoRows.push(row);
+      });
+
+      state.baseGroupedByType.identity = buildGroupedData(identityRows, x);
+      state.baseGroupedByType.ego = buildGroupedData(egoRows, x);
+      state.baseGroupedSnapshot.tierlist = tierlist;
+      state.baseGroupedSnapshot.x = x;
+      state.baseValueById = baseValueById;
+    }
+
+    function getBaseGroupForId(type, id) {
+      const baseData = state.baseGroupedByType[type];
+      if (!baseData) {
+        return null;
+      }
+
+      const baseGroup = baseData.idToGroup.get(id);
+      return Number.isInteger(baseGroup) ? baseGroup : null;
+    }
+
+    function setManualGroupOverride(id, type, targetGroup) {
+      const baseGroup = getBaseGroupForId(type, id);
+      if (baseGroup !== null && targetGroup === baseGroup) {
+        state.manualGroupById.delete(id);
+        return;
+      }
+
+      state.manualGroupById.set(id, targetGroup);
+    }
+
+    function resetDiffState() {
+      state.manualGroupById.clear();
+      state.exceptIdentityIds.clear();
+      state.exceptEgoIds.clear();
+      state.exceptRestoreGroupById.clear();
     }
 
     function moveIdBetweenGroups(grouped, idToGroup, id, targetGroup) {
@@ -203,10 +324,8 @@
     }
 
     function renderControlButtons(id, groupValue, isExcept, type) {
-      const includeChecked = getExceptSet(type).has(id) ? '' : 'checked';
-
       if (isExcept) {
-        return `<label><input type="checkbox" data-action="toggle-except" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${includeChecked}> </label>`;
+        return `<button type="button" data-action="toggle-except" data-include="1" data-id="${id}" data-type="${type}" data-group="${groupValue}">戻す</button>`;
       }
 
       const disablePlus2 = groupValue >= 8;
@@ -217,7 +336,7 @@
       return [
         `<button type="button" data-action="move" data-delta="2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus2 ? 'disabled' : ''}>+2</button>`,
         `<button type="button" data-action="move" data-delta="1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus1 ? 'disabled' : ''}>+1</button>`,
-        `<label><input type="checkbox" data-action="toggle-except" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${includeChecked}> </label>`,
+        `<button type="button" data-action="toggle-except" data-include="0" data-id="${id}" data-type="${type}" data-group="${groupValue}">除外</button>`,
         `<button type="button" data-action="move" data-delta="-1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus1 ? 'disabled' : ''}>-1</button>`,
         `<button type="button" data-action="move" data-delta="-2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus2 ? 'disabled' : ''}> -2</button>`
       ].join('');
@@ -243,31 +362,11 @@
     }
 
     function getGroupLabel(groupValue) {
-      if (groupValue === 9) return 'SS';
-      if (groupValue === 8) return 'S+';
-      if (groupValue === 7) return 'S';
-      if (groupValue === 6) return 'S-';
-      if (groupValue === 5) return 'A';
-      if (groupValue === 4) return 'B';
-      if (groupValue === 3) return 'C';
-      if (groupValue === 2) return 'D';
-      if (groupValue === 1) return 'E';
-      if (groupValue === 0) return '除外';
-      return String(groupValue);
+      return GROUP_META[groupValue]?.label ?? String(groupValue);
     }
 
     function getGroupClass(groupValue) {
-      if (groupValue === 9) return 'tier-ss';
-      if (groupValue === 8) return 'tier-s-plus';
-      if (groupValue === 7) return 'tier-s';
-      if (groupValue === 6) return 'tier-s-minus';
-      if (groupValue === 5) return 'tier-a';
-      if (groupValue === 4) return 'tier-b';
-      if (groupValue === 3) return 'tier-c';
-      if (groupValue === 2) return 'tier-d';
-      if (groupValue === 1) return 'tier-e';
-      if (groupValue === 0) return 'tier-except';
-      return '';
+      return GROUP_META[groupValue]?.className ?? '';
     }
 
     function getIdRangeFilters() {
@@ -310,13 +409,32 @@
         checkbox.checked = checked;
       });
 
+      clearGeneratedUrl();
+
       if (state.tierlist && Number.isFinite(state.x)) {
         renderRows(state.tierlist, state.x);
       }
     }
 
-    function isIdVisibleByRange(id) {
+    function getVisibleBuckets() {
       if (!idRangeFiltersEl) {
+        return null;
+      }
+
+      const visibleBuckets = new Set();
+      const checkboxes = idRangeFiltersEl.querySelectorAll('input[data-action="toggle-id-range"]:checked');
+      checkboxes.forEach((checkbox) => {
+        const bucket = Number.parseInt(checkbox.dataset.bucket ?? '', 10);
+        if (Number.isInteger(bucket)) {
+          visibleBuckets.add(bucket);
+        }
+      });
+
+      return visibleBuckets;
+    }
+
+    function isIdVisibleByRange(id, visibleBuckets) {
+      if (!visibleBuckets) {
         return true;
       }
 
@@ -325,43 +443,168 @@
         return true;
       }
 
-      const checkbox = idRangeFiltersEl.querySelector(`input[data-action="toggle-id-range"][data-bucket="${bucket}"]`);
-      return !checkbox || checkbox.checked;
+      return visibleBuckets.has(bucket);
     }
 
     function shouldShowExceptRows() {
       return !toggleExceptRowsInput || toggleExceptRowsInput.checked;
     }
 
+    function shouldSortByCalcValueDesc() {
+      return state.changeParam === '1';
+    }
+
+    function shouldShowDiffOnly() {
+      return state.changeParam === '2';
+    }
+
+    function orderVisibleIds(ids) {
+      if (shouldSortByCalcValueDesc()) {
+        return [...ids].sort((a, b) => {
+          const valueA = state.baseValueById.get(a) ?? Number.NEGATIVE_INFINITY;
+          const valueB = state.baseValueById.get(b) ?? Number.NEGATIVE_INFINITY;
+          if (valueB !== valueA) {
+            return valueB - valueA;
+          }
+
+          return a - b;
+        });
+      }
+
+      return [...ids].sort((a, b) => a - b);
+    }
+
+    function buildDiffOnlyGroupedData(type) {
+      const grouped = new Map();
+      for (let group = 9; group >= 0; group -= 1) {
+        grouped.set(group, []);
+      }
+
+      state.manualGroupById.forEach((groupValue, id) => {
+        if (!belongsToType(id, type)) {
+          return;
+        }
+
+        if (groupValue < 1 || groupValue > 9) {
+          return;
+        }
+
+        grouped.get(groupValue).push(id);
+      });
+
+      getExceptSet(type).forEach((id) => {
+        grouped.get(0).push(id);
+      });
+
+      return grouped;
+    }
+
+    function renderTypeRows(type, baseData, showExceptRows, visibleBuckets) {
+      let grouped;
+
+      if (shouldShowDiffOnly()) {
+        grouped = buildDiffOnlyGroupedData(type);
+      } else {
+        if (!baseData) {
+          return '';
+        }
+
+        const workingData = cloneGroupedData(baseData);
+        applyManualAndExceptOverrides(workingData.grouped, workingData.idToGroup, type);
+        grouped = workingData.grouped;
+      }
+
+      return Array.from(grouped.entries())
+        .filter(([groupValue]) => showExceptRows || groupValue !== 0)
+        .map(([groupValue, ids]) => {
+          const visibleIds = ids.filter((id) => isIdVisibleByRange(id, visibleBuckets));
+          const orderedIds = orderVisibleIds(visibleIds);
+          const label = getGroupLabel(groupValue);
+          const tierClass = getGroupClass(groupValue);
+          return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(orderedIds, groupValue, type)}</td></tr>`;
+        }).join('');
+    }
+
     function renderRows(tierlist, x) {
-      const identityRows = tierlist.filter((row) => row[0] < 13001);
-      const egoRows = tierlist.filter((row) => row[0] >= 13001);
+      const needsRebuild = (
+        !state.baseGroupedByType.identity
+        || !state.baseGroupedByType.ego
+        || state.baseGroupedSnapshot.tierlist !== tierlist
+        || state.baseGroupedSnapshot.x !== x
+      );
 
-      const identityData = buildGroupedData(identityRows, x);
-      const egoData = buildGroupedData(egoRows, x);
-
-      applyManualAndExceptOverrides(identityData.grouped, identityData.idToGroup, 'identity');
-      applyManualAndExceptOverrides(egoData.grouped, egoData.idToGroup, 'ego');
+      if (needsRebuild) {
+        initializeBaseGroupedData(tierlist, x);
+      }
 
       const showExceptRows = shouldShowExceptRows();
+      const visibleBuckets = getVisibleBuckets();
 
-      bodyIdentityEl.innerHTML = Array.from(identityData.grouped.entries())
-        .filter(([groupValue]) => showExceptRows || groupValue !== 0)
-        .map(([groupValue, ids]) => {
-        const visibleIds = ids.filter((id) => isIdVisibleByRange(id));
-        const label = getGroupLabel(groupValue);
-        const tierClass = getGroupClass(groupValue);
-        return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(visibleIds, groupValue, 'identity')}</td></tr>`;
-      }).join('');
+      bodyIdentityEl.innerHTML = renderTypeRows('identity', state.baseGroupedByType.identity, showExceptRows, visibleBuckets);
+      bodyEgoEl.innerHTML = renderTypeRows('ego', state.baseGroupedByType.ego, showExceptRows, visibleBuckets);
+    }
 
-      bodyEgoEl.innerHTML = Array.from(egoData.grouped.entries())
-        .filter(([groupValue]) => showExceptRows || groupValue !== 0)
-        .map(([groupValue, ids]) => {
-        const visibleIds = ids.filter((id) => isIdVisibleByRange(id));
-        const label = getGroupLabel(groupValue);
-        const tierClass = getGroupClass(groupValue);
-        return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(visibleIds, groupValue, 'ego')}</td></tr>`;
-      }).join('');
+    function clearGeneratedUrl() {
+      if (generatedUrlInput) {
+        generatedUrlInput.value = '';
+        generatedUrlInput.rows = GENERATED_URL_BASE_ROWS;
+        generatedUrlInput.classList.remove('dynamic-width');
+        generatedUrlInput.style.removeProperty('--generated-url-width');
+        generatedUrlInput.style.height = '';
+      }
+    }
+
+    function getSelectedScrollFixMode() {
+      const checked = document.querySelector('input[name="scrollFixMode"]:checked');
+      return checked ? checked.value : 'group-relative';
+    }
+
+    function renderRowsWithScrollFix(targetId) {
+      if (!state.tierlist || !Number.isFinite(state.x)) {
+        return;
+      }
+
+      const beforeImg = document.querySelector(`img[alt="${targetId}"]`);
+      if (!beforeImg) {
+        renderRows(state.tierlist, state.x);
+        return;
+      }
+
+      const mode = getSelectedScrollFixMode();
+      state.scrollFixMode = mode;
+
+      if (mode === 'group-relative') {
+        const beforeRow = beforeImg.closest('tr');
+        if (beforeRow) {
+          const itemRect = beforeImg.getBoundingClientRect();
+          const rowRect = beforeRow.getBoundingClientRect();
+          const relativeOffset = itemRect.top - rowRect.top;
+
+          renderRows(state.tierlist, state.x);
+
+          const afterImg = document.querySelector(`img[alt="${targetId}"]`);
+          const afterRow = afterImg ? afterImg.closest('tr') : null;
+          if (afterImg && afterRow) {
+            const afterRowRect = afterRow.getBoundingClientRect();
+            const targetTop = afterRowRect.top + relativeOffset;
+            const delta = afterImg.getBoundingClientRect().top - targetTop;
+            window.scrollBy(0, delta);
+          }
+          return;
+        }
+      }
+
+      const beforeTop = beforeImg.getBoundingClientRect().top;
+      renderRows(state.tierlist, state.x);
+      setTimeout(() => {
+        const afterImg = document.querySelector(`img[alt="${targetId}"]`);
+        if (!afterImg) {
+          return;
+        }
+
+        const afterTop = afterImg.getBoundingClientRect().top;
+        window.scrollBy(0, afterTop - beforeTop);
+      }, 0);
     }
 
     function handleMove(id, type, currentGroup, delta) {
@@ -376,26 +619,25 @@
 
       getExceptSet(type).delete(id);
       state.exceptRestoreGroupById.delete(id);
-      state.manualGroupById.set(id, target);
+      setManualGroupOverride(id, type, target);
+      clearGeneratedUrl();
 
-      if (state.tierlist && Number.isFinite(state.x)) {
-        renderRows(state.tierlist, state.x);
-      }
+      renderRowsWithScrollFix(id);
     }
 
-    function handleExceptToggle(id, type, currentGroup, checked) {
+    function handleExceptToggle(id, type, currentGroup, include) {
       if (!Number.isInteger(id) || !Number.isInteger(currentGroup)) {
         return;
       }
 
       const exceptIds = getExceptSet(type);
 
-      if (checked) {
+      if (include) {
         exceptIds.delete(id);
 
         const restoreGroup = state.exceptRestoreGroupById.get(id);
         if (Number.isInteger(restoreGroup) && restoreGroup >= 1 && restoreGroup <= 9) {
-          state.manualGroupById.set(id, restoreGroup);
+          setManualGroupOverride(id, type, restoreGroup);
         }
       } else {
         if (currentGroup > 0) {
@@ -404,6 +646,8 @@
 
         exceptIds.add(id);
       }
+
+      clearGeneratedUrl();
 
       if (state.tierlist && Number.isFinite(state.x)) {
         renderRows(state.tierlist, state.x);
@@ -423,41 +667,37 @@
     }
 
     function onControlClick(event) {
-      const moveButton = event.target.closest('button[data-action="move"]');
-      if (!moveButton) {
+      const controlButton = event.target.closest('button[data-action]');
+      if (!controlButton) {
         return;
       }
 
-      const payload = parseControlPayload(moveButton);
+      const payload = parseControlPayload(controlButton);
       if (!payload) {
         return;
       }
 
-      const delta = Number.parseInt(moveButton.dataset.delta ?? '', 10);
-      handleMove(payload.id, payload.type, payload.group, delta);
-    }
-
-    function onControlChange(event) {
-      const exceptCheckbox = event.target.closest('input[data-action="toggle-except"]');
-      if (!exceptCheckbox) {
+      if (controlButton.dataset.action === 'move') {
+        const delta = Number.parseInt(controlButton.dataset.delta ?? '', 10);
+        handleMove(payload.id, payload.type, payload.group, delta);
         return;
       }
 
-      const payload = parseControlPayload(exceptCheckbox);
-      if (!payload) {
-        return;
+      if (controlButton.dataset.action === 'toggle-except') {
+        const include = controlButton.dataset.include === '1';
+        handleExceptToggle(payload.id, payload.type, payload.group, include);
       }
-
-      handleExceptToggle(payload.id, payload.type, payload.group, exceptCheckbox.checked);
     }
 
     bodyIdentityEl.addEventListener('click', onControlClick);
     bodyEgoEl.addEventListener('click', onControlClick);
-    bodyIdentityEl.addEventListener('change', onControlChange);
-    bodyEgoEl.addEventListener('change', onControlChange);
 
     function applyAdjustControlVisibility(show) {
       document.body.classList.toggle('hide-adjust-controls', !show);
+    }
+
+    function applyExceptMoveControlVisibility(show) {
+      document.body.classList.toggle('hide-except-move-controls', !show);
     }
 
     if (toggleAdjustControlsInput) {
@@ -466,6 +706,14 @@
       });
 
       applyAdjustControlVisibility(toggleAdjustControlsInput.checked);
+    }
+
+    if (toggleExceptMoveControlsInput) {
+      toggleExceptMoveControlsInput.addEventListener('change', () => {
+        applyExceptMoveControlVisibility(toggleExceptMoveControlsInput.checked);
+      });
+
+      applyExceptMoveControlVisibility(toggleExceptMoveControlsInput.checked);
     }
 
     if (toggleExceptRowsInput) {
@@ -504,6 +752,218 @@
           setAllRangeFilters(true);
         }
       });
+    }
+
+    function encodeDiffId(id) {
+      const high = Math.floor(id / 1000);
+      const low = id % 100;
+
+      if (high > 35 || low > 35) {
+        throw new Error(`ID ${id} は圧縮形式の範囲外です（上位・下位とも35以下が必要）`);
+      }
+
+      return {
+        id,
+        high,
+        low,
+        highChar: high.toString(36),
+        lowChar: low.toString(36),
+      };
+    }
+
+    function compressEncodedIds(ids) {
+      const encoded = ids
+        .slice()
+        .sort((a, b) => a - b)
+        .map((id) => encodeDiffId(id));
+
+      let result = '';
+      let index = 0;
+
+      while (index < encoded.length) {
+        const start = encoded[index];
+        let endIndex = index;
+
+        while (
+          endIndex + 1 < encoded.length
+          && encoded[endIndex + 1].high === start.high
+          && encoded[endIndex + 1].low === encoded[endIndex].low + 1
+        ) {
+          endIndex += 1;
+        }
+
+        const runLength = endIndex - index + 1;
+        if (runLength >= 3) {
+          result += `${start.highChar}${start.lowChar}~${encoded[endIndex].lowChar}`;
+          index = endIndex + 1;
+          continue;
+        }
+
+        for (let i = index; i <= endIndex; i += 1) {
+          result += `${encoded[i].highChar}${encoded[i].lowChar}`;
+        }
+
+        index = endIndex + 1;
+      }
+
+      return result;
+    }
+
+    function toBase64Url(input) {
+      return btoa(input)
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/g, '');
+    }
+
+    function fromBase64Url(input) {
+      const normalized = input
+        .replace(/-/g, '+')
+        .replace(/_/g, '/');
+
+      const padLength = (4 - (normalized.length % 4)) % 4;
+      return atob(`${normalized}${'='.repeat(padLength)}`);
+    }
+
+    function decodeSection(section) {
+      if (!section) {
+        return [];
+      }
+
+      const ids = [];
+      let i = 0;
+
+      while (i < section.length) {
+        const highChar = section[i];
+        const lowChar = section[i + 1];
+
+        if (!highChar || !lowChar) {
+          throw new Error('Cパラメータの形式が不正です（ID桁不足）');
+        }
+
+        const high = Number.parseInt(highChar, 36);
+        const lowStart = Number.parseInt(lowChar, 36);
+
+        if (!Number.isInteger(high) || !Number.isInteger(lowStart)) {
+          throw new Error('Cパラメータの形式が不正です（base36変換失敗）');
+        }
+
+        const rangeMark = section[i + 2];
+        if (rangeMark === '~') {
+          const lowEndChar = section[i + 3];
+          const lowEnd = Number.parseInt(lowEndChar ?? '', 36);
+
+          if (!Number.isInteger(lowEnd) || lowEnd < lowStart) {
+            throw new Error('Cパラメータの形式が不正です（範囲指定）');
+          }
+
+          for (let low = lowStart; low <= lowEnd; low += 1) {
+            ids.push(high * 1000 + low);
+          }
+
+          i += 4;
+          continue;
+        }
+
+        ids.push(high * 1000 + lowStart);
+        i += 2;
+      }
+
+      return ids;
+    }
+
+    function applyCompressedDiffParam(cParam) {
+      resetDiffState();
+
+      if (!cParam) {
+        return;
+      }
+
+      const decoded = fromBase64Url(cParam);
+      const sections = decoded.split('.');
+      if (sections.length !== 10) {
+        throw new Error('Cパラメータの形式が不正です（セクション数）');
+      }
+
+      for (let sectionIndex = 0; sectionIndex < sections.length; sectionIndex += 1) {
+        const group = 9 - sectionIndex;
+        const ids = decodeSection(sections[sectionIndex]);
+
+        ids.forEach((id) => {
+          if (group === 0) {
+            if (belongsToType(id, 'identity')) {
+              state.exceptIdentityIds.add(id);
+            } else {
+              state.exceptEgoIds.add(id);
+            }
+            return;
+          }
+
+          setManualGroupOverride(id, belongsToType(id, 'identity') ? 'identity' : 'ego', group);
+        });
+      }
+    }
+
+    function buildCompressedDiffParam() {
+      const idsByGroup = new Map();
+      for (let group = 0; group <= 9; group += 1) {
+        idsByGroup.set(group, []);
+      }
+
+      const exceptAll = new Set([...state.exceptIdentityIds, ...state.exceptEgoIds]);
+
+      state.manualGroupById.forEach((group, id) => {
+        if (exceptAll.has(id)) {
+          return;
+        }
+
+        if (group >= 1 && group <= 9) {
+          idsByGroup.get(group).push(id);
+        }
+      });
+
+      exceptAll.forEach((id) => idsByGroup.get(0).push(id));
+
+      const sections = [];
+      for (let group = 9; group >= 0; group -= 1) {
+        sections.push(compressEncodedIds(idsByGroup.get(group)));
+      }
+
+      return toBase64Url(sections.join('.'));
+    }
+
+    function generateShareUrl() {
+      if (!state.tierlist || !Number.isFinite(state.x)) {
+        return;
+      }
+
+      try {
+        const compressed = buildCompressedDiffParam();
+        const url = `https://394ast.github.io/limbus.tiermaker/?T=${state.tableIndex}&X=${state.x}&C=${compressed}`;
+
+        if (generatedUrlInput) {
+          generatedUrlInput.value = url;
+          const estimatedWidthPx = Math.max(
+            GENERATED_URL_BASE_WIDTH_PX,
+            Math.min(2200, Math.ceil(url.length * 8.2))
+          );
+          const estimatedRows = Math.max(
+            GENERATED_URL_BASE_ROWS,
+            Math.min(10, Math.ceil(url.length / 140))
+          );
+          generatedUrlInput.rows = estimatedRows;
+          generatedUrlInput.style.setProperty('--generated-url-width', `${estimatedWidthPx}px`);
+          generatedUrlInput.classList.add('dynamic-width');
+          generatedUrlInput.style.height = 'auto';
+          generatedUrlInput.style.height = `${generatedUrlInput.scrollHeight}px`;
+          generatedUrlInput.focus();
+          generatedUrlInput.select();
+        }
+      } catch (err) {
+        if (generatedUrlInput) {
+          generatedUrlInput.value = `URL生成エラー: ${err.message}`;
+        }
+      }
     }
 
     function applyCustomSize(width) {
@@ -561,6 +1021,19 @@
       const params = new URLSearchParams(window.location.search);
       const tableParam = params.get('T');
       const xParam = params.get('X');
+      const changeParam = params.get('S');
+      const compressedParam = changeParam === '1' ? null : params.get('C');
+
+      state.changeParam = changeParam;
+
+      if (toggleAdjustControlsInput && changeParam === '1') {
+        toggleAdjustControlsInput.checked = false;
+        applyAdjustControlVisibility(false);
+      }
+
+      if (statusEl) {
+        statusEl.hidden = !(changeParam !== null && changeParam !== '');
+      }
 
       const tableIndex = Number.parseInt(tableParam ?? String(DEFAULT_T), 10);
       const xValue = xParam !== null ? Number(xParam) : DEFAULT_X;
@@ -568,11 +1041,12 @@
       return {
         tableIndex: Number.isInteger(tableIndex) && tableIndex >= 0 ? tableIndex : DEFAULT_T,
         xValue,
+        compressedParam,
       };
     }
 
     async function loadAndRender() {
-      const { tableIndex, xValue } = getQuerySettings();
+      const { tableIndex, xValue, compressedParam } = getQuerySettings();
       const x = xValue;
 
       if (!Number.isFinite(x)) {
@@ -590,6 +1064,9 @@
         const tierlist = await response.json();
         state.tierlist = tierlist;
         state.x = x;
+        state.tableIndex = tableIndex;
+        initializeBaseGroupedData(tierlist, x);
+        applyCompressedDiffParam(compressedParam);
         renderRows(tierlist, x);
 
         statusEl.textContent = `読み込み完了（table${tableIndex} / 件数: ${tierlist.length} / X: ${x}）`;
@@ -600,6 +1077,10 @@
         statusEl.className = 'error';
         bodyIdentityEl.innerHTML = '';
         bodyEgoEl.innerHTML = '';
+        state.baseGroupedByType.identity = null;
+        state.baseGroupedByType.ego = null;
+        state.baseGroupedSnapshot.tierlist = null;
+        state.baseGroupedSnapshot.x = null;
       }
     }
 
@@ -610,6 +1091,16 @@
         }
       });
     });
+
+    scrollFixModeInputs.forEach((input) => {
+      input.addEventListener('change', () => {
+        state.scrollFixMode = input.value;
+      });
+    });
+
+    if (generateUrlButton) {
+      generateUrlButton.addEventListener('click', generateShareUrl);
+    }
 
     loadAndRender();
   </script>
