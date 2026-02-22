@@ -47,6 +47,11 @@
       .hide-except-move-controls button[data-action="toggle-except"][data-include="0"] { display: none; }
       #generatedUrl { width: 100%; max-width: 900px; resize: vertical; white-space: pre-wrap; word-break: break-all; overflow-wrap: anywhere; line-height: 1.35; min-height: 3.2em; }
       #generatedUrl.dynamic-width { width: min(98vw, var(--generated-url-width, 900px)); }
+      #hiddenPrisonerDialog { width: min(520px, calc(100vw - 32px)); border: none; border-radius: 8px; padding: 16px; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24); }
+      #hiddenPrisonerDialog::backdrop { background: rgba(0, 0, 0, 0.45); }
+      .hidden-prisoner-title { margin: 0 0 12px; font-size: 18px; }
+      .hidden-prisoner-actions { display: grid; gap: 8px; }
+      .hidden-prisoner-actions button { font-size: 14px; padding: 7px 10px; text-align: left; }
     </style>
 </head>
 <body>
@@ -95,6 +100,15 @@
     <textarea id="generatedUrl" readonly rows="2" placeholder="生成されたURLがここに表示されます"></textarea>
   </div>
 
+  <dialog id="hiddenPrisonerDialog">
+    <h3 class="hidden-prisoner-title">非表示状態になっている囚人がいます</h3>
+    <div class="hidden-prisoner-actions">
+      <button type="button" data-action="show-and-generate">非表示状態の囚人を表示してURLを生成</button>
+      <button type="button" data-action="except-and-generate">非表示状態の囚人を除外ランクに移動してURLを生成</button>
+      <button type="button" data-action="cancel-generate">URLの生成をキャンセル</button>
+    </div>
+  </dialog>
+
   <h3>人格Tier</h3>
   <table>
     <tbody id="resultBodyIdentity"></tbody>
@@ -118,6 +132,7 @@
     const idRangeFiltersEl = document.getElementById('idRangeFilters');
     const generateUrlButton = document.getElementById('generateUrlButton');
     const generatedUrlInput = document.getElementById('generatedUrl');
+    const hiddenPrisonerDialog = document.getElementById('hiddenPrisonerDialog');
     const scrollFixModeInputs = document.querySelectorAll('input[name="scrollFixMode"]');
 
     const state = {
@@ -431,6 +446,104 @@
       });
 
       return visibleBuckets;
+    }
+
+    function hasUncheckedRangeFilters() {
+      if (!idRangeFiltersEl) {
+        return false;
+      }
+
+      const checkboxes = idRangeFiltersEl.querySelectorAll('input[data-action="toggle-id-range"]');
+      return Array.from(checkboxes).some((checkbox) => !checkbox.checked);
+    }
+
+    function getHiddenPrisonerIds() {
+      if (!state.tierlist) {
+        return [];
+      }
+
+      const visibleBuckets = getVisibleBuckets();
+      if (!visibleBuckets) {
+        return [];
+      }
+
+      return state.tierlist
+        .map((row) => row[0])
+        .filter((id) => !isIdVisibleByRange(id, visibleBuckets));
+    }
+
+    function getCurrentGroupOfId(id, type) {
+      if (getExceptSet(type).has(id)) {
+        return 0;
+      }
+
+      const manualGroup = state.manualGroupById.get(id);
+      if (Number.isInteger(manualGroup)) {
+        return manualGroup;
+      }
+
+      return getBaseGroupForId(type, id);
+    }
+
+    function moveIdsToExcept(ids) {
+      ids.forEach((id) => {
+        const type = belongsToType(id, 'identity') ? 'identity' : 'ego';
+        const exceptSet = getExceptSet(type);
+        const currentGroup = getCurrentGroupOfId(id, type);
+
+        if (!exceptSet.has(id) && Number.isInteger(currentGroup) && currentGroup > 0) {
+          state.exceptRestoreGroupById.set(id, currentGroup);
+        }
+
+        exceptSet.add(id);
+      });
+    }
+
+    function promptHiddenPrisonerChoice() {
+      if (!hiddenPrisonerDialog || typeof hiddenPrisonerDialog.showModal !== 'function') {
+        return Promise.resolve('cancel');
+      }
+
+      return new Promise((resolve) => {
+        const closeWith = (action) => {
+          cleanup();
+          hiddenPrisonerDialog.close();
+          resolve(action);
+        };
+
+        const onClick = (event) => {
+          const button = event.target.closest('button[data-action]');
+          if (!button) {
+            return;
+          }
+
+          if (button.dataset.action === 'show-and-generate') {
+            closeWith('show-and-generate');
+          }
+
+          if (button.dataset.action === 'except-and-generate') {
+            closeWith('except-and-generate');
+          }
+
+          if (button.dataset.action === 'cancel-generate') {
+            closeWith('cancel');
+          }
+        };
+
+        const onCancel = (event) => {
+          event.preventDefault();
+          closeWith('cancel');
+        };
+
+        const cleanup = () => {
+          hiddenPrisonerDialog.removeEventListener('click', onClick);
+          hiddenPrisonerDialog.removeEventListener('cancel', onCancel);
+        };
+
+        hiddenPrisonerDialog.addEventListener('click', onClick);
+        hiddenPrisonerDialog.addEventListener('cancel', onCancel);
+        hiddenPrisonerDialog.showModal();
+      });
     }
 
     function isIdVisibleByRange(id, visibleBuckets) {
@@ -933,7 +1046,7 @@
       return toBase64Url(sections.join('.'));
     }
 
-    function generateShareUrl() {
+    function generateShareUrlCore() {
       if (!state.tierlist || !Number.isFinite(state.x)) {
         return;
       }
@@ -964,6 +1077,41 @@
         if (generatedUrlInput) {
           generatedUrlInput.value = `URL生成エラー: ${err.message}`;
         }
+      }
+    }
+
+    async function generateShareUrl() {
+      if (!state.tierlist || !Number.isFinite(state.x)) {
+        return;
+      }
+
+      if (!hasUncheckedRangeFilters()) {
+        generateShareUrlCore();
+        return;
+      }
+
+      const hiddenIds = getHiddenPrisonerIds();
+      if (hiddenIds.length === 0) {
+        generateShareUrlCore();
+        return;
+      }
+
+      const selectedAction = await promptHiddenPrisonerChoice();
+      if (selectedAction === 'show-and-generate') {
+        setAllRangeFilters(true);
+        generateShareUrlCore();
+        return;
+      }
+
+      if (selectedAction === 'except-and-generate') {
+        moveIdsToExcept(hiddenIds);
+        clearGeneratedUrl();
+
+        if (state.tierlist && Number.isFinite(state.x)) {
+          renderRows(state.tierlist, state.x);
+        }
+
+        generateShareUrlCore();
       }
     }
 
