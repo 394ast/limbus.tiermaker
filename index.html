@@ -35,8 +35,8 @@
       .tier-e { background-color: #c8d4ee; }
       .tier-except { background-color: #ececec; color: #555; }
       .error { color: #b00020; }
-      .id-items { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-start; }
-      .id-item { display: flex; align-items: center; gap: 6px; border: 1px solid #ddd; border-radius: 4px; padding: 4px; background: #fff; }
+      .id-items { display: flex; flex-wrap: wrap; gap: 2px; justify-content: flex-start; }
+      .id-item { display: flex; align-items: center; gap: 6px; border: 1px solid #ddd; border-radius: 4px; padding: 2px; background: #fff; }
       .id-item img { width: var(--img-size, 56px); height: var(--img-size, 56px); object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
       .id-controls { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
       .id-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -52,10 +52,12 @@
       .hidden-prisoner-title { margin: 0 0 12px; font-size: 18px; }
       .hidden-prisoner-actions { display: grid; gap: 8px; }
       .hidden-prisoner-actions button { font-size: 14px; padding: 7px 10px; text-align: left; }
+      #openLatestTierButton { margin: 4px 0 12px; font-size: 13px; padding: 4px 10px; }
     </style>
 </head>
 <body>
   <h2>みんなでつくる　リンバスTier表</h2>
+  <button type="button" id="openLatestTierButton">最新の みんなでつくったTier表 を表示</button>
 
   <div id="status" aria-live="polite" hidden></div>
 
@@ -132,6 +134,7 @@
     const idRangeFiltersEl = document.getElementById('idRangeFilters');
     const generateUrlButton = document.getElementById('generateUrlButton');
     const generatedUrlInput = document.getElementById('generatedUrl');
+    const openLatestTierButton = document.getElementById('openLatestTierButton');
     const hiddenPrisonerDialog = document.getElementById('hiddenPrisonerDialog');
     const scrollFixModeInputs = document.querySelectorAll('input[name="scrollFixMode"]');
 
@@ -1249,6 +1252,20 @@
 
     if (generateUrlButton) {
       generateUrlButton.addEventListener('click', generateShareUrl);
+    }
+
+    if (openLatestTierButton) {
+      openLatestTierButton.addEventListener('click', openLatestTierWithCushion);
+    }
+
+
+    function openLatestTierWithCushion() {
+      const ok = window.confirm('外部ページへ移動します。よろしいですか？');
+      if (!ok) {
+        return;
+      }
+
+      window.location.href = 'https://394ast.github.io/limbus.tiermaker/';
     }
 
     loadAndRender();
