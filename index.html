@@ -595,7 +595,7 @@
         }
       }
 
-      const beforeTop = beforeImg.getBoundingClientRect().top;
+      const beforeRect = beforeImg.getBoundingClientRect();
       renderRows(state.tierlist, state.x);
       setTimeout(() => {
         const afterImg = document.querySelector(`img[alt="${targetId}"]`);
@@ -603,8 +603,11 @@
           return;
         }
 
-        const afterTop = afterImg.getBoundingClientRect().top;
-        window.scrollBy(0, afterTop - beforeTop);
+        const afterRect = afterImg.getBoundingClientRect();
+        window.scrollBy(
+          afterRect.left - beforeRect.left,
+          afterRect.top - beforeRect.top
+        );
       }, 0);
     }
 
