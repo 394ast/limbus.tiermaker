@@ -381,6 +381,8 @@
         checkbox.checked = checked;
       });
 
+      clearGeneratedUrl();
+
       if (state.tierlist && Number.isFinite(state.x)) {
         renderRows(state.tierlist, state.x);
       }
@@ -462,6 +464,12 @@
       bodyEgoEl.innerHTML = renderTypeRows('ego', state.baseGroupedByType.ego, showExceptRows, visibleBuckets);
     }
 
+    function clearGeneratedUrl() {
+      if (generatedUrlInput) {
+        generatedUrlInput.value = '';
+      }
+    }
+
     function handleMove(id, type, currentGroup, delta) {
       if (!Number.isInteger(id) || !Number.isInteger(currentGroup) || !Number.isInteger(delta)) {
         return;
@@ -475,6 +483,7 @@
       getExceptSet(type).delete(id);
       state.exceptRestoreGroupById.delete(id);
       setManualGroupOverride(id, type, target);
+      clearGeneratedUrl();
 
       if (state.tierlist && Number.isFinite(state.x)) {
         renderRows(state.tierlist, state.x);
@@ -502,6 +511,8 @@
 
         exceptIds.add(id);
       }
+
+      clearGeneratedUrl();
 
       if (state.tierlist && Number.isFinite(state.x)) {
         renderRows(state.tierlist, state.x);
