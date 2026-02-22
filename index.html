@@ -109,6 +109,7 @@
         tierlist: null,
         x: null,
       },
+      changeParam: null,
     };
 
     const GROUP_META = {
@@ -384,6 +385,10 @@
       return !toggleExceptRowsInput || toggleExceptRowsInput.checked;
     }
 
+    function shouldSortIdsAscending() {
+      return state.changeParam !== '1';
+    }
+
     function renderTypeRows(type, baseData, showExceptRows, visibleBuckets) {
       if (!baseData) {
         return '';
@@ -396,9 +401,10 @@
         .filter(([groupValue]) => showExceptRows || groupValue !== 0)
         .map(([groupValue, ids]) => {
           const visibleIds = ids.filter((id) => isIdVisibleByRange(id, visibleBuckets));
+          const orderedIds = shouldSortIdsAscending() ? [...visibleIds].sort((a, b) => a - b) : visibleIds;
           const label = getGroupLabel(groupValue);
           const tierClass = getGroupClass(groupValue);
-          return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(visibleIds, groupValue, type)}</td></tr>`;
+          return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(orderedIds, groupValue, type)}</td></tr>`;
         }).join('');
     }
 
@@ -619,6 +625,8 @@
       const tableParam = params.get('T');
       const xParam = params.get('X');
       const changeParam = params.get('S');
+
+      state.changeParam = changeParam;
 
       if (statusEl) {
         statusEl.hidden = !(changeParam !== null && changeParam !== '');
