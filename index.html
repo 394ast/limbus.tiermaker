@@ -43,7 +43,7 @@
       .share-url-tools { margin: 8px 0 12px; display: grid; gap: 6px; }
       #generateUrlButton { width: fit-content; font-size: 13px; padding: 4px 10px; }
       .hide-except-move-controls button[data-action="toggle-except"][data-include="0"] { display: none; }
-      #generatedUrl { width: 100%; max-width: 900px; }
+      #generatedUrl { width: 100%; max-width: 900px; resize: vertical; white-space: pre-wrap; word-break: break-all; overflow-wrap: anywhere; line-height: 1.35; min-height: 3.2em; }
       #generatedUrl.dynamic-width { width: min(98vw, var(--generated-url-width, 900px)); }
     </style>
 </head>
@@ -84,7 +84,7 @@
 
   <div class="share-url-tools">
     <button type="button" id="generateUrlButton">URLを生成する</button>
-    <input type="text" id="generatedUrl" readonly placeholder="生成されたURLがここに表示されます">
+    <textarea id="generatedUrl" readonly rows="2" placeholder="生成されたURLがここに表示されます"></textarea>
   </div>
 
   <h3>人格Tier</h3>
@@ -144,6 +144,7 @@
     };
 
     const GENERATED_URL_BASE_WIDTH_PX = 900;
+    const GENERATED_URL_BASE_ROWS = 2;
 
 
     function calcValue(row, x) {
@@ -478,8 +479,10 @@
     function clearGeneratedUrl() {
       if (generatedUrlInput) {
         generatedUrlInput.value = '';
+        generatedUrlInput.rows = GENERATED_URL_BASE_ROWS;
         generatedUrlInput.classList.remove('dynamic-width');
         generatedUrlInput.style.removeProperty('--generated-url-width');
+        generatedUrlInput.style.height = '';
       }
     }
 
@@ -825,8 +828,15 @@
             GENERATED_URL_BASE_WIDTH_PX,
             Math.min(2200, Math.ceil(url.length * 8.2))
           );
+          const estimatedRows = Math.max(
+            GENERATED_URL_BASE_ROWS,
+            Math.min(10, Math.ceil(url.length / 140))
+          );
+          generatedUrlInput.rows = estimatedRows;
           generatedUrlInput.style.setProperty('--generated-url-width', `${estimatedWidthPx}px`);
           generatedUrlInput.classList.add('dynamic-width');
+          generatedUrlInput.style.height = 'auto';
+          generatedUrlInput.style.height = `${generatedUrlInput.scrollHeight}px`;
           generatedUrlInput.focus();
           generatedUrlInput.select();
         }
