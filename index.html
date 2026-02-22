@@ -57,7 +57,7 @@
 </head>
 <body>
   <h2>みんなでつくる　リンバスTier表</h2>
-  <button type="button" id="openLatestTierButton">最新の みんなでつくったTier表 を表示</button>
+  <button type="button" id="openLatestTierButton">現在のみんなでつくったTier表を表示</button>
 
   <div id="status" aria-live="polite" hidden></div>
 
@@ -1260,7 +1260,8 @@
 
 
     function openLatestTierWithCushion() {
-      const ok = window.confirm('外部ページへ移動します。よろしいですか？');
+      const ok = window.confirm('https://394ast.github.io/limbus.tiermaker/ に移動します。
+よろしいですか？');
       if (!ok) {
         return;
       }
