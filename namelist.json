@@ -654,5 +654,341 @@
     "season": "SEASON 6",
     "rank": 3,
     "time": 6
+  },
+  {
+    "id": 7001,
+    "name1": "LCB 囚人",
+    "name2": "ヒースクリフ",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 7002,
+    "name1": "南部シ協会 5課",
+    "name2": "ヒースクリフ",
+    "season": "恒常",
+    "rank": 2,
+    "time": 0
+  },
+  {
+    "id": 7003,
+    "name1": "R社第4群 ウサギチーム",
+    "name2": "ヒースクリフ",
+    "season": "恒常",
+    "rank": 3,
+    "time": 0
+  },
+  {
+    "id": 7004,
+    "name1": "N社 小鎚",
+    "name2": "ヒースクリフ",
+    "season": "SEASON 1",
+    "rank": 2,
+    "time": 1
+  },
+  {
+    "id": 7005,
+    "name1": "ロボトミーE.G.O:: 狐雨",
+    "name2": "ヒースクリフ",
+    "season": "SEASON 2",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 7006,
+    "name1": "南部セブン協会 4課",
+    "name2": "ヒースクリフ",
+    "season": "恒常",
+    "rank": 2,
+    "time": 2
+  },
+  {
+    "id": 7007,
+    "name1": "ピークォド号 銛使い",
+    "name2": "ヒースクリフ",
+    "season": "SEASON 3",
+    "rank": 3,
+    "time": 3
+  },
+  {
+    "id": 7008,
+    "name1": "南部ウーフィ協会 3課",
+    "name2": "ヒースクリフ",
+    "season": "恒常",
+    "rank": 3,
+    "time": 3
+  },
+  {
+    "id": 7009,
+    "name1": "マルチクラック事務所 フィクサー",
+    "name2": "ヒースクリフ",
+    "season": "SEASON 4 [EVENT]",
+    "rank": 2,
+    "time": 4
+  },
+  {
+    "id": 7010,
+    "name1": "ワイルドハント",
+    "name2": "ヒースクリフ",
+    "season": "SEASON 4",
+    "rank": 3,
+    "time": 4
+  },
+  {
+    "id": 7011,
+    "name1": "終止符事務所 フィクサー",
+    "name2": "ヒースクリフ",
+    "season": "WALPURGISNACHT-V",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 7012,
+    "name1": "黒雲会 若衆",
+    "name2": "ヒースクリフ",
+    "season": "SEASON 5 [EVENT]",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 7013,
+    "name1": "W社 4級 整理要員 - CCA",
+    "name2": "ヒースクリフ",
+    "season": "SEASON 6 [EVENT]",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 7014,
+    "name1": "黒獣 - 酉 筆頭",
+    "name2": "ヒースクリフ",
+    "season": "SEASON 6",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 8001,
+    "name1": "LCB 囚人",
+    "name2": "イシュメール",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 8002,
+    "name1": "R社第4群 トナカイチーム",
+    "name2": "イシュメール",
+    "season": "恒常",
+    "rank": 3,
+    "time": 0
+  },
+  {
+    "id": 8003,
+    "name1": "南部シ協会 5課",
+    "name2": "イシュメール",
+    "season": "恒常",
+    "rank": 2,
+    "time": 0
+  },
+  {
+    "id": 8004,
+    "name1": "LCCB 係長",
+    "name2": "イシュメール",
+    "season": "SEASON 1",
+    "rank": 2,
+    "time": 0
+  },
+  {
+    "id": 8005,
+    "name1": "ロボトミーE.G.O:: たぷつき",
+    "name2": "イシュメール",
+    "season": "SEASON 2",
+    "rank": 2,
+    "time": 2
+  },
+  {
+    "id": 8006,
+    "name1": "南部リウ協会 4課",
+    "name2": "イシュメール",
+    "season": "恒常",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 8007,
+    "name1": "奥歯ボートセンター フィクサー",
+    "name2": "イシュメール",
+    "season": "SEASON 2 [EVENT]",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 8008,
+    "name1": "ピークォド号 船長",
+    "name2": "イシュメール",
+    "season": "SEASON 3",
+    "rank": 3,
+    "time": 3
+  },
+  {
+    "id": 8009,
+    "name1": "エドガー家 バトラー",
+    "name2": "イシュメール",
+    "season": "SEASON 4",
+    "rank": 2,
+    "time": 4
+  },
+  {
+    "id": 8010,
+    "name1": "西部ツヴァイ協会 3課",
+    "name2": "イシュメール",
+    "season": "恒常",
+    "rank": 3,
+    "time": 4
+  },
+  {
+    "id": 8011,
+    "name1": "黒雲会 副組長",
+    "name2": "イシュメール",
+    "season": "SEASON 5 [EVENT]",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 8012,
+    "name1": "家主候補",
+    "name2": "イシュメール",
+    "season": "SEASON 6",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 8013,
+    "name1": "定事務所 代表",
+    "name2": "イシュメール",
+    "season": "WALPURGISNACHT-VII",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 8014,
+    "name1": "蜘蛛の巣 中指の子方",
+    "name2": "イシュメール",
+    "season": "SEASON 7",
+    "rank": 3,
+    "time": 7
+  },
+  {
+    "id": 9001,
+    "name1": "LCB 囚人",
+    "name2": "ロージャ",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 9002,
+    "name1": "黒雲会 若衆",
+    "name2": "ロージャ",
+    "season": "恒常",
+    "rank": 3,
+    "time": 0
+  },
+  {
+    "id": 9003,
+    "name1": "LCCB 係長",
+    "name2": "ロージャ",
+    "season": "SEASON 1",
+    "rank": 2,
+    "time": 0
+  },
+  {
+    "id": 9004,
+    "name1": "N社 中鎚",
+    "name2": "ロージャ",
+    "season": "SEASON 1",
+    "rank": 2,
+    "time": 1
+  },
+  {
+    "id": 9005,
+    "name1": "バラのスパナ工房 代表",
+    "name2": "ロージャ",
+    "season": "SEASON 2",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 9006,
+    "name1": "南部ツヴァイ協会 5課",
+    "name2": "ロージャ",
+    "season": "恒常",
+    "rank": 2,
+    "time": 2
+  },
+  {
+    "id": 9007,
+    "name1": "南部ディエーチ協会 4課",
+    "name2": "ロージャ",
+    "season": "恒常",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 9008,
+    "name1": "南部リウ協会 4課 部長",
+    "name2": "ロージャ",
+    "season": "恒常",
+    "rank": 3,
+    "time": 3
+  },
+  {
+    "id": 9009,
+    "name1": "T社 2級 徴収職職員",
+    "name2": "ロージャ",
+    "season": "恒常",
+    "rank": 2,
+    "time": 4
+  },
+  {
+    "id": 9010,
+    "name1": "北部ヂェーヴィチ協会 3課",
+    "name2": "ロージャ",
+    "season": "恒常",
+    "rank": 3,
+    "time": 4
+  },
+  {
+    "id": 9011,
+    "name1": "ラ・マンチャランドの姫",
+    "name2": "ロージャ",
+    "season": "SEASON 5",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 9012,
+    "name1": "黒獣 - 巳",
+    "name2": "ロージャ",
+    "season": "SEASON 6",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 9013,
+    "name1": "ロボトミーE.G.O:: 涙で研ぎ澄まされた剣",
+    "name2": "ロージャ",
+    "season": "WALPURGISNACHT-VI",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 9014,
+    "name1": "R社第4群 トナカイチーム",
+    "name2": "ロージャ",
+    "season": "恒常",
+    "rank": 3,
+    "time": 6
   }
 ]
