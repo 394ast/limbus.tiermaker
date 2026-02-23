@@ -230,5 +230,117 @@
     "season": "SEASON 7",
     "rank": 3,
     "time": 7
+  },
+  {
+    "id": 3001,
+    "name1": "LCB 囚人",
+    "name2": "ドンキホーテ",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 3002,
+    "name1": "W社 3級 整理要員",
+    "name2": "ドンキホーテ",
+    "season": "恒常",
+    "rank": 3,
+    "time": 0
+  },
+  {
+    "id": 3003,
+    "name1": "南部シ協会 5課",
+    "name2": "ドンキホーテ",
+    "season": "恒常",
+    "rank": 2,
+    "time": 0
+  },
+  {
+    "id": 3004,
+    "name1": "N社 中鎚",
+    "name2": "ドンキホーテ",
+    "season": "SEASON 1",
+    "rank": 2,
+    "time": 1
+  },
+  {
+    "id": 3005,
+    "name1": "南部センク協会 5課 部長",
+    "name2": "ドンキホーテ",
+    "season": "恒常",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 3006,
+    "name1": "中指 末妹",
+    "name2": "ドンキホーテ",
+    "season": "SEASON 3",
+    "rank": 3,
+    "time": 3
+  },
+  {
+    "id": 3007,
+    "name1": "ロボトミーE.G.O:: 提灯",
+    "name2": "ドンキホーテ",
+    "season": "WALPURGISNACHT-II",
+    "rank": 2,
+    "time": 3
+  },
+  {
+    "id": 3008,
+    "name1": "剣契 殺手",
+    "name2": "ドンキホーテ",
+    "season": "SEASON 3 [EVENT]",
+    "rank": 2,
+    "time": 3
+  },
+  {
+    "id": 3009,
+    "name1": "T社 3級 徴収職職員",
+    "name2": "ドンキホーテ",
+    "season": "恒常",
+    "rank": 3,
+    "time": 4
+  },
+  {
+    "id": 3010,
+    "name1": "ラ・マンチャランド 室長",
+    "name2": "ドンキホーテ",
+    "season": "SEASON 5",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 3011,
+    "name1": "東部センク協会 3課",
+    "name2": "ドンキホーテ",
+    "season": "恒常",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 3012,
+    "name1": "ロボトミーE.G.O:: 愛と憎悪の名の下に",
+    "name2": "ドンキホーテ",
+    "season": "WALPURGISNACHT-VI",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 3013,
+    "name1": "黒獣 - 未",
+    "name2": "ドンキホーテ",
+    "season": "SEASON 6",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 3014,
+    "name1": "人差し指代行者 - 開花E.G.O::　代行",
+    "name2": "ドンキホーテ",
+    "season": "SEASON 7",
+    "rank": 3,
+    "time": 7
   }
 ]
