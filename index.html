@@ -174,6 +174,7 @@
 
     const GENERATED_URL_BASE_WIDTH_PX = 900;
     const GENERATED_URL_BASE_ROWS = 2;
+    const changecodingDIffID = 0; // 下位idが36を超えるとき手動で1に変更する
 
 
     function calcValue(row, x) {
@@ -885,10 +886,11 @@
         low,
         highChar: high.toString(36),
         lowChar: low.toString(36),
+        lowPadded: String(low).padStart(2, '0'),
       };
     }
 
-    function compressEncodedIds(ids) {
+    function compressEncodedIds(ids, codingDiffId = 0) {
       const encoded = ids
         .slice()
         .sort((a, b) => a - b)
@@ -911,13 +913,21 @@
 
         const runLength = endIndex - index + 1;
         if (runLength >= 3) {
-          result += `${start.highChar}${start.lowChar}~${encoded[endIndex].lowChar}`;
+          if (codingDiffId === 1) {
+            result += `${start.highChar}${start.lowPadded}~${encoded[endIndex].lowPadded}`;
+          } else {
+            result += `${start.highChar}${start.lowChar}~${encoded[endIndex].lowChar}`;
+          }
           index = endIndex + 1;
           continue;
         }
 
         for (let i = index; i <= endIndex; i += 1) {
-          result += `${encoded[i].highChar}${encoded[i].lowChar}`;
+          if (codingDiffId === 1) {
+            result += `${encoded[i].highChar}${encoded[i].lowPadded}`;
+          } else {
+            result += `${encoded[i].highChar}${encoded[i].lowChar}`;
+          }
         }
 
         index = endIndex + 1;
@@ -942,7 +952,7 @@
       return atob(`${normalized}${'='.repeat(padLength)}`);
     }
 
-    function decodeSection(section) {
+    function decodeSection(section, codingDiffId = 0) {
       if (!section) {
         return [];
       }
@@ -952,23 +962,24 @@
 
       while (i < section.length) {
         const highChar = section[i];
-        const lowChar = section[i + 1];
+        const lowCharLength = codingDiffId === 1 ? 2 : 1;
+        const lowStartRaw = section.slice(i + 1, i + 1 + lowCharLength);
 
-        if (!highChar || !lowChar) {
+        if (!highChar || lowStartRaw.length !== lowCharLength) {
           throw new Error('Cパラメータの形式が不正です（ID桁不足）');
         }
 
         const high = Number.parseInt(highChar, 36);
-        const lowStart = Number.parseInt(lowChar, 36);
+        const lowStart = Number.parseInt(lowStartRaw, codingDiffId === 1 ? 10 : 36);
 
         if (!Number.isInteger(high) || !Number.isInteger(lowStart)) {
           throw new Error('Cパラメータの形式が不正です（base36変換失敗）');
         }
 
-        const rangeMark = section[i + 2];
+        const rangeMark = section[i + 1 + lowCharLength];
         if (rangeMark === '~') {
-          const lowEndChar = section[i + 3];
-          const lowEnd = Number.parseInt(lowEndChar ?? '', 36);
+          const lowEndRaw = section.slice(i + 2 + lowCharLength, i + 2 + (lowCharLength * 2));
+          const lowEnd = Number.parseInt(lowEndRaw ?? '', codingDiffId === 1 ? 10 : 36);
 
           if (!Number.isInteger(lowEnd) || lowEnd < lowStart) {
             throw new Error('Cパラメータの形式が不正です（範囲指定）');
@@ -978,25 +989,45 @@
             ids.push(high * 1000 + low);
           }
 
-          i += 4;
+          i += 2 + (lowCharLength * 2);
           continue;
         }
 
         ids.push(high * 1000 + lowStart);
-        i += 2;
+        i += 1 + lowCharLength;
       }
 
       return ids;
     }
 
+    function parseCompressedDiffParam(cParam) {
+      if (!cParam) {
+        return { codingDiffId: 0, payload: cParam };
+      }
+
+      if (cParam.startsWith('1:')) {
+        return {
+          codingDiffId: 1,
+          payload: cParam.slice(2),
+        };
+      }
+
+      return {
+        codingDiffId: 0,
+        payload: cParam,
+      };
+    }
+
     function applyCompressedDiffParam(cParam) {
       resetDiffState();
 
-      if (!cParam) {
+      const { codingDiffId, payload } = parseCompressedDiffParam(cParam);
+
+      if (!payload) {
         return;
       }
 
-      const decoded = fromBase64Url(cParam);
+      const decoded = fromBase64Url(payload);
       const sections = decoded.split('.');
       if (sections.length !== 10) {
         throw new Error('Cパラメータの形式が不正です（セクション数）');
@@ -1004,7 +1035,7 @@
 
       for (let sectionIndex = 0; sectionIndex < sections.length; sectionIndex += 1) {
         const group = 9 - sectionIndex;
-        const ids = decodeSection(sections[sectionIndex]);
+        const ids = decodeSection(sections[sectionIndex], codingDiffId);
 
         ids.forEach((id) => {
           if (group === 0) {
@@ -1021,7 +1052,7 @@
       }
     }
 
-    function buildCompressedDiffParam() {
+    function buildCompressedDiffParam(codingDiffId = 0) {
       const idsByGroup = new Map();
       for (let group = 0; group <= 9; group += 1) {
         idsByGroup.set(group, []);
@@ -1043,10 +1074,15 @@
 
       const sections = [];
       for (let group = 9; group >= 0; group -= 1) {
-        sections.push(compressEncodedIds(idsByGroup.get(group)));
+        sections.push(compressEncodedIds(idsByGroup.get(group), codingDiffId));
       }
 
-      return toBase64Url(sections.join('.'));
+      const encodedPayload = toBase64Url(sections.join('.'));
+      if (codingDiffId === 1) {
+        return `1:${encodedPayload}`;
+      }
+
+      return encodedPayload;
     }
 
     function generateShareUrlCore() {
@@ -1055,7 +1091,7 @@
       }
 
       try {
-        const compressed = buildCompressedDiffParam();
+        const compressed = buildCompressedDiffParam(changecodingDIffID);
         const url = `https://394ast.github.io/limbus.tiermaker/?T=${state.tableIndex}&X=${state.x}&C=${compressed}`;
 
         if (generatedUrlInput) {
