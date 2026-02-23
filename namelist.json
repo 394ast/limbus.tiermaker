@@ -446,5 +446,213 @@
     "season": "SEASON 6",
     "rank": 3,
     "time": 6
+  },
+  {
+    "id": 5001,
+    "name1": "LCB 囚人",
+    "name2": "ムルソー",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 5002,
+    "name1": "南部リウ協会 6課",
+    "name2": "ムルソー",
+    "season": "恒常",
+    "rank": 2,
+    "time": 0
+  },
+  {
+    "id": 5003,
+    "name1": "W社 2級 整理要員",
+    "name2": "ムルソー",
+    "season": "恒常",
+    "rank": 3,
+    "time": 0
+  },
+  {
+    "id": 5004,
+    "name1": "N社 大鎚",
+    "name2": "ムルソー",
+    "season": "SEASON 1",
+    "rank": 3,
+    "time": 1
+  },
+  {
+    "id": 5005,
+    "name1": "バラのスパナ工房 フィクサー",
+    "name2": "ムルソー",
+    "season": "SEASON 2",
+    "rank": 2,
+    "time": 2
+  },
+  {
+    "id": 5006,
+    "name1": "R社第4群 サイチーム",
+    "name2": "ムルソー",
+    "season": "恒常",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 5007,
+    "name1": "中指 末弟",
+    "name2": "ムルソー",
+    "season": "SEASON 3",
+    "rank": 2,
+    "time": 3
+  },
+  {
+    "id": 5008,
+    "name1": "剣契 頭目",
+    "name2": "ムルソー",
+    "season": "SEASON 3 [EVENT]",
+    "rank": 3,
+    "time": 3
+  },
+  {
+    "id": 5009,
+    "name1": "デッドラビッツ ボス",
+    "name2": "ムルソー",
+    "season": "SEASON 4",
+    "rank": 2,
+    "time": 4
+  },
+  {
+    "id": 5010,
+    "name1": "南部ディエーチ協会 4課 部長",
+    "name2": "ムルソー",
+    "season": "恒常",
+    "rank": 3,
+    "time": 4
+  },
+  {
+    "id": 5011,
+    "name1": "西部センク協会 3課",
+    "name2": "ムルソー",
+    "season": "SEASON 5",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 5012,
+    "name1": "東部親指 カポIIII",
+    "name2": "ムルソー",
+    "season": "SEASON 6",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 5013,
+    "name1": "ラ・マンチャランドの王子",
+    "name2": "ムルソー",
+    "season": "SEASON 6 [EVENT]",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 6001,
+    "name1": "LCB 囚人",
+    "name2": "ホンル",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 6002,
+    "name1": "黒雲会 若衆",
+    "name2": "ホンル",
+    "season": "恒常",
+    "rank": 2,
+    "time": 0
+  },
+  {
+    "id": 6003,
+    "name1": "ぽんぽん派 ボス",
+    "name2": "ホンル",
+    "season": "SEASON 1",
+    "rank": 3,
+    "time": 0
+  },
+  {
+    "id": 6004,
+    "name1": "南部リウ協会 5課",
+    "name2": "ホンル",
+    "season": "恒常",
+    "rank": 2,
+    "time": 1
+  },
+  {
+    "id": 6005,
+    "name1": "K社 3級 摘出職職員",
+    "name2": "ホンル",
+    "season": "SEASON 2",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 6006,
+    "name1": "W社 2級 整理要員",
+    "name2": "ホンル",
+    "season": "恒常",
+    "rank": 2,
+    "time": 2
+  },
+  {
+    "id": 6007,
+    "name1": "鈎事務所 フィクサー",
+    "name2": "ホンル",
+    "season": "WALPURGISNACHT-I",
+    "rank": 2,
+    "time": 2
+  },
+  {
+    "id": 6008,
+    "name1": "南部ディエーチ協会 4課",
+    "name2": "ホンル",
+    "season": "恒常",
+    "rank": 3,
+    "time": 3
+  },
+  {
+    "id": 6009,
+    "name1": "20区 ユロージヴィ",
+    "name2": "ホンル",
+    "season": "SEASON 4 [EVENT]",
+    "rank": 3,
+    "time": 4
+  },
+  {
+    "id": 6010,
+    "name1": "牙狩事務所 フィクサー",
+    "name2": "ホンル",
+    "season": "SEASON 5",
+    "rank": 2,
+    "time": 5
+  },
+  {
+    "id": 6011,
+    "name1": "終止符事務所 代表",
+    "name2": "ホンル",
+    "season": "WALPURGISNACHT-V",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 6012,
+    "name1": "R社第4群 トナカイチーム",
+    "name2": "ホンル",
+    "season": "恒常",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 6013,
+    "name1": "鴻園の君主",
+    "name2": "ホンル",
+    "season": "SEASON 6",
+    "rank": 3,
+    "time": 6
   }
 ]
