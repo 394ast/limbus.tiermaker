@@ -342,5 +342,109 @@
     "season": "SEASON 7",
     "rank": 3,
     "time": 7
+  },
+  {
+    "id": 4001,
+    "name1": "LCB 囚人",
+    "name2": "良秀",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 4002,
+    "name1": "南部セブン協会 6課",
+    "name2": "良秀",
+    "season": "恒常",
+    "rank": 2,
+    "time": 0
+  },
+  {
+    "id": 4003,
+    "name1": "黒雲会 若衆",
+    "name2": "良秀",
+    "season": "恒常",
+    "rank": 3,
+    "time": 0
+  },
+  {
+    "id": 4004,
+    "name1": "りょ・ミ・パ 厨房長",
+    "name2": "良秀",
+    "season": "SEASON 1 [EVENT]",
+    "rank": 3,
+    "time": 1
+  },
+  {
+    "id": 4005,
+    "name1": "W社 3級 整理要員",
+    "name2": "良秀",
+    "season": "恒常",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 4006,
+    "name1": "LCCB 係長",
+    "name2": "良秀",
+    "season": "SEASON 3",
+    "rank": 2,
+    "time": 3
+  },
+  {
+    "id": 4007,
+    "name1": "南部リウ協会 4課",
+    "name2": "良秀",
+    "season": "恒常",
+    "rank": 2,
+    "time": 3
+  },
+  {
+    "id": 4008,
+    "name1": "エドガー家 チーフバトラー",
+    "name2": "良秀",
+    "season": "SEASON 4",
+    "rank": 3,
+    "time": 4
+  },
+  {
+    "id": 4009,
+    "name1": "20区 ユロージヴィ",
+    "name2": "良秀",
+    "season": "SEASON 4 [EVENT]",
+    "rank": 2,
+    "time": 4
+  },
+  {
+    "id": 4010,
+    "name1": "ロボトミーE.G.O:: 赤眼・懺悔",
+    "name2": "良秀",
+    "season": "WALPURGISNACHT-IV",
+    "rank": 3,
+    "time": 4
+  },
+  {
+    "id": 4011,
+    "name1": "黒獣 - 卯",
+    "name2": "良秀",
+    "season": "SEASON 5 [EVENT]",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 4012,
+    "name1": "N社E.G.O:: 軽蔑、畏敬",
+    "name2": "良秀",
+    "season": "SEASON 6",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 4013,
+    "name1": "鴻園の放浪武者",
+    "name2": "良秀",
+    "season": "SEASON 6",
+    "rank": 3,
+    "time": 6
   }
 ]
