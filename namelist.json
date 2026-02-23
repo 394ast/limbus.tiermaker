@@ -118,5 +118,117 @@
     "season": "SEASON 7",
     "rank": 3,
     "time": 7
+  },
+  {
+    "id": 2001,
+    "name1": "LCB 囚人",
+    "name2": "ファウスト",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 2002,
+    "name1": "W社 2級 整理要員",
+    "name2": "ファウスト",
+    "season": "恒常",
+    "rank": 2,
+    "time": 0
+  },
+  {
+    "id": 2003,
+    "name1": "生き残った ロボトミー職員",
+    "name2": "ファウスト",
+    "season": "SEASON 1",
+    "rank": 2,
+    "time": 0
+  },
+  {
+    "id": 2004,
+    "name1": "握る者",
+    "name2": "ファウスト",
+    "season": "SEASON 1",
+    "rank": 3,
+    "time": 1
+  },
+  {
+    "id": 2005,
+    "name1": "南部ツヴァイ協会 4課",
+    "name2": "ファウスト",
+    "season": "恒常",
+    "rank": 2,
+    "time": 2
+  },
+  {
+    "id": 2006,
+    "name1": "南部セブン協会 4課",
+    "name2": "ファウスト",
+    "season": "恒常",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 2007,
+    "name1": "ロボトミーE.G.O:: 後悔",
+    "name2": "ファウスト",
+    "season": "WALPURGISNACHT-I",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 2008,
+    "name1": "剣契 殺手",
+    "name2": "ファウスト",
+    "season": "SEASON 3 [EVENT]",
+    "rank": 3,
+    "time": 3
+  },
+  {
+    "id": 2009,
+    "name1": "ワザリング・ハイツ バトラー",
+    "name2": "ファウスト",
+    "season": "SEASON 4",
+    "rank": 2,
+    "time": 4
+  },
+  {
+    "id": 2010,
+    "name1": "マルチクラック事務所 代表",
+    "name2": "ファウスト",
+    "season": "SEASON 4 [EVENT]",
+    "rank": 3,
+    "time": 4
+  },
+  {
+    "id": 2011,
+    "name1": "LCE E.G.O:: 紅炎殺",
+    "name2": "ファウスト",
+    "season": "SEASON 5 [EVENT]",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 2012,
+    "name1": "黒獣 - 卯 筆頭",
+    "name2": "ファウスト",
+    "season": "SEASON 6",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 2013,
+    "name1": "東部シ協会 3課",
+    "name2": "ファウスト",
+    "season": "恒常",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 2014,
+    "name1": "人差し指遂行者: 【紙片】",
+    "name2": "ファウスト",
+    "season": "SEASON 7",
+    "rank": 3,
+    "time": 7
   }
 ]
