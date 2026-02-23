@@ -1,23 +1,122 @@
 [
   {
     "id": 1001,
-    "name": "LCB 囚人 イサン",
+    "name1": "LCB 囚人",
+    "name2": "イサン",
     "season": "恒常",
     "rank": 1,
     "time": 0
   },
   {
     "id": 1002,
-    "name": "南部セブン協会 6課 イサン",
+    "name1": "南部セブン協会 6課",
+    "name2": "イサン",
     "season": "恒常",
     "rank": 2,
     "time": 0
   },
   {
     "id": 1003,
-    "name": "剣契 殺手 イサン",
+    "name1": "剣契 殺手",
+    "name2": "イサン",
     "season": "恒常",
     "rank": 3,
     "time": 0
+  },
+  {
+    "id": 1004,
+    "name1": "開花 E.G.O:: 壇香梅",
+    "name2": "イサン",
+    "season": "SEASON 2",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 1005,
+    "name1": "奥歯事務所 フィクサー",
+    "name2": "イサン",
+    "season": "SEASON 2 [EVENT]",
+    "rank": 2,
+    "time": 2
+  },
+  {
+    "id": 1006,
+    "name1": "W社 3級 整理要員",
+    "name2": "イサン",
+    "season": "恒常",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 1007,
+    "name1": "ピークォド号 1等航海士",
+    "name2": "イサン",
+    "season": "SEASON 3",
+    "rank": 2,
+    "time": 3
+  },
+  {
+    "id": 1008,
+    "name1": "南部ディエーチ協会 4課",
+    "name2": "イサン",
+    "season": "恒常",
+    "rank": 2,
+    "time": 3
+  },
+  {
+    "id": 1009,
+    "name1": "薬指点描派 スチューデント",
+    "name2": "イサン",
+    "season": "恒常",
+    "rank": 3,
+    "time": 4
+  },
+  {
+    "id": 1010,
+    "name1": "ロボトミーE.G.O:: 厳粛な哀悼",
+    "name2": "イサン",
+    "season": "WALPURGISNACHT-IV",
+    "rank": 3,
+    "time": 4
+  },
+  {
+    "id": 1011,
+    "name1": "LCE E.G.O:: 提灯",
+    "name2": "イサン",
+    "season": "SEASON 5 [EVENT]",
+    "rank": 2,
+    "time": 5
+  },
+  {
+    "id": 1012,
+    "name1": "南部リウ協会 3課",
+    "name2": "イサン",
+    "season": "恒常",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 1013,
+    "name1": "N社E.G.O:: 凶弾",
+    "name2": "イサン",
+    "season": "SEASON 6",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 1014,
+    "name1": "黒獣 - 午 筆頭",
+    "name2": "イサン",
+    "season": "SEASON 6 [EVENT]",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 1015,
+    "name1": "蜘蛛の巣 人差し指の親方",
+    "name2": "イサン",
+    "season": "SEASON 7",
+    "rank": 3,
+    "time": 7
   }
 ]
