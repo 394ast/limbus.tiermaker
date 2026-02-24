@@ -1902,5 +1902,277 @@
     "season": "COLLABORATION-LIMITED",
     "rank": 3,
     "time": 6
+  },
+  {
+    "id": 21001,
+    "name1": "投げられたもの",
+    "name2": "ロージャ",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 21002,
+    "name1": "4本目のマッチの火",
+    "name2": "ロージャ",
+    "season": "SEASON 1",
+    "rank": 3,
+    "time": 1
+  },
+  {
+    "id": 21003,
+    "name1": "氷の脚",
+    "name2": "ロージャ",
+    "season": "SEASON 1",
+    "rank": 2,
+    "time": 1
+  },
+  {
+    "id": 21004,
+    "name1": "沸き立つ腐食",
+    "name2": "ロージャ",
+    "season": "SEASON 3",
+    "rank": 2,
+    "time": 3
+  },
+  {
+    "id": 21005,
+    "name1": "執行",
+    "name2": "ロージャ",
+    "season": "恒常",
+    "rank": 3,
+    "time": 3
+  },
+  {
+    "id": 21006,
+    "name1": "血色の欲望",
+    "name2": "ロージャ",
+    "season": "WALPURGISNACHT-III",
+    "rank": 4,
+    "time": 4
+  },
+  {
+    "id": 21007,
+    "name1": "呪いの釘",
+    "name2": "ロージャ",
+    "season": "SEASON 5",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 21008,
+    "name1": "指定裁判",
+    "name2": "ロージャ",
+    "season": "SEASON 5",
+    "rank": 4,
+    "time": 5
+  },
+  {
+    "id": 22001,
+    "name1": "知識の木の枝",
+    "name2": "シンクレア",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 22002,
+    "name1": "迫り来る日",
+    "name2": "シンクレア",
+    "season": "SEASON 1",
+    "rank": 2,
+    "time": 1
+  },
+  {
+    "id": 22003,
+    "name1": "一生シチュー",
+    "name2": "シンクレア",
+    "season": "SEASON 1 [EVENT]",
+    "rank": 2,
+    "time": 1
+  },
+  {
+    "id": 22004,
+    "name1": "提灯",
+    "name2": "シンクレア",
+    "season": "恒常",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 22005,
+    "name1": "9章2節",
+    "name2": "シンクレア",
+    "season": "SEASON 3",
+    "rank": 3,
+    "time": 3
+  },
+  {
+    "id": 22006,
+    "name1": "低いなきごえ",
+    "name2": "シンクレア",
+    "season": "恒常",
+    "rank": 1,
+    "time": 4
+  },
+  {
+    "id": 22007,
+    "name1": "呪いの釘",
+    "name2": "シンクレア",
+    "season": "SEASON 5",
+    "rank": 2,
+    "time": 5
+  },
+  {
+    "id": 22008,
+    "name1": "汚血泣涙",
+    "name2": "シンクレア",
+    "season": "SEASON 6",
+    "rank": 4,
+    "time": 6
+  },
+  {
+    "id": 23001,
+    "name1": "ト・パソス・マソス",
+    "name2": "ウーティス",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 23002,
+    "name1": "黒い枝",
+    "name2": "ウーティス",
+    "season": "SEASON 1",
+    "rank": 3,
+    "time": 1
+  },
+  {
+    "id": 23003,
+    "name1": "空即是色",
+    "name2": "ウーティス",
+    "season": "恒常",
+    "rank": 2,
+    "time": 0
+  },
+  {
+    "id": 23004,
+    "name1": "狐雨",
+    "name2": "ウーティス",
+    "season": "SEASON 2",
+    "rank": 2,
+    "time": 2
+  },
+  {
+    "id": 23005,
+    "name1": "ホリデイ",
+    "name2": "ウーティス",
+    "season": "SEASON 3 [EVENT]",
+    "rank": 3,
+    "time": 3
+  },
+  {
+    "id": 23006,
+    "name1": "拘束",
+    "name2": "ウーティス",
+    "season": "SEASON 4",
+    "rank": 4,
+    "time": 4
+  },
+  {
+    "id": 23007,
+    "name1": "次元裂き",
+    "name2": "ウーティス",
+    "season": "SEASON 4 [EVENT]",
+    "rank": 3,
+    "time": 4
+  },
+  {
+    "id": 23008,
+    "name1": "魔弾",
+    "name2": "ウーティス",
+    "season": "WALPURGISNACHT-V",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 23009,
+    "name1": "私はチョキを出すね、そっちは？",
+    "name2": "ウーティス",
+    "season": "SEASON 7",
+    "rank": 1,
+    "time": 7
+  },
+  {
+    "id": 24001,
+    "name1": "ある日突然",
+    "name2": "グレゴール",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 24002,
+    "name1": "まやかし",
+    "name2": "グレゴール",
+    "season": "SEASON 1",
+    "rank": 1,
+    "time": 1
+  },
+  {
+    "id": 24003,
+    "name1": "提灯",
+    "name2": "グレゴール",
+    "season": "恒常",
+    "rank": 2,
+    "time": 0
+  },
+  {
+    "id": 24004,
+    "name1": "AEDD",
+    "name2": "グレゴール",
+    "season": "SEASON 2",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 24005,
+    "name1": "茨の花園",
+    "name2": "グレゴール",
+    "season": "SEASON 3",
+    "rank": 4,
+    "time": 3
+  },
+  {
+    "id": 24006,
+    "name1": "過ぎし日",
+    "name2": "グレゴール",
+    "season": "SEASON 4",
+    "rank": 2,
+    "time": 4
+  },
+  {
+    "id": 24007,
+    "name1": "厳粛な哀悼",
+    "name2": "グレゴール",
+    "season": "WALPURGISNACHT-IV",
+    "rank": 3,
+    "time": 4
+  },
+  {
+    "id": 24008,
+    "name1": "クリスマスの悪夢",
+    "name2": "グレゴール",
+    "season": "SEASON 5 [EVENT]",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 24009,
+    "name1": "輝かざる栄光",
+    "name2": "グレゴール",
+    "season": "COLLABORATION-LIMITED",
+    "rank": 4,
+    "time": 6
   }
 ]
