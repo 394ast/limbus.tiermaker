@@ -1334,5 +1334,573 @@
     "season": "SEASON 7",
     "rank": 3,
     "time": 7
+  },
+  {
+    "id": 13001,
+    "name1": "烏瞰刀",
+    "name2": "イサン",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 13002,
+    "name1": "4本目のマッチの火",
+    "name2": "イサン",
+    "season": "SEASON 1",
+    "rank": 2,
+    "time": 1
+  },
+  {
+    "id": 13003,
+    "name1": "願いの石",
+    "name2": "イサン",
+    "season": "恒常",
+    "rank": 2,
+    "time": 0
+  },
+  {
+    "id": 13004,
+    "name1": "次元裂き",
+    "name2": "イサン",
+    "season": "恒常",
+    "rank": 3,
+    "time": 0
+  },
+  {
+    "id": 13005,
+    "name1": "狐雨",
+    "name2": "イサン",
+    "season": "SEASON 2",
+    "rank": 4,
+    "time": 2
+  },
+  {
+    "id": 13006,
+    "name1": "過ぎし日",
+    "name2": "イサン",
+    "season": "SEASON 4",
+    "rank": 1,
+    "time": 4
+  },
+  {
+    "id": 13007,
+    "name1": "凶弾",
+    "name2": "イサン",
+    "season": "SEASON 5",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 13008,
+    "name1": "三千大世界",
+    "name2": "イサン",
+    "season": "SEASON 7",
+    "rank": 4,
+    "time": 7
+  },
+  {
+    "id": 14001,
+    "name1": "表象放出機",
+    "name2": "ファウスト",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 14002,
+    "name1": "水袋",
+    "name2": "ファウスト",
+    "season": "恒常",
+    "rank": 3,
+    "time": 1
+  },
+  {
+    "id": 14003,
+    "name1": "呪いの釘",
+    "name2": "ファウスト",
+    "season": "恒常",
+    "rank": 2,
+    "time": 0
+  },
+  {
+    "id": 14004,
+    "name1": "電信柱",
+    "name2": "ファウスト",
+    "season": "恒常",
+    "rank": 3,
+    "time": 1
+  },
+  {
+    "id": 14005,
+    "name1": "9章2節",
+    "name2": "ファウスト",
+    "season": "SEASON 3",
+    "rank": 2,
+    "time": 3
+  },
+  {
+    "id": 14006,
+    "name1": "永続",
+    "name2": "ファウスト",
+    "season": "SEASON 4 [EVENT]",
+    "rank": 4,
+    "time": 4
+  },
+  {
+    "id": 14007,
+    "name1": "投げ縄",
+    "name2": "ファウスト",
+    "season": "SEASON 5",
+    "rank": 2,
+    "time": 5
+  },
+  {
+    "id": 14008,
+    "name1": "胸痛",
+    "name2": "ファウスト",
+    "season": "SEASON 5",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 14009,
+    "name1": "指令：メルトダウン",
+    "name2": "ファウスト",
+    "season": "COLLABORATION-LIMITED",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 15001,
+    "name1": "ラ・サングレ・デ・サンチョ",
+    "name2": "ドンキホーテ",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 15002,
+    "name1": "水袋",
+    "name2": "ドンキホーテ",
+    "season": "SEASON 1",
+    "rank": 3,
+    "time": 1
+  },
+  {
+    "id": 15003,
+    "name1": "電信柱",
+    "name2": "ドンキホーテ",
+    "season": "恒常",
+    "rank": 3,
+    "time": 1
+  },
+  {
+    "id": 15004,
+    "name1": "一生シチュー",
+    "name2": "ドンキホーテ",
+    "season": "SEASON 1 [EVENT]",
+    "rank": 2,
+    "time": 1
+  },
+  {
+    "id": 15005,
+    "name1": "願いの石",
+    "name2": "ドンキホーテ",
+    "season": "恒常",
+    "rank": 2,
+    "time": 3
+  },
+  {
+    "id": 15006,
+    "name1": "電気哀鳴",
+    "name2": "ドンキホーテ",
+    "season": "SEASON 4",
+    "rank": 2,
+    "time": 4
+  },
+  {
+    "id": 15007,
+    "name1": "渇望-ミルカラ",
+    "name2": "ドンキホーテ",
+    "season": "SEASON 5",
+    "rank": 4,
+    "time": 5
+  },
+  {
+    "id": 15008,
+    "name1": "紅籍",
+    "name2": "ドンキホーテ",
+    "season": "SEASON 6",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 15009,
+    "name1": "愛と憎悪の名の下に",
+    "name2": "ドンキホーテ",
+    "season": "WALPURGISNACHT-VI",
+    "rank": 4,
+    "time": 6
+  },
+  {
+    "id": 16001,
+    "name1": "森羅炎象",
+    "name2": "良秀",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 16002,
+    "name1": "4本目のマッチの火",
+    "name2": "良秀",
+    "season": "SEASON 1",
+    "rank": 3,
+    "time": 1
+  },
+  {
+    "id": 16003,
+    "name1": "赤眼",
+    "name2": "良秀",
+    "season": "恒常",
+    "rank": 2,
+    "time": 2
+  },
+  {
+    "id": 16004,
+    "name1": "赤眼(開)",
+    "name2": "良秀",
+    "season": "恒常",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 16005,
+    "name1": "ソーダ",
+    "name2": "良秀",
+    "season": "SEASON 2 [EVENT]",
+    "rank": 1,
+    "time": 2
+  },
+  {
+    "id": 16006,
+    "name1": "盲目",
+    "name2": "良秀",
+    "season": "SEASON 3",
+    "rank": 2,
+    "time": 3
+  },
+  {
+    "id": 16007,
+    "name1": "軽蔑、畏敬",
+    "name2": "良秀",
+    "season": "SEASON 4",
+    "rank": 4,
+    "time": 4
+  },
+  {
+    "id": 16008,
+    "name1": "胸痛",
+    "name2": "良秀",
+    "season": "SEASON 5 [EVENT]",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 16009,
+    "name1": "三千大世界",
+    "name2": "良秀",
+    "season": "SEASON 7",
+    "rank": 4,
+    "time": 7
+  },
+  {
+    "id": 17001,
+    "name1": "他人の鎖",
+    "name2": "ムルソー",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 17002,
+    "name1": "ネジの外れた一撃",
+    "name2": "ムルソー",
+    "season": "SEASON 1",
+    "rank": 2,
+    "time": 1
+  },
+  {
+    "id": 17003,
+    "name1": "執行",
+    "name2": "ムルソー",
+    "season": "恒常",
+    "rank": 3,
+    "time": 0
+  },
+  {
+    "id": 17004,
+    "name1": "カポーテ",
+    "name2": "ムルソー",
+    "season": "SEASON 2",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 17005,
+    "name1": "後悔",
+    "name2": "ムルソー",
+    "season": "WALPURGISNACHT-I",
+    "rank": 2,
+    "time": 2
+  },
+  {
+    "id": 17006,
+    "name1": "電気哀鳴",
+    "name2": "ムルソー",
+    "season": "SEASON 4",
+    "rank": 2,
+    "time": 4
+  },
+  {
+    "id": 17007,
+    "name1": "渇望-ミルカラ",
+    "name2": "ムルソー",
+    "season": "SEASON 5",
+    "rank": 4,
+    "time": 5
+  },
+  {
+    "id": 17008,
+    "name1": "粉砕される過去",
+    "name2": "ムルソー",
+    "season": "SEASON 6 [EVENT]",
+    "rank": 4,
+    "time": 6
+  },
+  {
+    "id": 18001,
+    "name1": "虚幻境",
+    "name2": "ホンル",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 18002,
+    "name1": "桃色の欲望",
+    "name2": "ホンル",
+    "season": "SEASON 1",
+    "rank": 2,
+    "time": 1
+  },
+  {
+    "id": 18003,
+    "name1": "次元裂き",
+    "name2": "ホンル",
+    "season": "恒常",
+    "rank": 3,
+    "time": 1
+  },
+  {
+    "id": 18004,
+    "name1": "ソーダ",
+    "name2": "ホンル",
+    "season": "SEASON 2 [EVENT]",
+    "rank": 2,
+    "time": 2
+  },
+  {
+    "id": 18005,
+    "name1": "沸き立つ腐食",
+    "name2": "ホンル",
+    "season": "SEASON 3",
+    "rank": 3,
+    "time": 3
+  },
+  {
+    "id": 18006,
+    "name1": "低いなきごえ",
+    "name2": "ホンル",
+    "season": "恒常",
+    "rank": 2,
+    "time": 4
+  },
+  {
+    "id": 18007,
+    "name1": "投げ縄",
+    "name2": "ホンル",
+    "season": "SEASON 5",
+    "rank": 2,
+    "time": 5
+  },
+  {
+    "id": 18008,
+    "name1": "汚血泣涙",
+    "name2": "ホンル",
+    "season": "SEASON 6",
+    "rank": 4,
+    "time": 6
+  },
+  {
+    "id": 18009,
+    "name1": "寧ろ吾をなさん",
+    "name2": "ホンル",
+    "season": "COLLABORATION-LIMITED",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 19001,
+    "name1": "死体袋",
+    "name2": "ヒースクリフ",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 19002,
+    "name1": "電信柱",
+    "name2": "ヒースクリフ",
+    "season": "SEASON 1",
+    "rank": 3,
+    "time": 1
+  },
+  {
+    "id": 19003,
+    "name1": "AEDD",
+    "name2": "ヒースクリフ",
+    "season": "SEASON 2",
+    "rank": 2,
+    "time": 2
+  },
+  {
+    "id": 19004,
+    "name1": "空即是色",
+    "name2": "ヒースクリフ",
+    "season": "恒常",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 19005,
+    "name1": "ホリデイ",
+    "name2": "ヒースクリフ",
+    "season": "SEASON 3 [EVENT]",
+    "rank": 1,
+    "time": 3
+  },
+  {
+    "id": 19006,
+    "name1": "拘束",
+    "name2": "ヒースクリフ",
+    "season": "SEASON 4",
+    "rank": 4,
+    "time": 4
+  },
+  {
+    "id": 19007,
+    "name1": "凶弾",
+    "name2": "ヒースクリフ",
+    "season": "恒常",
+    "rank": 2,
+    "time": 4
+  },
+  {
+    "id": 19008,
+    "name1": "偏った慣性",
+    "name2": "ヒースクリフ",
+    "season": "恒常",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 19009,
+    "name1": "転入届",
+    "name2": "ヒースクリフ",
+    "season": "SEASON 7",
+    "rank": 2,
+    "time": 7
+  },
+  {
+    "id": 20001,
+    "name1": "銛穿ち",
+    "name2": "イシュメール",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 20002,
+    "name1": "桃色の欲望",
+    "name2": "イシュメール",
+    "season": "SEASON 1",
+    "rank": 2,
+    "time": 1
+  },
+  {
+    "id": 20003,
+    "name1": "紅炎殺",
+    "name2": "イシュメール",
+    "season": "恒常",
+    "rank": 3,
+    "time": 0
+  },
+  {
+    "id": 20004,
+    "name1": "カポーテ",
+    "name2": "イシュメール",
+    "season": "SEASON 2",
+    "rank": 2,
+    "time": 2
+  },
+  {
+    "id": 20005,
+    "name1": "盲目",
+    "name2": "イシュメール",
+    "season": "SEASON 3",
+    "rank": 4,
+    "time": 3
+  },
+  {
+    "id": 20006,
+    "name1": "羽ばたき",
+    "name2": "イシュメール",
+    "season": "WALPURGISNACHT-III",
+    "rank": 3,
+    "time": 4
+  },
+  {
+    "id": 20007,
+    "name1": "過ぎし日",
+    "name2": "イシュメール",
+    "season": "恒常",
+    "rank": 2,
+    "time": 4
+  },
+  {
+    "id": 20008,
+    "name1": "クリスマスの悪夢",
+    "name2": "イシュメール",
+    "season": "SEASON 5 [EVENT]",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 20009,
+    "name1": "蝍蛆殺",
+    "name2": "イシュメール",
+    "season": "SEASON 6",
+    "rank": 1,
+    "time": 6
+  },
+  {
+    "id": 20010,
+    "name1": "海嘯の悲歌",
+    "name2": "イシュメール",
+    "season": "COLLABORATION-LIMITED",
+    "rank": 3,
+    "time": 6
   }
 ]
