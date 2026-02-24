@@ -38,6 +38,8 @@
       .id-items { display: flex; flex-wrap: wrap; gap: 2px; justify-content: flex-start; }
       .id-item { display: flex; align-items: center; gap: 6px; border: 1px solid #ddd; border-radius: 4px; padding: 2px; background: #fff; }
       .id-item img { width: var(--img-size, 56px); height: var(--img-size, 56px); object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
+      .id-main { display: grid; gap: 2px; justify-items: center; }
+      .id-name { font-size: 11px; line-height: 1.2; text-align: center; max-width: calc(var(--img-size, 56px) + 24px); word-break: break-word; }
       .id-controls { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
       .id-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
       .id-controls label { font-size: 12px; }
@@ -91,6 +93,11 @@
     <label><input type="checkbox" id="toggleExceptRows" checked> 除外ランクを表示する</label>
   </div>
 
+  <div class="sync-mode">
+    <label><input type="checkbox" id="toggleName1"> name1を表示する</label>
+    <label><input type="checkbox" id="toggleName2"> name2を表示する</label>
+  </div>
+
   <div class="scroll-fix-options">
     <span class="indent">Tierの移動ボタンを押した後のカーソルの位置:</span>
     <label><input type="radio" name="scrollFixMode" value="group-relative" checked> 移動前のランク</label>
@@ -130,6 +137,8 @@
     const customWidthInput = document.getElementById('customWidth');
     const toggleAdjustControlsInput = document.getElementById('toggleAdjustControls');
     const toggleExceptRowsInput = document.getElementById('toggleExceptRows');
+    const toggleName1Input = document.getElementById('toggleName1');
+    const toggleName2Input = document.getElementById('toggleName2');
     const toggleExceptMoveControlsInput = document.getElementById('toggleExceptMoveControls');
     const idRangeFiltersEl = document.getElementById('idRangeFilters');
     const generateUrlButton = document.getElementById('generateUrlButton');
@@ -155,6 +164,7 @@
         x: null,
       },
       baseValueById: new Map(),
+      nameDataById: new Map(),
       changeParam: null,
       scrollFixMode: 'group-relative',
     };
@@ -342,6 +352,26 @@
       return `https://raw.githubusercontent.com/394ast/limbus.sharetool/main/EGO/${id}.jpg`;
     }
 
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function getDisplayNames(id) {
+      const nameData = state.nameDataById.get(id);
+      if (!nameData) {
+        return { name1: '', name2: '' };
+      }
+
+      const name1 = typeof nameData.name1 === 'string' ? nameData.name1 : '';
+      const name2 = typeof nameData.name2 === 'string' ? nameData.name2 : '';
+      return { name1, name2 };
+    }
+
     function renderControlButtons(id, groupValue, isExcept, type) {
       if (isExcept) {
         return `<button type="button" data-action="toggle-except" data-include="1" data-id="${id}" data-type="${type}" data-group="${groupValue}">戻す</button>`;
@@ -366,10 +396,17 @@
 
       const items = ids.map((id) => {
         const src = type === 'identity' ? getIdentityImageUrl(id) : getEgoImageUrl(id);
+        const { name1, name2 } = getDisplayNames(id);
+        const showName1 = Boolean(toggleName1Input?.checked && name1);
+        const showName2 = Boolean(toggleName2Input?.checked && name2);
 
         return `
           <div class="id-item">
-            <img src="${src}" alt="${id}" loading="lazy">
+            <div class="id-main">
+              <img src="${src}" alt="${id}" loading="lazy">
+              ${showName1 ? `<div class="id-name">${escapeHtml(name1)}</div>` : ''}
+              ${showName2 ? `<div class="id-name">${escapeHtml(name2)}</div>` : ''}
+            </div>
             <div class="id-controls">
               ${renderControlButtons(id, groupValue, isExcept, type)}
             </div>
@@ -842,6 +879,18 @@
       });
     }
 
+    [toggleName1Input, toggleName2Input].forEach((input) => {
+      if (!input) {
+        return;
+      }
+
+      input.addEventListener('change', () => {
+        if (state.tierlist && Number.isFinite(state.x)) {
+          renderRows(state.tierlist, state.x);
+        }
+      });
+    });
+
     renderIdRangeFilters();
 
     if (idRangeFiltersEl) {
@@ -1244,15 +1293,51 @@
       }
 
       try {
-        const response = await fetch(`data/table${tableIndex}.json`, { cache: 'no-store' });
-        if (!response.ok) {
-          throw new Error(`data/table${tableIndex}.json の取得に失敗しました (HTTP ${response.status})`);
+        const [tableResponse, namelistResponse] = await Promise.all([
+          fetch(`data/table${tableIndex}.json`, { cache: 'no-store' }),
+          fetch('namelist.json', { cache: 'no-store' }),
+        ]);
+
+        if (!tableResponse.ok) {
+          throw new Error(`data/table${tableIndex}.json の取得に失敗しました (HTTP ${tableResponse.status})`);
         }
 
-        const tierlist = await response.json();
+        if (!namelistResponse.ok) {
+          throw new Error(`namelist.json の取得に失敗しました (HTTP ${namelistResponse.status})`);
+        }
+
+        const [tierlist, namelist] = await Promise.all([
+          tableResponse.json(),
+          namelistResponse.json(),
+        ]);
+
+        const nameDataById = new Map();
+        namelist.forEach((entry) => {
+          const id = Number.parseInt(entry?.id ?? '', 10);
+          if (!Number.isInteger(id)) {
+            return;
+          }
+
+          if (typeof entry?.name1 === 'string' || typeof entry?.name2 === 'string') {
+            nameDataById.set(id, {
+              name1: entry.name1 ?? '',
+              name2: entry.name2 ?? '',
+            });
+            return;
+          }
+
+          const baseName = typeof entry?.name === 'string' ? entry.name.trim() : '';
+          const nameTokens = baseName ? baseName.split(/\s+/) : [];
+          nameDataById.set(id, {
+            name1: nameTokens[0] ?? '',
+            name2: nameTokens.slice(1).join(' '),
+          });
+        });
+
         state.tierlist = tierlist;
         state.x = x;
         state.tableIndex = tableIndex;
+        state.nameDataById = nameDataById;
         initializeBaseGroupedData(tierlist, x);
         applyCompressedDiffParam(compressedParam);
         renderRows(tierlist, x);
