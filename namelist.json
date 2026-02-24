@@ -990,5 +990,349 @@
     "season": "恒常",
     "rank": 3,
     "time": 6
+  },
+  {
+    "id": 10001,
+    "name1": "LCB 囚人",
+    "name2": "シンクレア",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 10002,
+    "name1": "剣契 殺手",
+    "name2": "シンクレア",
+    "season": "恒常",
+    "rank": 3,
+    "time": 0
+  },
+  {
+    "id": 10003,
+    "name1": "南部ツヴァイ協会 6課",
+    "name2": "シンクレア",
+    "season": "恒常",
+    "rank": 2,
+    "time": 0
+  },
+  {
+    "id": 10004,
+    "name1": "マリアッチ ボス",
+    "name2": "シンクレア",
+    "season": "SEASON 1",
+    "rank": 2,
+    "time": 0
+  },
+  {
+    "id": 10005,
+    "name1": "握らんとする者",
+    "name2": "シンクレア",
+    "season": "SEASON 1",
+    "rank": 3,
+    "time": 1
+  },
+  {
+    "id": 10006,
+    "name1": "ロボトミーE.G.O:: 紅籍",
+    "name2": "シンクレア",
+    "season": "SEASON 2",
+    "rank": 2,
+    "time": 2
+  },
+  {
+    "id": 10007,
+    "name1": "奥歯ボートセンター フィクサー",
+    "name2": "シンクレア",
+    "season": "SEASON 2 [EVENT]",
+    "rank": 2,
+    "time": 2
+  },
+  {
+    "id": 10008,
+    "name1": "南部センク協会 4課 部長",
+    "name2": "シンクレア",
+    "season": "恒常",
+    "rank": 3,
+    "time": 3
+  },
+  {
+    "id": 10009,
+    "name1": "夜明事務所 フィクサー",
+    "name2": "シンクレア",
+    "season": "WALPURGISNACHT-III",
+    "rank": 3,
+    "time": 4
+  },
+  {
+    "id": 10010,
+    "name1": "西部ツヴァイ協会 3課",
+    "name2": "シンクレア",
+    "season": "SEASON 5",
+    "rank": 2,
+    "time": 5
+  },
+  {
+    "id": 10011,
+    "name1": "北部ヂェーヴィチ協会 3課",
+    "name2": "シンクレア",
+    "season": "恒常",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 10012,
+    "name1": "中指 末弟",
+    "name2": "シンクレア",
+    "season": "恒常",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 10013,
+    "name1": "東部親指 ソルダートII",
+    "name2": "シンクレア",
+    "season": "SEASON 6",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 10014,
+    "name1": "黒獣 - 酉",
+    "name2": "シンクレア",
+    "season": "SEASON 6 [EVENT]",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 10015,
+    "name1": "蜘蛛の巣 小指の子方",
+    "name2": "シンクレア",
+    "season": "SEASON 7",
+    "rank": 3,
+    "time": 7
+  },
+  {
+    "id": 11001,
+    "name1": "LCB 囚人",
+    "name2": "ウーティス",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 11002,
+    "name1": "剣契 殺手",
+    "name2": "ウーティス",
+    "season": "恒常",
+    "rank": 2,
+    "time": 0
+  },
+  {
+    "id": 11003,
+    "name1": "G社 部長",
+    "name2": "ウーティス",
+    "season": "SEASON 1",
+    "rank": 2,
+    "time": 0
+  },
+  {
+    "id": 11004,
+    "name1": "南部セブン協会 6課部長",
+    "name2": "ウーティス",
+    "season": "恒常",
+    "rank": 3,
+    "time": 1
+  },
+  {
+    "id": 11005,
+    "name1": "奥歯事務所 フィクサー",
+    "name2": "ウーティス",
+    "season": "SEASON 2 [EVENT]",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 11006,
+    "name1": "南部センク協会 4課",
+    "name2": "ウーティス",
+    "season": "恒常",
+    "rank": 2,
+    "time": 3
+  },
+  {
+    "id": 11007,
+    "name1": "ロボトミーE.G.O:: 魔弾",
+    "name2": "ウーティス",
+    "season": "WALPURGISNACHT-II",
+    "rank": 3,
+    "time": 3
+  },
+  {
+    "id": 11008,
+    "name1": "ワザリング・ハイツ チーフバトラー",
+    "name2": "ウーティス",
+    "season": "SEASON 4",
+    "rank": 3,
+    "time": 4
+  },
+  {
+    "id": 11009,
+    "name1": "薬指点描派 スチューデント",
+    "name2": "ウーティス",
+    "season": "恒常",
+    "rank": 2,
+    "time": 4
+  },
+  {
+    "id": 11010,
+    "name1": "W社 3級 整理要員チーフ",
+    "name2": "ウーティス",
+    "season": "恒常",
+    "rank": 3,
+    "time": 4
+  },
+  {
+    "id": 11011,
+    "name1": "ラ・マンチャランド 理髪師",
+    "name2": "ウーティス",
+    "season": "SEASON 5",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 11012,
+    "name1": "黒獣 - 卯",
+    "name2": "ウーティス",
+    "season": "SEASON 5 [EVENT]",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 11013,
+    "name1": "T社3級 強制徴収職 職員",
+    "name2": "ウーティス",
+    "season": "SEASON 6 [EVENT]",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 11014,
+    "name1": "LCA ウアジェト先鋒三隊隊長",
+    "name2": "ウーティス",
+    "season": "SEASON 7",
+    "rank": 3,
+    "time": 7
+  },
+  {
+    "id": 12001,
+    "name1": "LCB 囚人",
+    "name2": "グレゴール",
+    "season": "恒常",
+    "rank": 1,
+    "time": 0
+  },
+  {
+    "id": 12002,
+    "name1": "南部リウ協会 6課",
+    "name2": "グレゴール",
+    "season": "恒常",
+    "rank": 2,
+    "time": 0
+  },
+  {
+    "id": 12003,
+    "name1": "G社 課長代理",
+    "name2": "グレゴール",
+    "season": "SEASON 1",
+    "rank": 3,
+    "time": 0
+  },
+  {
+    "id": 12004,
+    "name1": "りょ・ミ・パ 助手",
+    "name2": "グレゴール",
+    "season": "SEASON 1 [EVENT]",
+    "rank": 2,
+    "time": 1
+  },
+  {
+    "id": 12005,
+    "name1": "バラのスパナ工房 フィクサー",
+    "name2": "グレゴール",
+    "season": "SEASON 2",
+    "rank": 2,
+    "time": 2
+  },
+  {
+    "id": 12006,
+    "name1": "南部ツヴァイ協会 4課",
+    "name2": "グレゴール",
+    "season": "恒常",
+    "rank": 3,
+    "time": 2
+  },
+  {
+    "id": 12007,
+    "name1": "双鉤海賊団 副船長",
+    "name2": "グレゴール",
+    "season": "SEASON 3",
+    "rank": 3,
+    "time": 3
+  },
+  {
+    "id": 12008,
+    "name1": "黒雲会 副組長",
+    "name2": "グレゴール",
+    "season": "SEASON 3 [EVENT]",
+    "rank": 2,
+    "time": 3
+  },
+  {
+    "id": 12009,
+    "name1": "エドガー家 継承者",
+    "name2": "グレゴール",
+    "season": "SEASON 4",
+    "rank": 3,
+    "time": 4
+  },
+  {
+    "id": 12010,
+    "name1": "ラ・マンチャランド 神父",
+    "name2": "グレゴール",
+    "season": "SEASON 5",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 12011,
+    "name1": "炎拳事務所 生存者",
+    "name2": "グレゴール",
+    "season": "SEASON 5",
+    "rank": 3,
+    "time": 5
+  },
+  {
+    "id": 12012,
+    "name1": "黒獣 - 巳",
+    "name2": "グレゴール",
+    "season": "SEASON 6",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 12013,
+    "name1": "夜の錐 カピターノ",
+    "name2": "グレゴール",
+    "season": "WALPURGISNACHT-VII",
+    "rank": 3,
+    "time": 6
+  },
+  {
+    "id": 12014,
+    "name1": "ロボトミーE.G.O:: ランプ",
+    "name2": "グレゴール",
+    "season": "SEASON 7",
+    "rank": 3,
+    "time": 7
   }
 ]
