@@ -488,7 +488,7 @@
         return `<label class="id-range-filter"><input type="checkbox" data-action="toggle-id-range" data-filter-type="${filterType}" data-key="${key}" checked> ${label}</label>`;
       }).join('');
 
-      const renderGroupActions = () => '<div class="id-range-actions"><button type="button" data-action="check-group-ranges">全て☑</button><button type="button" data-action="clear-group-ranges">全て☐</button></div>';
+      const renderGroupActions = () => '<div class="id-range-actions"><button type="button" data-action="check-group-ranges">全て☑に</button><button type="button" data-action="clear-group-ranges">全て☐に</button></div>';
 
       idRangeFiltersEl.innerHTML = [
         `<div class="id-range-group"><p class="id-range-title">表示する人格</p><div class="id-range-options">${renderOptions(identity, 'bucket')}</div>${renderGroupActions()}</div>`,
