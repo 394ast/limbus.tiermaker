@@ -479,7 +479,7 @@
         `<div class="id-range-group"><p class="id-range-title">表示する人格</p><div class="id-range-options">${renderOptions(identity, 'bucket')}</div></div>`,
         `<div class="id-range-group"><p class="id-range-title">表示するE.G.O.</p><div class="id-range-options">${renderOptions(ego, 'bucket')}</div></div>`,
         `<div class="id-range-group"><p class="id-range-title">season</p><div class="id-range-options">${renderOptions(seasonOptions, 'season')}</div></div>`,
-        `<div class="id-range-group"><p class="id-range-title">rank</p><div class="id-range-options">${renderOptions(identityRankOptions, 'rank')}${renderOptions(egoRankOptions, 'rank')}</div></div>`,
+        `<div class="id-range-group"><p class="id-range-title">rank</p><div class="id-range-options">${renderOptions(identityRankOptions, 'rank')}<br>${renderOptions(egoRankOptions, 'rank')}</div></div>`,
         `<div class="id-range-group"><p class="id-range-title">time</p><div class="id-range-options">${renderOptions(timeOptions, 'time')}</div></div>`,
         '<div class="id-range-actions"><button type="button" data-action="clear-all-ranges">全解除</button><button type="button" data-action="check-all-ranges">全表示</button></div>'
       ].join('');
