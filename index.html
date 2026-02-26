@@ -445,28 +445,38 @@
       }
 
       const { identity, ego } = getIdRangeFilters();
+    　const identityRankOptions = [
+        { key: '1', label: '0(星1)' },
+        { key: '2', label: '00(星2)' },
+        { key: '3', label: '000(星3)' },
+      ];
+      const egoRankOptions = [
+        { key: '1', label: 'ZAYIN' },
+        { key: '2', label: 'TETH' },
+        { key: '3', label: 'HE' },
+        { key: '4', label: 'WAW' },
+        { key: '5', label: 'ALEPH' },
+      ];
       const seasonOptions = [
         { key: '恒常', label: '恒常' },
-        { key: 'SEASON 1', label: 'SEASON 1' },
-        { key: 'SEASON 2', label: 'SEASON 2' },
-        { key: 'SEASON 3', label: 'SEASON 3' },
-        { key: 'SEASON 4', label: 'SEASON 4' },
-        { key: 'SEASON 5', label: 'SEASON 5' },
-        { key: 'SEASON 6', label: 'SEASON 6' },
-        { key: 'SEASON 7', label: 'SEASON 7' },
-        { key: 'WALPURGISNACHT', label: 'WALPURGISNACHT' },
-        { key: 'COLLABORATION-LIMITED', label: 'COLLABORATION-LIMITED' },
+        { key: 'SEASON 1', label: 'シーズン1' },
+        { key: 'SEASON 2', label: 'シ－ズン2' },
+        { key: 'SEASON 3', label: 'シーズン3' },
+        { key: 'SEASON 4', label: 'シーズン4' },
+        { key: 'SEASON 5', label: 'シーズン5' },
+        { key: 'SEASON 6', label: 'シーズン6' },
+        { key: 'SEASON 7', label: 'シーズン7' },
+        { key: 'WALPURGISNACHT', label: 'ヴァルプルギスの夜' },
+        { key: 'COLLABORATION-LIMITED', label: 'コラボ限定' },
       ];
-      const identityRankOptions = [1, 2, 3].map((rank) => ({ key: `i-${rank}`, label: `人格 ${rank}` }));
-      const egoRankOptions = [1, 2, 3, 4, 5].map((rank) => ({ key: `e-${rank}`, label: `E.G.O. ${rank}` }));
-      const timeOptions = [
-        { key: '0,1', label: '0,1' },
-        { key: '2', label: '2' },
-        { key: '3', label: '3' },
-        { key: '4', label: '4' },
-        { key: '5', label: '5' },
-        { key: '6', label: '6' },
-        { key: '7', label: '7' },
+    　const timeOptions = [
+        { key: '0,1', label: 'シーズン1' },
+        { key: '2', label: 'シーズン2' },
+        { key: '3', label: 'シーズン3' },
+        { key: '4', label: 'シーズン4' },
+        { key: '5', label: 'シーズン5' },
+        { key: '6', label: 'シーズン6' },
+        { key: '7', label: 'シーズン7' },
       ];
 
       const renderOptions = (items, filterType) => items.map((item) => {
@@ -480,9 +490,9 @@
       idRangeFiltersEl.innerHTML = [
         `<div class="id-range-group"><p class="id-range-title">表示する人格</p><div class="id-range-options">${renderOptions(identity, 'bucket')}</div>${renderGroupActions()}</div>`,
         `<div class="id-range-group"><p class="id-range-title">表示するE.G.O.</p><div class="id-range-options">${renderOptions(ego, 'bucket')}</div>${renderGroupActions()}</div>`,
-        `<div class="id-range-group"><p class="id-range-title">区分</p><div class="id-range-options">${renderOptions(seasonOptions, 'season')}</div>${renderGroupActions()}</div>`,
         `<div class="id-range-group"><p class="id-range-title">星</p><div class="id-range-options">${renderOptions(identityRankOptions, 'rank')}</div>${renderGroupActions()}</div>`,
         `<div class="id-range-group"><p class="id-range-title">危険ランク</p><div class="id-range-options">${renderOptions(egoRankOptions, 'rank')}</div>${renderGroupActions()}</div>`,
+        `<div class="id-range-group"><p class="id-range-title">区分</p><div class="id-range-options">${renderOptions(seasonOptions, 'season')}</div>${renderGroupActions()}</div>`,
         `<div class="id-range-group"><p class="id-range-title">実装時期</p><div class="id-range-options">${renderOptions(timeOptions, 'time')}</div>${renderGroupActions()}</div>`
       ].join('');
     }
