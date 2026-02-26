@@ -481,7 +481,8 @@
         `<div class="id-range-group"><p class="id-range-title">表示する人格</p><div class="id-range-options">${renderOptions(identity, 'bucket')}</div>${renderGroupActions()}</div>`,
         `<div class="id-range-group"><p class="id-range-title">表示するE.G.O.</p><div class="id-range-options">${renderOptions(ego, 'bucket')}</div>${renderGroupActions()}</div>`,
         `<div class="id-range-group"><p class="id-range-title">区分</p><div class="id-range-options">${renderOptions(seasonOptions, 'season')}</div>${renderGroupActions()}</div>`,
-        `<div class="id-range-group"><p class="id-range-title">rank</p><div class="id-range-options"><div class="id-range-subgroup"><span class="id-range-filter">人格のrank</span><div class="id-range-options">${renderOptions(identityRankOptions, 'rank')}</div>${renderGroupActions()}</div><div class="id-range-subgroup"><span class="id-range-filter">E.G.Oのrank</span><div class="id-range-options">${renderOptions(egoRankOptions, 'rank')}</div>${renderGroupActions()}</div></div></div>`,
+        `<div class="id-range-group"><p class="id-range-title">星</p><div class="id-range-options">${renderOptions(identityRankOptions, 'rank')}</div>${renderGroupActions()}</div>`,
+        `<div class="id-range-group"><p class="id-range-title">危険ランク</p><div class="id-range-options">${renderOptions(egoRankOptions, 'rank')}</div>${renderGroupActions()}</div>`,
         `<div class="id-range-group"><p class="id-range-title">実装時期</p><div class="id-range-options">${renderOptions(timeOptions, 'time')}</div>${renderGroupActions()}</div>`
       ].join('');
     }
