@@ -166,6 +166,7 @@
       },
       baseValueById: new Map(),
       nameDataById: new Map(),
+      idMetaById: new Map(),
       changeParam: null,
       scrollFixMode: 'group-relative',
     };
@@ -444,14 +445,42 @@
       }
 
       const { identity, ego } = getIdRangeFilters();
+      const seasonOptions = [
+        { key: '恒常', label: '恒常' },
+        { key: 'SEASON 1', label: 'SEASON 1' },
+        { key: 'SEASON 2', label: 'SEASON 2' },
+        { key: 'SEASON 3', label: 'SEASON 3' },
+        { key: 'SEASON 4', label: 'SEASON 4' },
+        { key: 'SEASON 5', label: 'SEASON 5' },
+        { key: 'SEASON 6', label: 'SEASON 6' },
+        { key: 'SEASON 7', label: 'SEASON 7' },
+        { key: 'WALPURGISNACHT', label: 'WALPURGISNACHT' },
+        { key: 'COLLABORATION-LIMITED', label: 'COLLABORATION-LIMITED' },
+      ];
+      const identityRankOptions = [1, 2, 3].map((rank) => ({ key: `i-${rank}`, label: `人格 ${rank}` }));
+      const egoRankOptions = [1, 2, 3, 4, 5].map((rank) => ({ key: `e-${rank}`, label: `E.G.O. ${rank}` }));
+      const timeOptions = [
+        { key: '0,1', label: '0,1' },
+        { key: '2', label: '2' },
+        { key: '3', label: '3' },
+        { key: '4', label: '4' },
+        { key: '5', label: '5' },
+        { key: '6', label: '6' },
+        { key: '7', label: '7' },
+      ];
 
-      const renderOptions = (items) => items.map(({ bucket, name }) => {
-        return `<label class="id-range-filter"><input type="checkbox" data-action="toggle-id-range" data-bucket="${bucket}" checked> ${name}</label>`;
+      const renderOptions = (items, filterType) => items.map((item) => {
+        const key = filterType === 'bucket' ? item.bucket : item.key;
+        const label = filterType === 'bucket' ? item.name : item.label;
+        return `<label class="id-range-filter"><input type="checkbox" data-action="toggle-id-range" data-filter-type="${filterType}" data-key="${key}" checked> ${label}</label>`;
       }).join('');
 
       idRangeFiltersEl.innerHTML = [
-        `<div class="id-range-group"><p class="id-range-title">表示する人格</p><div class="id-range-options">${renderOptions(identity)}</div></div>`,
-        `<div class="id-range-group"><p class="id-range-title">表示するE.G.O.</p><div class="id-range-options">${renderOptions(ego)}</div></div>`,
+        `<div class="id-range-group"><p class="id-range-title">表示する人格</p><div class="id-range-options">${renderOptions(identity, 'bucket')}</div></div>`,
+        `<div class="id-range-group"><p class="id-range-title">表示するE.G.O.</p><div class="id-range-options">${renderOptions(ego, 'bucket')}</div></div>`,
+        `<div class="id-range-group"><p class="id-range-title">season</p><div class="id-range-options">${renderOptions(seasonOptions, 'season')}</div></div>`,
+        `<div class="id-range-group"><p class="id-range-title">rank</p><div class="id-range-options">${renderOptions(identityRankOptions, 'rank')}${renderOptions(egoRankOptions, 'rank')}</div></div>`,
+        `<div class="id-range-group"><p class="id-range-title">time</p><div class="id-range-options">${renderOptions(timeOptions, 'time')}</div></div>`,
         '<div class="id-range-actions"><button type="button" data-action="clear-all-ranges">全解除</button><button type="button" data-action="check-all-ranges">全表示</button></div>'
       ].join('');
     }
@@ -473,21 +502,21 @@
       }
     }
 
-    function getVisibleBuckets() {
+    function getActiveFilterKeys(filterType) {
       if (!idRangeFiltersEl) {
         return null;
       }
 
-      const visibleBuckets = new Set();
-      const checkboxes = idRangeFiltersEl.querySelectorAll('input[data-action="toggle-id-range"]:checked');
+      const selected = new Set();
+      const checkboxes = idRangeFiltersEl.querySelectorAll(`input[data-action="toggle-id-range"][data-filter-type="${filterType}"]:checked`);
       checkboxes.forEach((checkbox) => {
-        const bucket = Number.parseInt(checkbox.dataset.bucket ?? '', 10);
-        if (Number.isInteger(bucket)) {
-          visibleBuckets.add(bucket);
+        const key = checkbox.dataset.key;
+        if (typeof key === 'string' && key !== '') {
+          selected.add(key);
         }
       });
 
-      return visibleBuckets;
+      return selected;
     }
 
     function hasUncheckedRangeFilters() {
@@ -504,14 +533,20 @@
         return [];
       }
 
-      const visibleBuckets = getVisibleBuckets();
-      if (!visibleBuckets) {
+      const filters = {
+        buckets: getActiveFilterKeys('bucket'),
+        seasons: getActiveFilterKeys('season'),
+        ranks: getActiveFilterKeys('rank'),
+        times: getActiveFilterKeys('time'),
+      };
+
+      if (!filters.buckets || !filters.seasons || !filters.ranks || !filters.times) {
         return [];
       }
 
       return state.tierlist
         .map((row) => row[0])
-        .filter((id) => !isIdVisibleByRange(id, visibleBuckets));
+        .filter((id) => !isIdVisibleByFilters(id, filters));
     }
 
     function getCurrentGroupOfId(id, type) {
@@ -588,17 +623,45 @@
       });
     }
 
-    function isIdVisibleByRange(id, visibleBuckets) {
-      if (!visibleBuckets) {
+    function isIdVisibleByFilters(id, filters) {
+      if (!filters || !filters.buckets || !filters.seasons || !filters.ranks || !filters.times) {
         return true;
       }
 
       const bucket = Math.floor(id / 1000);
-      if (bucket < 1 || bucket > 24) {
+      if (bucket >= 1 && bucket <= 24 && !filters.buckets.has(String(bucket))) {
+        return false;
+      }
+
+      const meta = state.idMetaById.get(id);
+      if (!meta) {
         return true;
       }
 
-      return visibleBuckets.has(bucket);
+      const season = typeof meta.season === 'string' ? meta.season : '';
+      const seasonMatched = [
+        '恒常',
+        'SEASON 1',
+        'SEASON 2',
+        'SEASON 3',
+        'SEASON 4',
+        'SEASON 5',
+        'SEASON 6',
+        'SEASON 7',
+        'WALPURGISNACHT',
+        'COLLABORATION-LIMITED',
+      ].some((token) => filters.seasons.has(token) && season.includes(token));
+      if (!seasonMatched) {
+        return false;
+      }
+
+      const rankKey = `${id < 13001 ? 'i' : 'e'}-${meta.rank}`;
+      if (!filters.ranks.has(rankKey)) {
+        return false;
+      }
+
+      const timeKey = (meta.time === 0 || meta.time === 1) ? '0,1' : String(meta.time);
+      return filters.times.has(timeKey);
     }
 
     function shouldShowExceptRows() {
@@ -654,7 +717,7 @@
       return grouped;
     }
 
-    function renderTypeRows(type, baseData, showExceptRows, visibleBuckets) {
+    function renderTypeRows(type, baseData, showExceptRows, filters) {
       let grouped;
 
       if (shouldShowDiffOnly()) {
@@ -672,7 +735,7 @@
       return Array.from(grouped.entries())
         .filter(([groupValue]) => showExceptRows || groupValue !== 0)
         .map(([groupValue, ids]) => {
-          const visibleIds = ids.filter((id) => isIdVisibleByRange(id, visibleBuckets));
+          const visibleIds = ids.filter((id) => isIdVisibleByFilters(id, filters));
           const orderedIds = orderVisibleIds(visibleIds);
           const label = getGroupLabel(groupValue);
           const tierClass = getGroupClass(groupValue);
@@ -693,10 +756,15 @@
       }
 
       const showExceptRows = shouldShowExceptRows();
-      const visibleBuckets = getVisibleBuckets();
+      const filters = {
+        buckets: getActiveFilterKeys('bucket'),
+        seasons: getActiveFilterKeys('season'),
+        ranks: getActiveFilterKeys('rank'),
+        times: getActiveFilterKeys('time'),
+      };
 
-      bodyIdentityEl.innerHTML = renderTypeRows('identity', state.baseGroupedByType.identity, showExceptRows, visibleBuckets);
-      bodyEgoEl.innerHTML = renderTypeRows('ego', state.baseGroupedByType.ego, showExceptRows, visibleBuckets);
+      bodyIdentityEl.innerHTML = renderTypeRows('identity', state.baseGroupedByType.identity, showExceptRows, filters);
+      bodyEgoEl.innerHTML = renderTypeRows('ego', state.baseGroupedByType.ego, showExceptRows, filters);
     }
 
     function clearGeneratedUrl() {
@@ -1313,11 +1381,20 @@
         ]);
 
         const nameDataById = new Map();
+        const idMetaById = new Map();
         namelist.forEach((entry) => {
           const id = Number.parseInt(entry?.id ?? '', 10);
           if (!Number.isInteger(id)) {
             return;
           }
+
+          const rank = Number.parseInt(entry?.rank ?? '', 10);
+          const time = Number.parseInt(entry?.time ?? '', 10);
+          idMetaById.set(id, {
+            season: typeof entry?.season === 'string' ? entry.season : '',
+            rank: Number.isInteger(rank) ? rank : null,
+            time: Number.isInteger(time) ? time : null,
+          });
 
           if (typeof entry?.name1 === 'string' || typeof entry?.name2 === 'string') {
             nameDataById.set(id, {
@@ -1339,6 +1416,7 @@
         state.x = x;
         state.tableIndex = tableIndex;
         state.nameDataById = nameDataById;
+        state.idMetaById = idMetaById;
         initializeBaseGroupedData(tierlist, x);
         applyCompressedDiffParam(compressedParam);
         renderRows(tierlist, x);
