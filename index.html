@@ -17,6 +17,7 @@
       .id-range-group { margin-bottom: 8px; }
       .id-range-title { font-weight: 600; margin: 0 0 4px; }
       .id-range-options { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+      .id-range-subgroup { width: 100%; }
       .id-range-filter { font-size: 12px; white-space: nowrap; }
       .id-range-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
       table { border-collapse: collapse; width: 100%; max-width: none; margin-bottom: 20px; }
@@ -479,7 +480,7 @@
         `<div class="id-range-group"><p class="id-range-title">表示する人格</p><div class="id-range-options">${renderOptions(identity, 'bucket')}</div></div>`,
         `<div class="id-range-group"><p class="id-range-title">表示するE.G.O.</p><div class="id-range-options">${renderOptions(ego, 'bucket')}</div></div>`,
         `<div class="id-range-group"><p class="id-range-title">season</p><div class="id-range-options">${renderOptions(seasonOptions, 'season')}</div></div>`,
-        `<div class="id-range-group"><p class="id-range-title">rank</p><div class="id-range-options">${renderOptions(identityRankOptions, 'rank')}<br>${renderOptions(egoRankOptions, 'rank')}</div></div>`,
+        `<div class="id-range-group"><p class="id-range-title">rank</p><div class="id-range-options"><div class="id-range-subgroup"><span class="id-range-filter">人格のrank</span><div class="id-range-options">${renderOptions(identityRankOptions, 'rank')}</div></div><div class="id-range-subgroup"><span class="id-range-filter">E.G.Oのrank</span><div class="id-range-options">${renderOptions(egoRankOptions, 'rank')}</div></div></div></div>`,
         `<div class="id-range-group"><p class="id-range-title">time</p><div class="id-range-options">${renderOptions(timeOptions, 'time')}</div></div>`,
         '<div class="id-range-actions"><button type="button" data-action="clear-all-ranges">全解除</button><button type="button" data-action="check-all-ranges">全表示</button></div>'
       ].join('');
