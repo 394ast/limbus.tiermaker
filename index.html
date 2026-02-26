@@ -17,7 +17,6 @@
       .id-range-group { margin-bottom: 8px; }
       .id-range-title { font-weight: 600; margin: 0 0 4px; }
       .id-range-options { display: flex; flex-wrap: wrap; gap: 4px 12px; }
-      .id-range-subgroup { width: 100%; }
       .id-range-filter { font-size: 12px; white-space: nowrap; }
       .id-range-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
       table { border-collapse: collapse; width: 100%; max-width: none; margin-bottom: 20px; }
@@ -1002,7 +1001,7 @@
           return;
         }
 
-        const container = button.closest('.id-range-subgroup') || button.closest('.id-range-group');
+        const container = button.closest('.id-range-group');
         setRangeFiltersInContainer(container, action === 'check-group-ranges');
       });
     }
