@@ -476,22 +476,23 @@
         return `<label class="id-range-filter"><input type="checkbox" data-action="toggle-id-range" data-filter-type="${filterType}" data-key="${key}" checked> ${label}</label>`;
       }).join('');
 
+      const renderGroupActions = () => '<div class="id-range-actions"><button type="button" data-action="clear-group-ranges">全解除</button><button type="button" data-action="check-group-ranges">全表示</button></div>';
+
       idRangeFiltersEl.innerHTML = [
-        `<div class="id-range-group"><p class="id-range-title">表示する人格</p><div class="id-range-options">${renderOptions(identity, 'bucket')}</div></div>`,
-        `<div class="id-range-group"><p class="id-range-title">表示するE.G.O.</p><div class="id-range-options">${renderOptions(ego, 'bucket')}</div></div>`,
-        `<div class="id-range-group"><p class="id-range-title">season</p><div class="id-range-options">${renderOptions(seasonOptions, 'season')}</div></div>`,
-        `<div class="id-range-group"><p class="id-range-title">rank</p><div class="id-range-options"><div class="id-range-subgroup"><span class="id-range-filter">人格のrank</span><div class="id-range-options">${renderOptions(identityRankOptions, 'rank')}</div></div><div class="id-range-subgroup"><span class="id-range-filter">E.G.Oのrank</span><div class="id-range-options">${renderOptions(egoRankOptions, 'rank')}</div></div></div></div>`,
-        `<div class="id-range-group"><p class="id-range-title">time</p><div class="id-range-options">${renderOptions(timeOptions, 'time')}</div></div>`,
-        '<div class="id-range-actions"><button type="button" data-action="clear-all-ranges">全解除</button><button type="button" data-action="check-all-ranges">全表示</button></div>'
+        `<div class="id-range-group"><p class="id-range-title">表示する人格</p><div class="id-range-options">${renderOptions(identity, 'bucket')}</div>${renderGroupActions()}</div>`,
+        `<div class="id-range-group"><p class="id-range-title">表示するE.G.O.</p><div class="id-range-options">${renderOptions(ego, 'bucket')}</div>${renderGroupActions()}</div>`,
+        `<div class="id-range-group"><p class="id-range-title">season</p><div class="id-range-options">${renderOptions(seasonOptions, 'season')}</div>${renderGroupActions()}</div>`,
+        `<div class="id-range-group"><p class="id-range-title">rank</p><div class="id-range-options"><div class="id-range-subgroup"><span class="id-range-filter">人格のrank</span><div class="id-range-options">${renderOptions(identityRankOptions, 'rank')}</div>${renderGroupActions()}</div><div class="id-range-subgroup"><span class="id-range-filter">E.G.Oのrank</span><div class="id-range-options">${renderOptions(egoRankOptions, 'rank')}</div>${renderGroupActions()}</div></div></div>`,
+        `<div class="id-range-group"><p class="id-range-title">time</p><div class="id-range-options">${renderOptions(timeOptions, 'time')}</div>${renderGroupActions()}</div>`
       ].join('');
     }
 
-    function setAllRangeFilters(checked) {
-      if (!idRangeFiltersEl) {
+    function setRangeFiltersInContainer(container, checked) {
+      if (!container) {
         return;
       }
 
-      const checkboxes = idRangeFiltersEl.querySelectorAll('input[data-action="toggle-id-range"]');
+      const checkboxes = container.querySelectorAll('input[data-action="toggle-id-range"]');
       checkboxes.forEach((checkbox) => {
         checkbox.checked = checked;
       });
@@ -501,6 +502,11 @@
       if (state.tierlist && Number.isFinite(state.x)) {
         renderRows(state.tierlist, state.x);
       }
+    }
+
+
+    function setAllRangeFilters(checked) {
+      setRangeFiltersInContainer(idRangeFiltersEl, checked);
     }
 
     function getActiveFilterKeys(filterType) {
@@ -981,13 +987,13 @@
           return;
         }
 
-        if (button.dataset.action === 'clear-all-ranges') {
-          setAllRangeFilters(false);
+        const action = button.dataset.action;
+        if (action !== 'clear-group-ranges' && action !== 'check-group-ranges') {
+          return;
         }
 
-        if (button.dataset.action === 'check-all-ranges') {
-          setAllRangeFilters(true);
-        }
+        const container = button.closest('.id-range-subgroup') || button.closest('.id-range-group');
+        setRangeFiltersInContainer(container, action === 'check-group-ranges');
       });
     }
 
