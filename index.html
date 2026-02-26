@@ -41,6 +41,7 @@
       .id-main { display: grid; gap: 2px; justify-items: center; }
       .id-name { font-size: 13px; line-height: 1.2; text-align: center; word-break: break-word; }
       .id-name-primary { white-space: nowrap; word-break: normal; }
+      .digit-zero { font-family: Consolas, "Courier New", monospace; }
       .id-controls { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
       .id-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
       .id-controls label { font-size: 12px; }
@@ -94,6 +95,7 @@
   <div class="sync-mode">
     <label><input type="checkbox" id="toggleName1"> 人格,E.G.O.名を表示する</label>
     <label><input type="checkbox" id="toggleName2"> 囚人名を表示する</label>
+    <label><input type="checkbox" id="toggleSeason"> シーズン区分を表示する</label>
   </div>
 
   <div class="scroll-fix-options">
@@ -139,6 +141,7 @@
     const toggleExceptRowsInput = document.getElementById('toggleExceptRows');
     const toggleName1Input = document.getElementById('toggleName1');
     const toggleName2Input = document.getElementById('toggleName2');
+    const toggleSeasonInput = document.getElementById('toggleSeason');
     const toggleExceptMoveControlsInput = document.getElementById('toggleExceptMoveControls');
     const idRangeFiltersEl = document.getElementById('idRangeFilters');
     const generateUrlButton = document.getElementById('generateUrlButton');
@@ -364,13 +367,12 @@
 
     function getDisplayNames(id) {
       const nameData = state.nameDataById.get(id);
-      if (!nameData) {
-        return { name1: '', name2: '' };
-      }
+      const meta = state.idMetaById.get(id);
 
-      const name1 = typeof nameData.name1 === 'string' ? nameData.name1 : '';
-      const name2 = typeof nameData.name2 === 'string' ? nameData.name2 : '';
-      return { name1, name2 };
+      const name1 = typeof nameData?.name1 === 'string' ? nameData.name1 : '';
+      const name2 = typeof nameData?.name2 === 'string' ? nameData.name2 : '';
+      const season = typeof meta?.season === 'string' ? meta.season : '';
+      return { name1, name2, season };
     }
 
     function renderControlButtons(id, groupValue, isExcept, type) {
@@ -397,9 +399,10 @@
 
       const items = ids.map((id) => {
         const src = type === 'identity' ? getIdentityImageUrl(id) : getEgoImageUrl(id);
-        const { name1, name2 } = getDisplayNames(id);
+        const { name1, name2, season } = getDisplayNames(id);
         const showName1 = Boolean(toggleName1Input?.checked && name1);
         const showName2 = Boolean(toggleName2Input?.checked && name2);
+        const showSeason = Boolean(toggleSeasonInput?.checked && season);
 
         return `
           <div class="id-item">
@@ -407,6 +410,7 @@
               <img src="${src}" alt="${id}" loading="lazy">
               ${showName1 ? `<div class="id-name id-name-primary">${escapeHtml(name1)}</div>` : ''}
               ${showName2 ? `<div class="id-name">${escapeHtml(name2)}</div>` : ''}
+              ${showSeason ? `<div class="id-name">${escapeHtml(season)}</div>` : ''}
             </div>
             <div class="id-controls">
               ${renderControlButtons(id, groupValue, isExcept, type)}
@@ -445,9 +449,9 @@
 
       const { identity, ego } = getIdRangeFilters();
       const identityRankOptions = [
-        { key: 'i-1', label: '0(星1)' },
-        { key: 'i-2', label: '00(星2)' },
-        { key: 'i-3', label: '000(星3)' },
+        { key: 'i-1', label: '<span class="digit-zero">0</span>(星1)' },
+        { key: 'i-2', label: '<span class="digit-zero">00</span>(星2)' },
+        { key: 'i-3', label: '<span class="digit-zero">000</span>(星3)' },
       ];
       const egoRankOptions = [
         { key: 'e-1', label: 'ZAYIN' },
@@ -964,7 +968,7 @@
       });
     }
 
-    [toggleName1Input, toggleName2Input].forEach((input) => {
+    [toggleName1Input, toggleName2Input, toggleSeasonInput].forEach((input) => {
       if (!input) {
         return;
       }
