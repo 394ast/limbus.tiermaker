@@ -38,6 +38,9 @@
       .id-items { display: flex; flex-wrap: wrap; gap: 2px; justify-content: flex-start; }
       .id-item { display: flex; align-items: center; gap: 6px; border: 1px solid #ddd; border-radius: 4px; padding: 2px; background: #fff; }
       .id-item img { width: var(--img-size, 56px); height: var(--img-size, 56px); object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
+      .id-main { display: grid; gap: 2px; justify-items: center; }
+      .id-name { font-size: 13px; line-height: 1.2; text-align: center; word-break: break-word; }
+      .id-name-primary { white-space: nowrap; word-break: normal; }
       .id-controls { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
       .id-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
       .id-controls label { font-size: 12px; }
@@ -91,6 +94,11 @@
     <label><input type="checkbox" id="toggleExceptRows" checked> 除外ランクを表示する</label>
   </div>
 
+  <div class="sync-mode">
+    <label><input type="checkbox" id="toggleName1"> name1を表示する</label>
+    <label><input type="checkbox" id="toggleName2"> name2を表示する</label>
+  </div>
+
   <div class="scroll-fix-options">
     <span class="indent">Tierの移動ボタンを押した後のカーソルの位置:</span>
     <label><input type="radio" name="scrollFixMode" value="group-relative" checked> 移動前のランク</label>
@@ -130,6 +138,8 @@
     const customWidthInput = document.getElementById('customWidth');
     const toggleAdjustControlsInput = document.getElementById('toggleAdjustControls');
     const toggleExceptRowsInput = document.getElementById('toggleExceptRows');
+    const toggleName1Input = document.getElementById('toggleName1');
+    const toggleName2Input = document.getElementById('toggleName2');
     const toggleExceptMoveControlsInput = document.getElementById('toggleExceptMoveControls');
     const idRangeFiltersEl = document.getElementById('idRangeFilters');
     const generateUrlButton = document.getElementById('generateUrlButton');
@@ -155,6 +165,8 @@
         x: null,
       },
       baseValueById: new Map(),
+      nameDataById: new Map(),
+      idMetaById: new Map(),
       changeParam: null,
       scrollFixMode: 'group-relative',
     };
@@ -174,6 +186,7 @@
 
     const GENERATED_URL_BASE_WIDTH_PX = 900;
     const GENERATED_URL_BASE_ROWS = 2;
+    const changecodingDIffID = 0; // 下位idが36を超えるとき手動で1に変更する
 
 
     function calcValue(row, x) {
@@ -341,6 +354,26 @@
       return `https://raw.githubusercontent.com/394ast/limbus.sharetool/main/EGO/${id}.jpg`;
     }
 
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function getDisplayNames(id) {
+      const nameData = state.nameDataById.get(id);
+      if (!nameData) {
+        return { name1: '', name2: '' };
+      }
+
+      const name1 = typeof nameData.name1 === 'string' ? nameData.name1 : '';
+      const name2 = typeof nameData.name2 === 'string' ? nameData.name2 : '';
+      return { name1, name2 };
+    }
+
     function renderControlButtons(id, groupValue, isExcept, type) {
       if (isExcept) {
         return `<button type="button" data-action="toggle-except" data-include="1" data-id="${id}" data-type="${type}" data-group="${groupValue}">戻す</button>`;
@@ -365,10 +398,17 @@
 
       const items = ids.map((id) => {
         const src = type === 'identity' ? getIdentityImageUrl(id) : getEgoImageUrl(id);
+        const { name1, name2 } = getDisplayNames(id);
+        const showName1 = Boolean(toggleName1Input?.checked && name1);
+        const showName2 = Boolean(toggleName2Input?.checked && name2);
 
         return `
           <div class="id-item">
-            <img src="${src}" alt="${id}" loading="lazy">
+            <div class="id-main">
+              <img src="${src}" alt="${id}" loading="lazy">
+              ${showName1 ? `<div class="id-name id-name-primary">${escapeHtml(name1)}</div>` : ''}
+              ${showName2 ? `<div class="id-name">${escapeHtml(name2)}</div>` : ''}
+            </div>
             <div class="id-controls">
               ${renderControlButtons(id, groupValue, isExcept, type)}
             </div>
@@ -405,14 +445,42 @@
       }
 
       const { identity, ego } = getIdRangeFilters();
+      const seasonOptions = [
+        { key: '恒常', label: '恒常' },
+        { key: 'SEASON 1', label: 'SEASON 1' },
+        { key: 'SEASON 2', label: 'SEASON 2' },
+        { key: 'SEASON 3', label: 'SEASON 3' },
+        { key: 'SEASON 4', label: 'SEASON 4' },
+        { key: 'SEASON 5', label: 'SEASON 5' },
+        { key: 'SEASON 6', label: 'SEASON 6' },
+        { key: 'SEASON 7', label: 'SEASON 7' },
+        { key: 'WALPURGISNACHT', label: 'WALPURGISNACHT' },
+        { key: 'COLLABORATION-LIMITED', label: 'COLLABORATION-LIMITED' },
+      ];
+      const identityRankOptions = [1, 2, 3].map((rank) => ({ key: `i-${rank}`, label: `人格 ${rank}` }));
+      const egoRankOptions = [1, 2, 3, 4, 5].map((rank) => ({ key: `e-${rank}`, label: `E.G.O. ${rank}` }));
+      const timeOptions = [
+        { key: '0,1', label: '0,1' },
+        { key: '2', label: '2' },
+        { key: '3', label: '3' },
+        { key: '4', label: '4' },
+        { key: '5', label: '5' },
+        { key: '6', label: '6' },
+        { key: '7', label: '7' },
+      ];
 
-      const renderOptions = (items) => items.map(({ bucket, name }) => {
-        return `<label class="id-range-filter"><input type="checkbox" data-action="toggle-id-range" data-bucket="${bucket}" checked> ${name}</label>`;
+      const renderOptions = (items, filterType) => items.map((item) => {
+        const key = filterType === 'bucket' ? item.bucket : item.key;
+        const label = filterType === 'bucket' ? item.name : item.label;
+        return `<label class="id-range-filter"><input type="checkbox" data-action="toggle-id-range" data-filter-type="${filterType}" data-key="${key}" checked> ${label}</label>`;
       }).join('');
 
       idRangeFiltersEl.innerHTML = [
-        `<div class="id-range-group"><p class="id-range-title">表示する人格</p><div class="id-range-options">${renderOptions(identity)}</div></div>`,
-        `<div class="id-range-group"><p class="id-range-title">表示するE.G.O.</p><div class="id-range-options">${renderOptions(ego)}</div></div>`,
+        `<div class="id-range-group"><p class="id-range-title">表示する人格</p><div class="id-range-options">${renderOptions(identity, 'bucket')}</div></div>`,
+        `<div class="id-range-group"><p class="id-range-title">表示するE.G.O.</p><div class="id-range-options">${renderOptions(ego, 'bucket')}</div></div>`,
+        `<div class="id-range-group"><p class="id-range-title">season</p><div class="id-range-options">${renderOptions(seasonOptions, 'season')}</div></div>`,
+        `<div class="id-range-group"><p class="id-range-title">rank</p><div class="id-range-options">${renderOptions(identityRankOptions, 'rank')}${renderOptions(egoRankOptions, 'rank')}</div></div>`,
+        `<div class="id-range-group"><p class="id-range-title">time</p><div class="id-range-options">${renderOptions(timeOptions, 'time')}</div></div>`,
         '<div class="id-range-actions"><button type="button" data-action="clear-all-ranges">全解除</button><button type="button" data-action="check-all-ranges">全表示</button></div>'
       ].join('');
     }
@@ -434,21 +502,21 @@
       }
     }
 
-    function getVisibleBuckets() {
+    function getActiveFilterKeys(filterType) {
       if (!idRangeFiltersEl) {
         return null;
       }
 
-      const visibleBuckets = new Set();
-      const checkboxes = idRangeFiltersEl.querySelectorAll('input[data-action="toggle-id-range"]:checked');
+      const selected = new Set();
+      const checkboxes = idRangeFiltersEl.querySelectorAll(`input[data-action="toggle-id-range"][data-filter-type="${filterType}"]:checked`);
       checkboxes.forEach((checkbox) => {
-        const bucket = Number.parseInt(checkbox.dataset.bucket ?? '', 10);
-        if (Number.isInteger(bucket)) {
-          visibleBuckets.add(bucket);
+        const key = checkbox.dataset.key;
+        if (typeof key === 'string' && key !== '') {
+          selected.add(key);
         }
       });
 
-      return visibleBuckets;
+      return selected;
     }
 
     function hasUncheckedRangeFilters() {
@@ -465,14 +533,20 @@
         return [];
       }
 
-      const visibleBuckets = getVisibleBuckets();
-      if (!visibleBuckets) {
+      const filters = {
+        buckets: getActiveFilterKeys('bucket'),
+        seasons: getActiveFilterKeys('season'),
+        ranks: getActiveFilterKeys('rank'),
+        times: getActiveFilterKeys('time'),
+      };
+
+      if (!filters.buckets || !filters.seasons || !filters.ranks || !filters.times) {
         return [];
       }
 
       return state.tierlist
         .map((row) => row[0])
-        .filter((id) => !isIdVisibleByRange(id, visibleBuckets));
+        .filter((id) => !isIdVisibleByFilters(id, filters));
     }
 
     function getCurrentGroupOfId(id, type) {
@@ -549,17 +623,45 @@
       });
     }
 
-    function isIdVisibleByRange(id, visibleBuckets) {
-      if (!visibleBuckets) {
+    function isIdVisibleByFilters(id, filters) {
+      if (!filters || !filters.buckets || !filters.seasons || !filters.ranks || !filters.times) {
         return true;
       }
 
       const bucket = Math.floor(id / 1000);
-      if (bucket < 1 || bucket > 24) {
+      if (bucket >= 1 && bucket <= 24 && !filters.buckets.has(String(bucket))) {
+        return false;
+      }
+
+      const meta = state.idMetaById.get(id);
+      if (!meta) {
         return true;
       }
 
-      return visibleBuckets.has(bucket);
+      const season = typeof meta.season === 'string' ? meta.season : '';
+      const seasonMatched = [
+        '恒常',
+        'SEASON 1',
+        'SEASON 2',
+        'SEASON 3',
+        'SEASON 4',
+        'SEASON 5',
+        'SEASON 6',
+        'SEASON 7',
+        'WALPURGISNACHT',
+        'COLLABORATION-LIMITED',
+      ].some((token) => filters.seasons.has(token) && season.includes(token));
+      if (!seasonMatched) {
+        return false;
+      }
+
+      const rankKey = `${id < 13001 ? 'i' : 'e'}-${meta.rank}`;
+      if (!filters.ranks.has(rankKey)) {
+        return false;
+      }
+
+      const timeKey = (meta.time === 0 || meta.time === 1) ? '0,1' : String(meta.time);
+      return filters.times.has(timeKey);
     }
 
     function shouldShowExceptRows() {
@@ -615,7 +717,7 @@
       return grouped;
     }
 
-    function renderTypeRows(type, baseData, showExceptRows, visibleBuckets) {
+    function renderTypeRows(type, baseData, showExceptRows, filters) {
       let grouped;
 
       if (shouldShowDiffOnly()) {
@@ -633,7 +735,7 @@
       return Array.from(grouped.entries())
         .filter(([groupValue]) => showExceptRows || groupValue !== 0)
         .map(([groupValue, ids]) => {
-          const visibleIds = ids.filter((id) => isIdVisibleByRange(id, visibleBuckets));
+          const visibleIds = ids.filter((id) => isIdVisibleByFilters(id, filters));
           const orderedIds = orderVisibleIds(visibleIds);
           const label = getGroupLabel(groupValue);
           const tierClass = getGroupClass(groupValue);
@@ -654,10 +756,15 @@
       }
 
       const showExceptRows = shouldShowExceptRows();
-      const visibleBuckets = getVisibleBuckets();
+      const filters = {
+        buckets: getActiveFilterKeys('bucket'),
+        seasons: getActiveFilterKeys('season'),
+        ranks: getActiveFilterKeys('rank'),
+        times: getActiveFilterKeys('time'),
+      };
 
-      bodyIdentityEl.innerHTML = renderTypeRows('identity', state.baseGroupedByType.identity, showExceptRows, visibleBuckets);
-      bodyEgoEl.innerHTML = renderTypeRows('ego', state.baseGroupedByType.ego, showExceptRows, visibleBuckets);
+      bodyIdentityEl.innerHTML = renderTypeRows('identity', state.baseGroupedByType.identity, showExceptRows, filters);
+      bodyEgoEl.innerHTML = renderTypeRows('ego', state.baseGroupedByType.ego, showExceptRows, filters);
     }
 
     function clearGeneratedUrl() {
@@ -841,6 +948,18 @@
       });
     }
 
+    [toggleName1Input, toggleName2Input].forEach((input) => {
+      if (!input) {
+        return;
+      }
+
+      input.addEventListener('change', () => {
+        if (state.tierlist && Number.isFinite(state.x)) {
+          renderRows(state.tierlist, state.x);
+        }
+      });
+    });
+
     renderIdRangeFilters();
 
     if (idRangeFiltersEl) {
@@ -885,10 +1004,11 @@
         low,
         highChar: high.toString(36),
         lowChar: low.toString(36),
+        lowPadded: String(low).padStart(2, '0'),
       };
     }
 
-    function compressEncodedIds(ids) {
+    function compressEncodedIds(ids, codingDiffId = 0) {
       const encoded = ids
         .slice()
         .sort((a, b) => a - b)
@@ -911,13 +1031,21 @@
 
         const runLength = endIndex - index + 1;
         if (runLength >= 3) {
-          result += `${start.highChar}${start.lowChar}~${encoded[endIndex].lowChar}`;
+          if (codingDiffId === 1) {
+            result += `${start.highChar}${start.lowPadded}~${encoded[endIndex].lowPadded}`;
+          } else {
+            result += `${start.highChar}${start.lowChar}~${encoded[endIndex].lowChar}`;
+          }
           index = endIndex + 1;
           continue;
         }
 
         for (let i = index; i <= endIndex; i += 1) {
-          result += `${encoded[i].highChar}${encoded[i].lowChar}`;
+          if (codingDiffId === 1) {
+            result += `${encoded[i].highChar}${encoded[i].lowPadded}`;
+          } else {
+            result += `${encoded[i].highChar}${encoded[i].lowChar}`;
+          }
         }
 
         index = endIndex + 1;
@@ -942,7 +1070,7 @@
       return atob(`${normalized}${'='.repeat(padLength)}`);
     }
 
-    function decodeSection(section) {
+    function decodeSection(section, codingDiffId = 0) {
       if (!section) {
         return [];
       }
@@ -952,23 +1080,24 @@
 
       while (i < section.length) {
         const highChar = section[i];
-        const lowChar = section[i + 1];
+        const lowCharLength = codingDiffId === 1 ? 2 : 1;
+        const lowStartRaw = section.slice(i + 1, i + 1 + lowCharLength);
 
-        if (!highChar || !lowChar) {
+        if (!highChar || lowStartRaw.length !== lowCharLength) {
           throw new Error('Cパラメータの形式が不正です（ID桁不足）');
         }
 
         const high = Number.parseInt(highChar, 36);
-        const lowStart = Number.parseInt(lowChar, 36);
+        const lowStart = Number.parseInt(lowStartRaw, codingDiffId === 1 ? 10 : 36);
 
         if (!Number.isInteger(high) || !Number.isInteger(lowStart)) {
           throw new Error('Cパラメータの形式が不正です（base36変換失敗）');
         }
 
-        const rangeMark = section[i + 2];
+        const rangeMark = section[i + 1 + lowCharLength];
         if (rangeMark === '~') {
-          const lowEndChar = section[i + 3];
-          const lowEnd = Number.parseInt(lowEndChar ?? '', 36);
+          const lowEndRaw = section.slice(i + 2 + lowCharLength, i + 2 + (lowCharLength * 2));
+          const lowEnd = Number.parseInt(lowEndRaw ?? '', codingDiffId === 1 ? 10 : 36);
 
           if (!Number.isInteger(lowEnd) || lowEnd < lowStart) {
             throw new Error('Cパラメータの形式が不正です（範囲指定）');
@@ -978,25 +1107,45 @@
             ids.push(high * 1000 + low);
           }
 
-          i += 4;
+          i += 2 + (lowCharLength * 2);
           continue;
         }
 
         ids.push(high * 1000 + lowStart);
-        i += 2;
+        i += 1 + lowCharLength;
       }
 
       return ids;
     }
 
+    function parseCompressedDiffParam(cParam) {
+      if (!cParam) {
+        return { codingDiffId: 0, payload: cParam };
+      }
+
+      if (cParam.startsWith('1:')) {
+        return {
+          codingDiffId: 1,
+          payload: cParam.slice(2),
+        };
+      }
+
+      return {
+        codingDiffId: 0,
+        payload: cParam,
+      };
+    }
+
     function applyCompressedDiffParam(cParam) {
       resetDiffState();
 
-      if (!cParam) {
+      const { codingDiffId, payload } = parseCompressedDiffParam(cParam);
+
+      if (!payload) {
         return;
       }
 
-      const decoded = fromBase64Url(cParam);
+      const decoded = fromBase64Url(payload);
       const sections = decoded.split('.');
       if (sections.length !== 10) {
         throw new Error('Cパラメータの形式が不正です（セクション数）');
@@ -1004,7 +1153,7 @@
 
       for (let sectionIndex = 0; sectionIndex < sections.length; sectionIndex += 1) {
         const group = 9 - sectionIndex;
-        const ids = decodeSection(sections[sectionIndex]);
+        const ids = decodeSection(sections[sectionIndex], codingDiffId);
 
         ids.forEach((id) => {
           if (group === 0) {
@@ -1021,7 +1170,7 @@
       }
     }
 
-    function buildCompressedDiffParam() {
+    function buildCompressedDiffParam(codingDiffId = 0) {
       const idsByGroup = new Map();
       for (let group = 0; group <= 9; group += 1) {
         idsByGroup.set(group, []);
@@ -1043,10 +1192,15 @@
 
       const sections = [];
       for (let group = 9; group >= 0; group -= 1) {
-        sections.push(compressEncodedIds(idsByGroup.get(group)));
+        sections.push(compressEncodedIds(idsByGroup.get(group), codingDiffId));
       }
 
-      return toBase64Url(sections.join('.'));
+      const encodedPayload = toBase64Url(sections.join('.'));
+      if (codingDiffId === 1) {
+        return `1:${encodedPayload}`;
+      }
+
+      return encodedPayload;
     }
 
     function generateShareUrlCore() {
@@ -1055,7 +1209,7 @@
       }
 
       try {
-        const compressed = buildCompressedDiffParam();
+        const compressed = buildCompressedDiffParam(changecodingDIffID);
         const url = `https://394ast.github.io/limbus.tiermaker/?T=${state.tableIndex}&X=${state.x}&C=${compressed}`;
 
         if (generatedUrlInput) {
@@ -1208,15 +1362,61 @@
       }
 
       try {
-        const response = await fetch(`data/table${tableIndex}.json`, { cache: 'no-store' });
-        if (!response.ok) {
-          throw new Error(`data/table${tableIndex}.json の取得に失敗しました (HTTP ${response.status})`);
+        const [tableResponse, namelistResponse] = await Promise.all([
+          fetch(`data/table${tableIndex}.json`, { cache: 'no-store' }),
+          fetch('namelist.json', { cache: 'no-store' }),
+        ]);
+
+        if (!tableResponse.ok) {
+          throw new Error(`data/table${tableIndex}.json の取得に失敗しました (HTTP ${tableResponse.status})`);
         }
 
-        const tierlist = await response.json();
+        if (!namelistResponse.ok) {
+          throw new Error(`namelist.json の取得に失敗しました (HTTP ${namelistResponse.status})`);
+        }
+
+        const [tierlist, namelist] = await Promise.all([
+          tableResponse.json(),
+          namelistResponse.json(),
+        ]);
+
+        const nameDataById = new Map();
+        const idMetaById = new Map();
+        namelist.forEach((entry) => {
+          const id = Number.parseInt(entry?.id ?? '', 10);
+          if (!Number.isInteger(id)) {
+            return;
+          }
+
+          const rank = Number.parseInt(entry?.rank ?? '', 10);
+          const time = Number.parseInt(entry?.time ?? '', 10);
+          idMetaById.set(id, {
+            season: typeof entry?.season === 'string' ? entry.season : '',
+            rank: Number.isInteger(rank) ? rank : null,
+            time: Number.isInteger(time) ? time : null,
+          });
+
+          if (typeof entry?.name1 === 'string' || typeof entry?.name2 === 'string') {
+            nameDataById.set(id, {
+              name1: entry.name1 ?? '',
+              name2: entry.name2 ?? '',
+            });
+            return;
+          }
+
+          const baseName = typeof entry?.name === 'string' ? entry.name.trim() : '';
+          const nameTokens = baseName ? baseName.split(/\s+/) : [];
+          nameDataById.set(id, {
+            name1: nameTokens[0] ?? '',
+            name2: nameTokens.slice(1).join(' '),
+          });
+        });
+
         state.tierlist = tierlist;
         state.x = x;
         state.tableIndex = tableIndex;
+        state.nameDataById = nameDataById;
+        state.idMetaById = idMetaById;
         initializeBaseGroupedData(tierlist, x);
         applyCompressedDiffParam(compressedParam);
         renderRows(tierlist, x);
