@@ -15,6 +15,8 @@
       .scroll-fix-options label { margin-right: 12px; }
       .id-range-filters { margin: 8px 0 12px; border: 1px solid #d7d7d7; border-radius: 4px; padding: 4px 6px; width: fit-content; max-width: 100%; }
       .id-range-group { margin-bottom: 8px; }
+      .id-range-group-row { display: flex; gap: 3px; flex-wrap: wrap; }
+      .id-range-group-row > .id-range-group { flex: 1 1 320px; }
       .id-range-title { font-weight: 600; margin: 0 0 4px; }
       .id-range-options { display: flex; flex-wrap: wrap; gap: 4px 12px; }
       .id-range-filter { font-size: 12px; white-space: nowrap; }
@@ -85,8 +87,6 @@
 
   <div class="sync-mode">
     <label><input type="checkbox" id="toggleAdjustControls" checked> Tierの移動ボタンを表示する</label>
-  </div>
-  <div class="sync-mode">
     <label><input type="checkbox" id="toggleExceptMoveControls" checked> 除外ランクへの移動ボタンを表示する</label>
   </div>
   <div class="sync-mode">
@@ -488,13 +488,12 @@
         return `<label class="id-range-filter"><input type="checkbox" data-action="toggle-id-range" data-filter-type="${filterType}" data-key="${key}" checked> ${label}</label>`;
       }).join('');
 
-      const renderGroupActions = () => '<div class="id-range-actions"><button type="button" data-action="clear-group-ranges">全解除</button><button type="button" data-action="check-group-ranges">全表示</button></div>';
+      const renderGroupActions = () => '<div class="id-range-actions"><button type="button" data-action="check-group-ranges">全表示</button><button type="button" data-action="clear-group-ranges">全解除</button></div>';
 
       idRangeFiltersEl.innerHTML = [
         `<div class="id-range-group"><p class="id-range-title">表示する人格</p><div class="id-range-options">${renderOptions(identity, 'bucket')}</div>${renderGroupActions()}</div>`,
         `<div class="id-range-group"><p class="id-range-title">表示するE.G.O.</p><div class="id-range-options">${renderOptions(ego, 'bucket')}</div>${renderGroupActions()}</div>`,
-        `<div class="id-range-group"><p class="id-range-title">星</p><div class="id-range-options">${renderOptions(identityRankOptions, 'rank')}</div>${renderGroupActions()}</div>`,
-        `<div class="id-range-group"><p class="id-range-title">危険ランク</p><div class="id-range-options">${renderOptions(egoRankOptions, 'rank')}</div>${renderGroupActions()}</div>`,
+        `<div class="id-range-group-row"><div class="id-range-group"><p class="id-range-title">星</p><div class="id-range-options">${renderOptions(identityRankOptions, 'rank')}</div>${renderGroupActions()}</div><div class="id-range-group"><p class="id-range-title">危険ランク</p><div class="id-range-options">${renderOptions(egoRankOptions, 'rank')}</div>${renderGroupActions()}</div></div>`,
         `<div class="id-range-group"><p class="id-range-title">区分</p><div class="id-range-options">${renderOptions(seasonOptions, 'season')}</div>${renderGroupActions()}</div>`,
         `<div class="id-range-group"><p class="id-range-title">実装時期</p><div class="id-range-options">${renderOptions(timeOptions, 'time')}</div>${renderGroupActions()}</div>`
       ].join('');
