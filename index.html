@@ -15,9 +15,10 @@
       .scroll-fix-options label { margin-right: 12px; }
       .id-range-filters { margin: 8px 0 12px; border: 1px solid #d7d7d7; border-radius: 4px; padding: 4px 6px; width: fit-content; max-width: 100%; }
       .id-range-group { margin-bottom: 8px; }
+      .id-range-group-row { display: flex; gap: 3px; flex-wrap: wrap; }
+      .id-range-group-row > .id-range-group { flex: 1 1 320px; }
       .id-range-title { font-weight: 600; margin: 0 0 4px; }
       .id-range-options { display: flex; flex-wrap: wrap; gap: 4px 12px; }
-      .id-range-subgroup { width: 100%; }
       .id-range-filter { font-size: 12px; white-space: nowrap; }
       .id-range-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
       table { border-collapse: collapse; width: 100%; max-width: none; margin-bottom: 20px; }
@@ -42,6 +43,7 @@
       .id-main { display: grid; gap: 2px; justify-items: center; }
       .id-name { font-size: 13px; line-height: 1.2; text-align: center; word-break: break-word; }
       .id-name-primary { white-space: nowrap; word-break: normal; }
+      .digit-zero { font-family: Consolas, "Courier New", monospace; }
       .id-controls { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
       .id-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
       .id-controls label { font-size: 12px; }
@@ -85,8 +87,6 @@
 
   <div class="sync-mode">
     <label><input type="checkbox" id="toggleAdjustControls" checked> Tierの移動ボタンを表示する</label>
-  </div>
-  <div class="sync-mode">
     <label><input type="checkbox" id="toggleExceptMoveControls" checked> 除外ランクへの移動ボタンを表示する</label>
   </div>
   <div class="sync-mode">
@@ -95,6 +95,7 @@
   <div class="sync-mode">
     <label><input type="checkbox" id="toggleName1"> 人格,E.G.O.名を表示する</label>
     <label><input type="checkbox" id="toggleName2"> 囚人名を表示する</label>
+    <label><input type="checkbox" id="toggleSeason"> シーズン区分を表示する</label>
   </div>
 
   <div class="scroll-fix-options">
@@ -140,6 +141,7 @@
     const toggleExceptRowsInput = document.getElementById('toggleExceptRows');
     const toggleName1Input = document.getElementById('toggleName1');
     const toggleName2Input = document.getElementById('toggleName2');
+    const toggleSeasonInput = document.getElementById('toggleSeason');
     const toggleExceptMoveControlsInput = document.getElementById('toggleExceptMoveControls');
     const idRangeFiltersEl = document.getElementById('idRangeFilters');
     const generateUrlButton = document.getElementById('generateUrlButton');
@@ -365,13 +367,12 @@
 
     function getDisplayNames(id) {
       const nameData = state.nameDataById.get(id);
-      if (!nameData) {
-        return { name1: '', name2: '' };
-      }
+      const meta = state.idMetaById.get(id);
 
-      const name1 = typeof nameData.name1 === 'string' ? nameData.name1 : '';
-      const name2 = typeof nameData.name2 === 'string' ? nameData.name2 : '';
-      return { name1, name2 };
+      const name1 = typeof nameData?.name1 === 'string' ? nameData.name1 : '';
+      const name2 = typeof nameData?.name2 === 'string' ? nameData.name2 : '';
+      const season = typeof meta?.season === 'string' ? meta.season : '';
+      return { name1, name2, season };
     }
 
     function renderControlButtons(id, groupValue, isExcept, type) {
@@ -398,9 +399,10 @@
 
       const items = ids.map((id) => {
         const src = type === 'identity' ? getIdentityImageUrl(id) : getEgoImageUrl(id);
-        const { name1, name2 } = getDisplayNames(id);
+        const { name1, name2, season } = getDisplayNames(id);
         const showName1 = Boolean(toggleName1Input?.checked && name1);
         const showName2 = Boolean(toggleName2Input?.checked && name2);
+        const showSeason = Boolean(toggleSeasonInput?.checked && season);
 
         return `
           <div class="id-item">
@@ -408,6 +410,7 @@
               <img src="${src}" alt="${id}" loading="lazy">
               ${showName1 ? `<div class="id-name id-name-primary">${escapeHtml(name1)}</div>` : ''}
               ${showName2 ? `<div class="id-name">${escapeHtml(name2)}</div>` : ''}
+              ${showSeason ? `<div class="id-name">${escapeHtml(season)}</div>` : ''}
             </div>
             <div class="id-controls">
               ${renderControlButtons(id, groupValue, isExcept, type)}
@@ -445,17 +448,17 @@
       }
 
       const { identity, ego } = getIdRangeFilters();
-    　const identityRankOptions = [
-        { key: '1', label: '0(星1)' },
-        { key: '2', label: '00(星2)' },
-        { key: '3', label: '000(星3)' },
+      const identityRankOptions = [
+        { key: 'i-1', label: '<span class="digit-zero">0</span>(星1)' },
+        { key: 'i-2', label: '<span class="digit-zero">00</span>(星2)' },
+        { key: 'i-3', label: '<span class="digit-zero">000</span>(星3)' },
       ];
       const egoRankOptions = [
-        { key: '1', label: 'ZAYIN' },
-        { key: '2', label: 'TETH' },
-        { key: '3', label: 'HE' },
-        { key: '4', label: 'WAW' },
-        { key: '5', label: 'ALEPH' },
+        { key: 'e-1', label: 'ZAYIN' },
+        { key: 'e-2', label: 'TETH' },
+        { key: 'e-3', label: 'HE' },
+        { key: 'e-4', label: 'WAW' },
+        { key: 'e-5', label: 'ALEPH' },
       ];
       const seasonOptions = [
         { key: '恒常', label: '恒常' },
@@ -469,7 +472,7 @@
         { key: 'WALPURGISNACHT', label: 'ヴァルプルギスの夜' },
         { key: 'COLLABORATION-LIMITED', label: 'コラボ限定' },
       ];
-    　const timeOptions = [
+      const timeOptions = [
         { key: '0,1', label: 'シーズン1' },
         { key: '2', label: 'シーズン2' },
         { key: '3', label: 'シーズン3' },
@@ -485,13 +488,12 @@
         return `<label class="id-range-filter"><input type="checkbox" data-action="toggle-id-range" data-filter-type="${filterType}" data-key="${key}" checked> ${label}</label>`;
       }).join('');
 
-      const renderGroupActions = () => '<div class="id-range-actions"><button type="button" data-action="clear-group-ranges">全解除</button><button type="button" data-action="check-group-ranges">全表示</button></div>';
+      const renderGroupActions = () => '<div class="id-range-actions"><button type="button" data-action="check-group-ranges">全表示</button><button type="button" data-action="clear-group-ranges">全解除</button></div>';
 
       idRangeFiltersEl.innerHTML = [
         `<div class="id-range-group"><p class="id-range-title">表示する人格</p><div class="id-range-options">${renderOptions(identity, 'bucket')}</div>${renderGroupActions()}</div>`,
         `<div class="id-range-group"><p class="id-range-title">表示するE.G.O.</p><div class="id-range-options">${renderOptions(ego, 'bucket')}</div>${renderGroupActions()}</div>`,
-        `<div class="id-range-group"><p class="id-range-title">星</p><div class="id-range-options">${renderOptions(identityRankOptions, 'rank')}</div>${renderGroupActions()}</div>`,
-        `<div class="id-range-group"><p class="id-range-title">危険ランク</p><div class="id-range-options">${renderOptions(egoRankOptions, 'rank')}</div>${renderGroupActions()}</div>`,
+        `<div class="id-range-group-row"><div class="id-range-group"><p class="id-range-title">星</p><div class="id-range-options">${renderOptions(identityRankOptions, 'rank')}</div>${renderGroupActions()}</div><div class="id-range-group"><p class="id-range-title">危険ランク</p><div class="id-range-options">${renderOptions(egoRankOptions, 'rank')}</div>${renderGroupActions()}</div></div>`,
         `<div class="id-range-group"><p class="id-range-title">区分</p><div class="id-range-options">${renderOptions(seasonOptions, 'season')}</div>${renderGroupActions()}</div>`,
         `<div class="id-range-group"><p class="id-range-title">実装時期</p><div class="id-range-options">${renderOptions(timeOptions, 'time')}</div>${renderGroupActions()}</div>`
       ].join('');
@@ -965,7 +967,7 @@
       });
     }
 
-    [toggleName1Input, toggleName2Input].forEach((input) => {
+    [toggleName1Input, toggleName2Input, toggleSeasonInput].forEach((input) => {
       if (!input) {
         return;
       }
@@ -1002,7 +1004,7 @@
           return;
         }
 
-        const container = button.closest('.id-range-subgroup') || button.closest('.id-range-group');
+        const container = button.closest('.id-range-group');
         setRangeFiltersInContainer(container, action === 'check-group-ranges');
       });
     }
