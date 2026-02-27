@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>table取得テスト</title>
+
+<style>
+body { font-family: sans-serif; padding: 20px; }
+
+.url-row {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 5px;
+}
+
+pre {
+  background: #f4f4f4;
+  padding: 10px;
+  overflow-x: auto;
+}
+</style>
+</head>
+<body>
+
+<h2>table[数値] を入力</h2>
+<input type="number" id="tableNumber" placeholder="例: 1">
+
+<h2>URLを入力</h2>
+<div id="urlContainer">
+  <div class="url-row">
+    <input type="text" class="urlInput" placeholder="URLを入力">
+  </div>
+</div>
+
+<button onclick="addUrl()">＋</button>
+
+<br><br>
+<button onclick="generate()">JSON取得＆出力</button>
+
+<details>
+  <summary>出力結果（クリックで開く）</summary>
+  <button onclick="copyJson()">コピー</button>
+  <pre id="output"></pre>
+</details>
+
+<script>
+function addUrl() {
+  const container = document.getElementById("urlContainer");
+  const div = document.createElement("div");
+  div.className = "url-row";
+  div.innerHTML = `
+    <input type="text" class="urlInput" placeholder="URLを入力">
+  `;
+  container.appendChild(div);
+}
+
+async function generate() {
+  const num = document.getElementById("tableNumber").value;
+
+  if (!num) {
+    alert("数値を入力してください");
+    return;
+  }
+
+  const url = `https://raw.githubusercontent.com/394ast/limbus.tiermaker/main/data/table${num}.json`;
+
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error("取得失敗");
+    }
+
+    const data = await response.json();
+
+    const formatted = JSON.stringify(data, null, 2);
+    document.getElementById("output").textContent = formatted;
+
+  } catch (error) {
+    document.getElementById("output").textContent =
+      "エラー: ファイルが存在しないか取得できません";
+  }
+}
+
+function copyJson() {
+  const text = document.getElementById("output").textContent;
+  navigator.clipboard.writeText(text);
+  alert("コピーしました");
+}
+</script>
+
+</body>
+</html>
