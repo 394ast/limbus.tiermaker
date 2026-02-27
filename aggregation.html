@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>table取得テスト</title>
+<title>URL集計</title>
 
 <style>
 body { font-family: sans-serif; padding: 20px; }
@@ -23,8 +23,8 @@ pre {
 </head>
 <body>
 
-<h2>table[数値] を入力</h2>
-<input type="number" id="tableNumber" placeholder="例: 1">
+<h2>元のtableを入力</h2>
+<input type="number" id="tableNumber" placeholder="ここに数値を入力">
 
 <h2>URLを入力</h2>
 <div id="urlContainer">
@@ -36,7 +36,7 @@ pre {
 <button onclick="addUrl()">＋</button>
 
 <br><br>
-<button onclick="generate()">JSON取得＆出力</button>
+<button onclick="generate()">JSON生成＆出力</button>
 
 <details>
   <summary>出力結果（クリックで開く）</summary>
