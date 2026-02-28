@@ -5,7 +5,8 @@
     "name2": "イサン",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 1002,
@@ -13,7 +14,8 @@
     "name2": "イサン",
     "season": "恒常",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 1003,
@@ -21,7 +23,8 @@
     "name2": "イサン",
     "season": "恒常",
     "rank": 3,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 1004,
@@ -29,7 +32,8 @@
     "name2": "イサン",
     "season": "SEASON 2",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 1005,
@@ -37,7 +41,8 @@
     "name2": "イサン",
     "season": "SEASON 2 [EVENT]",
     "rank": 2,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 1006,
@@ -45,7 +50,8 @@
     "name2": "イサン",
     "season": "恒常",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 1007,
@@ -53,7 +59,8 @@
     "name2": "イサン",
     "season": "SEASON 3",
     "rank": 2,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 1008,
@@ -61,7 +68,8 @@
     "name2": "イサン",
     "season": "恒常",
     "rank": 2,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 1009,
@@ -69,7 +77,8 @@
     "name2": "イサン",
     "season": "恒常",
     "rank": 3,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 1010,
@@ -77,7 +86,8 @@
     "name2": "イサン",
     "season": "WALPURGISNACHT-IV",
     "rank": 3,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 1011,
@@ -85,7 +95,8 @@
     "name2": "イサン",
     "season": "SEASON 5 [EVENT]",
     "rank": 2,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 1012,
@@ -93,7 +104,8 @@
     "name2": "イサン",
     "season": "恒常",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 1013,
@@ -101,7 +113,8 @@
     "name2": "イサン",
     "season": "SEASON 6",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 1014,
@@ -109,7 +122,8 @@
     "name2": "イサン",
     "season": "SEASON 6 [EVENT]",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 1015,
@@ -117,7 +131,8 @@
     "name2": "イサン",
     "season": "SEASON 7",
     "rank": 3,
-    "time": 7
+    "time": 7,
+    "maxState": 4
   },
   {
     "id": 2001,
@@ -125,7 +140,8 @@
     "name2": "ファウスト",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 2002,
@@ -133,7 +149,8 @@
     "name2": "ファウスト",
     "season": "恒常",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 2003,
@@ -141,7 +158,8 @@
     "name2": "ファウスト",
     "season": "SEASON 1",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 2004,
@@ -149,7 +167,8 @@
     "name2": "ファウスト",
     "season": "SEASON 1",
     "rank": 3,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 2005,
@@ -157,7 +176,8 @@
     "name2": "ファウスト",
     "season": "恒常",
     "rank": 2,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 2006,
@@ -165,7 +185,8 @@
     "name2": "ファウスト",
     "season": "恒常",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 2007,
@@ -173,7 +194,8 @@
     "name2": "ファウスト",
     "season": "WALPURGISNACHT-I",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 2008,
@@ -181,7 +203,8 @@
     "name2": "ファウスト",
     "season": "SEASON 3 [EVENT]",
     "rank": 3,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 2009,
@@ -189,7 +212,8 @@
     "name2": "ファウスト",
     "season": "SEASON 4",
     "rank": 2,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 2010,
@@ -197,7 +221,8 @@
     "name2": "ファウスト",
     "season": "SEASON 4 [EVENT]",
     "rank": 3,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 2011,
@@ -205,7 +230,8 @@
     "name2": "ファウスト",
     "season": "SEASON 5 [EVENT]",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 2012,
@@ -213,7 +239,8 @@
     "name2": "ファウスト",
     "season": "SEASON 6",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 2013,
@@ -221,7 +248,8 @@
     "name2": "ファウスト",
     "season": "恒常",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 2014,
@@ -229,7 +257,8 @@
     "name2": "ファウスト",
     "season": "SEASON 7",
     "rank": 3,
-    "time": 7
+    "time": 7,
+    "maxState": 4
   },
   {
     "id": 3001,
@@ -237,7 +266,8 @@
     "name2": "ドンキホーテ",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 3002,
@@ -245,7 +275,8 @@
     "name2": "ドンキホーテ",
     "season": "恒常",
     "rank": 3,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 3003,
@@ -253,7 +284,8 @@
     "name2": "ドンキホーテ",
     "season": "恒常",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 3004,
@@ -261,7 +293,8 @@
     "name2": "ドンキホーテ",
     "season": "SEASON 1",
     "rank": 2,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 3005,
@@ -269,7 +302,8 @@
     "name2": "ドンキホーテ",
     "season": "恒常",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 3006,
@@ -277,7 +311,8 @@
     "name2": "ドンキホーテ",
     "season": "SEASON 3",
     "rank": 3,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 3007,
@@ -285,7 +320,8 @@
     "name2": "ドンキホーテ",
     "season": "WALPURGISNACHT-II",
     "rank": 2,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 3008,
@@ -293,7 +329,8 @@
     "name2": "ドンキホーテ",
     "season": "SEASON 3 [EVENT]",
     "rank": 2,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 3009,
@@ -301,7 +338,8 @@
     "name2": "ドンキホーテ",
     "season": "恒常",
     "rank": 3,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 3010,
@@ -309,7 +347,8 @@
     "name2": "ドンキホーテ",
     "season": "SEASON 5",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 3011,
@@ -317,7 +356,8 @@
     "name2": "ドンキホーテ",
     "season": "恒常",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 3012,
@@ -325,7 +365,8 @@
     "name2": "ドンキホーテ",
     "season": "WALPURGISNACHT-VI",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 3013,
@@ -333,7 +374,8 @@
     "name2": "ドンキホーテ",
     "season": "SEASON 6",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 3014,
@@ -341,7 +383,8 @@
     "name2": "ドンキホーテ",
     "season": "SEASON 7",
     "rank": 3,
-    "time": 7
+    "time": 7,
+    "maxState": 4
   },
   {
     "id": 4001,
@@ -349,7 +392,8 @@
     "name2": "良秀",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 4002,
@@ -357,7 +401,8 @@
     "name2": "良秀",
     "season": "恒常",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 4003,
@@ -365,7 +410,8 @@
     "name2": "良秀",
     "season": "恒常",
     "rank": 3,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 4004,
@@ -373,7 +419,8 @@
     "name2": "良秀",
     "season": "SEASON 1 [EVENT]",
     "rank": 3,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 4005,
@@ -381,7 +428,8 @@
     "name2": "良秀",
     "season": "恒常",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 4006,
@@ -389,7 +437,8 @@
     "name2": "良秀",
     "season": "SEASON 3",
     "rank": 2,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 4007,
@@ -397,7 +446,8 @@
     "name2": "良秀",
     "season": "恒常",
     "rank": 2,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 4008,
@@ -405,7 +455,8 @@
     "name2": "良秀",
     "season": "SEASON 4",
     "rank": 3,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 4009,
@@ -413,7 +464,8 @@
     "name2": "良秀",
     "season": "SEASON 4 [EVENT]",
     "rank": 2,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 4010,
@@ -421,7 +473,8 @@
     "name2": "良秀",
     "season": "WALPURGISNACHT-IV",
     "rank": 3,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 4011,
@@ -429,7 +482,8 @@
     "name2": "良秀",
     "season": "SEASON 5 [EVENT]",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 4012,
@@ -437,7 +491,8 @@
     "name2": "良秀",
     "season": "SEASON 6",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 4013,
@@ -445,7 +500,8 @@
     "name2": "良秀",
     "season": "SEASON 6",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 5001,
@@ -453,7 +509,8 @@
     "name2": "ムルソー",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 5002,
@@ -461,7 +518,8 @@
     "name2": "ムルソー",
     "season": "恒常",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 5003,
@@ -469,7 +527,8 @@
     "name2": "ムルソー",
     "season": "恒常",
     "rank": 3,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 5004,
@@ -477,7 +536,8 @@
     "name2": "ムルソー",
     "season": "SEASON 1",
     "rank": 3,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 5005,
@@ -485,7 +545,8 @@
     "name2": "ムルソー",
     "season": "SEASON 2",
     "rank": 2,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 5006,
@@ -493,7 +554,8 @@
     "name2": "ムルソー",
     "season": "恒常",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 5007,
@@ -501,7 +563,8 @@
     "name2": "ムルソー",
     "season": "SEASON 3",
     "rank": 2,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 5008,
@@ -509,7 +572,8 @@
     "name2": "ムルソー",
     "season": "SEASON 3 [EVENT]",
     "rank": 3,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 5009,
@@ -517,7 +581,8 @@
     "name2": "ムルソー",
     "season": "SEASON 4",
     "rank": 2,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 5010,
@@ -525,7 +590,8 @@
     "name2": "ムルソー",
     "season": "恒常",
     "rank": 3,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 5011,
@@ -533,7 +599,8 @@
     "name2": "ムルソー",
     "season": "SEASON 5",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 5012,
@@ -541,7 +608,8 @@
     "name2": "ムルソー",
     "season": "SEASON 6",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 5013,
@@ -549,7 +617,8 @@
     "name2": "ムルソー",
     "season": "SEASON 6 [EVENT]",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 6001,
@@ -557,7 +626,8 @@
     "name2": "ホンル",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 6002,
@@ -565,7 +635,8 @@
     "name2": "ホンル",
     "season": "恒常",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 6003,
@@ -573,7 +644,8 @@
     "name2": "ホンル",
     "season": "SEASON 1",
     "rank": 3,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 6004,
@@ -581,7 +653,8 @@
     "name2": "ホンル",
     "season": "恒常",
     "rank": 2,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 6005,
@@ -589,7 +662,8 @@
     "name2": "ホンル",
     "season": "SEASON 2",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 6006,
@@ -597,7 +671,8 @@
     "name2": "ホンル",
     "season": "恒常",
     "rank": 2,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 6007,
@@ -605,7 +680,8 @@
     "name2": "ホンル",
     "season": "WALPURGISNACHT-I",
     "rank": 2,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 6008,
@@ -613,7 +689,8 @@
     "name2": "ホンル",
     "season": "恒常",
     "rank": 3,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 6009,
@@ -621,7 +698,8 @@
     "name2": "ホンル",
     "season": "SEASON 4 [EVENT]",
     "rank": 3,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 6010,
@@ -629,7 +707,8 @@
     "name2": "ホンル",
     "season": "SEASON 5",
     "rank": 2,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 6011,
@@ -637,7 +716,8 @@
     "name2": "ホンル",
     "season": "WALPURGISNACHT-V",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 6012,
@@ -645,7 +725,8 @@
     "name2": "ホンル",
     "season": "恒常",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 6013,
@@ -653,7 +734,8 @@
     "name2": "ホンル",
     "season": "SEASON 6",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 7001,
@@ -661,7 +743,8 @@
     "name2": "ヒースクリフ",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 7002,
@@ -669,7 +752,8 @@
     "name2": "ヒースクリフ",
     "season": "恒常",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 7003,
@@ -677,7 +761,8 @@
     "name2": "ヒースクリフ",
     "season": "恒常",
     "rank": 3,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 7004,
@@ -685,7 +770,8 @@
     "name2": "ヒースクリフ",
     "season": "SEASON 1",
     "rank": 2,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 7005,
@@ -693,7 +779,8 @@
     "name2": "ヒースクリフ",
     "season": "SEASON 2",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 7006,
@@ -701,7 +788,8 @@
     "name2": "ヒースクリフ",
     "season": "恒常",
     "rank": 2,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 7007,
@@ -709,7 +797,8 @@
     "name2": "ヒースクリフ",
     "season": "SEASON 3",
     "rank": 3,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 7008,
@@ -717,7 +806,8 @@
     "name2": "ヒースクリフ",
     "season": "恒常",
     "rank": 3,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 7009,
@@ -725,7 +815,8 @@
     "name2": "ヒースクリフ",
     "season": "SEASON 4 [EVENT]",
     "rank": 2,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 7010,
@@ -733,7 +824,8 @@
     "name2": "ヒースクリフ",
     "season": "SEASON 4",
     "rank": 3,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 7011,
@@ -741,7 +833,8 @@
     "name2": "ヒースクリフ",
     "season": "WALPURGISNACHT-V",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 7012,
@@ -749,7 +842,8 @@
     "name2": "ヒースクリフ",
     "season": "SEASON 5 [EVENT]",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 7013,
@@ -757,7 +851,8 @@
     "name2": "ヒースクリフ",
     "season": "SEASON 6 [EVENT]",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 7014,
@@ -765,7 +860,8 @@
     "name2": "ヒースクリフ",
     "season": "SEASON 6",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 8001,
@@ -773,7 +869,8 @@
     "name2": "イシュメール",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 8002,
@@ -781,7 +878,8 @@
     "name2": "イシュメール",
     "season": "恒常",
     "rank": 3,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 8003,
@@ -789,7 +887,8 @@
     "name2": "イシュメール",
     "season": "恒常",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 8004,
@@ -797,7 +896,8 @@
     "name2": "イシュメール",
     "season": "SEASON 1",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 8005,
@@ -805,7 +905,8 @@
     "name2": "イシュメール",
     "season": "SEASON 2",
     "rank": 2,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 8006,
@@ -813,7 +914,8 @@
     "name2": "イシュメール",
     "season": "恒常",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 8007,
@@ -821,7 +923,8 @@
     "name2": "イシュメール",
     "season": "SEASON 2 [EVENT]",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 8008,
@@ -829,7 +932,8 @@
     "name2": "イシュメール",
     "season": "SEASON 3",
     "rank": 3,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 8009,
@@ -837,7 +941,8 @@
     "name2": "イシュメール",
     "season": "SEASON 4",
     "rank": 2,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 8010,
@@ -845,7 +950,8 @@
     "name2": "イシュメール",
     "season": "恒常",
     "rank": 3,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 8011,
@@ -853,7 +959,8 @@
     "name2": "イシュメール",
     "season": "SEASON 5 [EVENT]",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 8012,
@@ -861,7 +968,8 @@
     "name2": "イシュメール",
     "season": "SEASON 6",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 8013,
@@ -869,7 +977,8 @@
     "name2": "イシュメール",
     "season": "WALPURGISNACHT-VII",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 8014,
@@ -877,7 +986,8 @@
     "name2": "イシュメール",
     "season": "SEASON 7",
     "rank": 3,
-    "time": 7
+    "time": 7,
+    "maxState": 4
   },
   {
     "id": 9001,
@@ -885,7 +995,8 @@
     "name2": "ロージャ",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 9002,
@@ -893,7 +1004,8 @@
     "name2": "ロージャ",
     "season": "恒常",
     "rank": 3,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 9003,
@@ -901,7 +1013,8 @@
     "name2": "ロージャ",
     "season": "SEASON 1",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 9004,
@@ -909,7 +1022,8 @@
     "name2": "ロージャ",
     "season": "SEASON 1",
     "rank": 2,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 9005,
@@ -917,7 +1031,8 @@
     "name2": "ロージャ",
     "season": "SEASON 2",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 9006,
@@ -925,7 +1040,8 @@
     "name2": "ロージャ",
     "season": "恒常",
     "rank": 2,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 9007,
@@ -933,7 +1049,8 @@
     "name2": "ロージャ",
     "season": "恒常",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 9008,
@@ -941,7 +1058,8 @@
     "name2": "ロージャ",
     "season": "恒常",
     "rank": 3,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 9009,
@@ -949,7 +1067,8 @@
     "name2": "ロージャ",
     "season": "恒常",
     "rank": 2,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 9010,
@@ -957,7 +1076,8 @@
     "name2": "ロージャ",
     "season": "恒常",
     "rank": 3,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 9011,
@@ -965,7 +1085,8 @@
     "name2": "ロージャ",
     "season": "SEASON 5",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 9012,
@@ -973,7 +1094,8 @@
     "name2": "ロージャ",
     "season": "SEASON 6",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 9013,
@@ -981,7 +1103,8 @@
     "name2": "ロージャ",
     "season": "WALPURGISNACHT-VI",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 9014,
@@ -989,7 +1112,8 @@
     "name2": "ロージャ",
     "season": "恒常",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 10001,
@@ -997,7 +1121,8 @@
     "name2": "シンクレア",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 10002,
@@ -1005,7 +1130,8 @@
     "name2": "シンクレア",
     "season": "恒常",
     "rank": 3,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 10003,
@@ -1013,7 +1139,8 @@
     "name2": "シンクレア",
     "season": "恒常",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 10004,
@@ -1021,7 +1148,8 @@
     "name2": "シンクレア",
     "season": "SEASON 1",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 10005,
@@ -1029,7 +1157,8 @@
     "name2": "シンクレア",
     "season": "SEASON 1",
     "rank": 3,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 10006,
@@ -1037,7 +1166,8 @@
     "name2": "シンクレア",
     "season": "SEASON 2",
     "rank": 2,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 10007,
@@ -1045,7 +1175,8 @@
     "name2": "シンクレア",
     "season": "SEASON 2 [EVENT]",
     "rank": 2,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 10008,
@@ -1053,7 +1184,8 @@
     "name2": "シンクレア",
     "season": "恒常",
     "rank": 3,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 10009,
@@ -1061,7 +1193,8 @@
     "name2": "シンクレア",
     "season": "WALPURGISNACHT-III",
     "rank": 3,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 10010,
@@ -1069,7 +1202,8 @@
     "name2": "シンクレア",
     "season": "SEASON 5",
     "rank": 2,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 10011,
@@ -1077,7 +1211,8 @@
     "name2": "シンクレア",
     "season": "恒常",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 10012,
@@ -1085,7 +1220,8 @@
     "name2": "シンクレア",
     "season": "恒常",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 10013,
@@ -1093,7 +1229,8 @@
     "name2": "シンクレア",
     "season": "SEASON 6",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 10014,
@@ -1101,7 +1238,8 @@
     "name2": "シンクレア",
     "season": "SEASON 6 [EVENT]",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 10015,
@@ -1109,7 +1247,8 @@
     "name2": "シンクレア",
     "season": "SEASON 7",
     "rank": 3,
-    "time": 7
+    "time": 7,
+    "maxState": 4
   },
   {
     "id": 11001,
@@ -1117,7 +1256,8 @@
     "name2": "ウーティス",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 11002,
@@ -1125,7 +1265,8 @@
     "name2": "ウーティス",
     "season": "恒常",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 11003,
@@ -1133,7 +1274,8 @@
     "name2": "ウーティス",
     "season": "SEASON 1",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 11004,
@@ -1141,7 +1283,8 @@
     "name2": "ウーティス",
     "season": "恒常",
     "rank": 3,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 11005,
@@ -1149,7 +1292,8 @@
     "name2": "ウーティス",
     "season": "SEASON 2 [EVENT]",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 11006,
@@ -1157,7 +1301,8 @@
     "name2": "ウーティス",
     "season": "恒常",
     "rank": 2,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 11007,
@@ -1165,7 +1310,8 @@
     "name2": "ウーティス",
     "season": "WALPURGISNACHT-II",
     "rank": 3,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 11008,
@@ -1173,7 +1319,8 @@
     "name2": "ウーティス",
     "season": "SEASON 4",
     "rank": 3,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 11009,
@@ -1181,7 +1328,8 @@
     "name2": "ウーティス",
     "season": "恒常",
     "rank": 2,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 11010,
@@ -1189,7 +1337,8 @@
     "name2": "ウーティス",
     "season": "恒常",
     "rank": 3,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 11011,
@@ -1197,7 +1346,8 @@
     "name2": "ウーティス",
     "season": "SEASON 5",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 11012,
@@ -1205,7 +1355,8 @@
     "name2": "ウーティス",
     "season": "SEASON 5 [EVENT]",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 11013,
@@ -1213,7 +1364,8 @@
     "name2": "ウーティス",
     "season": "SEASON 6 [EVENT]",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 11014,
@@ -1221,7 +1373,8 @@
     "name2": "ウーティス",
     "season": "SEASON 7",
     "rank": 3,
-    "time": 7
+    "time": 7,
+    "maxState": 4
   },
   {
     "id": 12001,
@@ -1229,7 +1382,8 @@
     "name2": "グレゴール",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 12002,
@@ -1237,7 +1391,8 @@
     "name2": "グレゴール",
     "season": "恒常",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 12003,
@@ -1245,7 +1400,8 @@
     "name2": "グレゴール",
     "season": "SEASON 1",
     "rank": 3,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 12004,
@@ -1253,7 +1409,8 @@
     "name2": "グレゴール",
     "season": "SEASON 1 [EVENT]",
     "rank": 2,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 12005,
@@ -1261,7 +1418,8 @@
     "name2": "グレゴール",
     "season": "SEASON 2",
     "rank": 2,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 12006,
@@ -1269,7 +1427,8 @@
     "name2": "グレゴール",
     "season": "恒常",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 12007,
@@ -1277,7 +1436,8 @@
     "name2": "グレゴール",
     "season": "SEASON 3",
     "rank": 3,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 12008,
@@ -1285,7 +1445,8 @@
     "name2": "グレゴール",
     "season": "SEASON 3 [EVENT]",
     "rank": 2,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 12009,
@@ -1293,7 +1454,8 @@
     "name2": "グレゴール",
     "season": "SEASON 4",
     "rank": 3,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 12010,
@@ -1301,7 +1463,8 @@
     "name2": "グレゴール",
     "season": "SEASON 5",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 12011,
@@ -1309,7 +1472,8 @@
     "name2": "グレゴール",
     "season": "SEASON 5",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 12012,
@@ -1317,7 +1481,8 @@
     "name2": "グレゴール",
     "season": "SEASON 6",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 12013,
@@ -1325,7 +1490,8 @@
     "name2": "グレゴール",
     "season": "WALPURGISNACHT-VII",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 12014,
@@ -1333,7 +1499,8 @@
     "name2": "グレゴール",
     "season": "SEASON 7",
     "rank": 3,
-    "time": 7
+    "time": 7,
+    "maxState": 4
   },
   {
     "id": 13001,
@@ -1341,7 +1508,8 @@
     "name2": "イサン",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 13002,
@@ -1349,7 +1517,8 @@
     "name2": "イサン",
     "season": "SEASON 1",
     "rank": 2,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 13003,
@@ -1357,7 +1526,8 @@
     "name2": "イサン",
     "season": "恒常",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 13004,
@@ -1365,7 +1535,8 @@
     "name2": "イサン",
     "season": "恒常",
     "rank": 3,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 13005,
@@ -1373,7 +1544,8 @@
     "name2": "イサン",
     "season": "SEASON 2",
     "rank": 4,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 13006,
@@ -1381,7 +1553,8 @@
     "name2": "イサン",
     "season": "SEASON 4",
     "rank": 1,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 13007,
@@ -1389,7 +1562,8 @@
     "name2": "イサン",
     "season": "SEASON 5",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 13008,
@@ -1397,7 +1571,8 @@
     "name2": "イサン",
     "season": "SEASON 7",
     "rank": 4,
-    "time": 7
+    "time": 7,
+    "maxState": 4
   },
   {
     "id": 14001,
@@ -1405,7 +1580,8 @@
     "name2": "ファウスト",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 14002,
@@ -1413,7 +1589,8 @@
     "name2": "ファウスト",
     "season": "恒常",
     "rank": 3,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 14003,
@@ -1421,7 +1598,8 @@
     "name2": "ファウスト",
     "season": "恒常",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 14004,
@@ -1429,7 +1607,8 @@
     "name2": "ファウスト",
     "season": "恒常",
     "rank": 3,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 14005,
@@ -1437,7 +1616,8 @@
     "name2": "ファウスト",
     "season": "SEASON 3",
     "rank": 2,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 14006,
@@ -1445,7 +1625,8 @@
     "name2": "ファウスト",
     "season": "SEASON 4 [EVENT]",
     "rank": 4,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 14007,
@@ -1453,7 +1634,8 @@
     "name2": "ファウスト",
     "season": "SEASON 5",
     "rank": 2,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 14008,
@@ -1461,7 +1643,8 @@
     "name2": "ファウスト",
     "season": "SEASON 5",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 14009,
@@ -1469,7 +1652,8 @@
     "name2": "ファウスト",
     "season": "COLLABORATION-LIMITED",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 15001,
@@ -1477,7 +1661,8 @@
     "name2": "ドンキホーテ",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 15002,
@@ -1485,7 +1670,8 @@
     "name2": "ドンキホーテ",
     "season": "SEASON 1",
     "rank": 3,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 15003,
@@ -1493,7 +1679,8 @@
     "name2": "ドンキホーテ",
     "season": "恒常",
     "rank": 3,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 15004,
@@ -1501,7 +1688,8 @@
     "name2": "ドンキホーテ",
     "season": "SEASON 1 [EVENT]",
     "rank": 2,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 15005,
@@ -1509,7 +1697,8 @@
     "name2": "ドンキホーテ",
     "season": "恒常",
     "rank": 2,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 15006,
@@ -1517,7 +1706,8 @@
     "name2": "ドンキホーテ",
     "season": "SEASON 4",
     "rank": 2,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 15007,
@@ -1525,7 +1715,8 @@
     "name2": "ドンキホーテ",
     "season": "SEASON 5",
     "rank": 4,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 15008,
@@ -1533,7 +1724,8 @@
     "name2": "ドンキホーテ",
     "season": "SEASON 6",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 15009,
@@ -1541,7 +1733,8 @@
     "name2": "ドンキホーテ",
     "season": "WALPURGISNACHT-VI",
     "rank": 4,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 16001,
@@ -1549,7 +1742,8 @@
     "name2": "良秀",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 16002,
@@ -1557,7 +1751,8 @@
     "name2": "良秀",
     "season": "SEASON 1",
     "rank": 3,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 16003,
@@ -1565,7 +1760,8 @@
     "name2": "良秀",
     "season": "恒常",
     "rank": 2,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 16004,
@@ -1573,7 +1769,8 @@
     "name2": "良秀",
     "season": "恒常",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 16005,
@@ -1581,7 +1778,8 @@
     "name2": "良秀",
     "season": "SEASON 2 [EVENT]",
     "rank": 1,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 16006,
@@ -1589,7 +1787,8 @@
     "name2": "良秀",
     "season": "SEASON 3",
     "rank": 2,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 16007,
@@ -1597,7 +1796,8 @@
     "name2": "良秀",
     "season": "SEASON 4",
     "rank": 4,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 16008,
@@ -1605,7 +1805,8 @@
     "name2": "良秀",
     "season": "SEASON 5 [EVENT]",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 16009,
@@ -1613,7 +1814,8 @@
     "name2": "良秀",
     "season": "SEASON 7",
     "rank": 4,
-    "time": 7
+    "time": 7,
+    "maxState": 4
   },
   {
     "id": 17001,
@@ -1621,7 +1823,8 @@
     "name2": "ムルソー",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 17002,
@@ -1629,7 +1832,8 @@
     "name2": "ムルソー",
     "season": "SEASON 1",
     "rank": 2,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 17003,
@@ -1637,7 +1841,8 @@
     "name2": "ムルソー",
     "season": "恒常",
     "rank": 3,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 17004,
@@ -1645,7 +1850,8 @@
     "name2": "ムルソー",
     "season": "SEASON 2",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 17005,
@@ -1653,7 +1859,8 @@
     "name2": "ムルソー",
     "season": "WALPURGISNACHT-I",
     "rank": 2,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 17006,
@@ -1661,7 +1868,8 @@
     "name2": "ムルソー",
     "season": "SEASON 4",
     "rank": 2,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 17007,
@@ -1669,7 +1877,8 @@
     "name2": "ムルソー",
     "season": "SEASON 5",
     "rank": 4,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 17008,
@@ -1677,7 +1886,8 @@
     "name2": "ムルソー",
     "season": "SEASON 6 [EVENT]",
     "rank": 4,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 18001,
@@ -1685,7 +1895,8 @@
     "name2": "ホンル",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 18002,
@@ -1693,7 +1904,8 @@
     "name2": "ホンル",
     "season": "SEASON 1",
     "rank": 2,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 18003,
@@ -1701,7 +1913,8 @@
     "name2": "ホンル",
     "season": "恒常",
     "rank": 3,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 18004,
@@ -1709,7 +1922,8 @@
     "name2": "ホンル",
     "season": "SEASON 2 [EVENT]",
     "rank": 2,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 18005,
@@ -1717,7 +1931,8 @@
     "name2": "ホンル",
     "season": "SEASON 3",
     "rank": 3,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 18006,
@@ -1725,7 +1940,8 @@
     "name2": "ホンル",
     "season": "恒常",
     "rank": 2,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 18007,
@@ -1733,7 +1949,8 @@
     "name2": "ホンル",
     "season": "SEASON 5",
     "rank": 2,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 18008,
@@ -1741,7 +1958,8 @@
     "name2": "ホンル",
     "season": "SEASON 6",
     "rank": 4,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 18009,
@@ -1749,7 +1967,8 @@
     "name2": "ホンル",
     "season": "COLLABORATION-LIMITED",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 19001,
@@ -1757,7 +1976,8 @@
     "name2": "ヒースクリフ",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 19002,
@@ -1765,7 +1985,8 @@
     "name2": "ヒースクリフ",
     "season": "SEASON 1",
     "rank": 3,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 19003,
@@ -1773,7 +1994,8 @@
     "name2": "ヒースクリフ",
     "season": "SEASON 2",
     "rank": 2,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 19004,
@@ -1781,7 +2003,8 @@
     "name2": "ヒースクリフ",
     "season": "恒常",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 19005,
@@ -1789,7 +2012,8 @@
     "name2": "ヒースクリフ",
     "season": "SEASON 3 [EVENT]",
     "rank": 1,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 19006,
@@ -1797,7 +2021,8 @@
     "name2": "ヒースクリフ",
     "season": "SEASON 4",
     "rank": 4,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 19007,
@@ -1805,7 +2030,8 @@
     "name2": "ヒースクリフ",
     "season": "恒常",
     "rank": 2,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 19008,
@@ -1813,7 +2039,8 @@
     "name2": "ヒースクリフ",
     "season": "恒常",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 19009,
@@ -1821,7 +2048,8 @@
     "name2": "ヒースクリフ",
     "season": "SEASON 7",
     "rank": 2,
-    "time": 7
+    "time": 7,
+    "maxState": 4
   },
   {
     "id": 20001,
@@ -1829,7 +2057,8 @@
     "name2": "イシュメール",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 20002,
@@ -1837,7 +2066,8 @@
     "name2": "イシュメール",
     "season": "SEASON 1",
     "rank": 2,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 20003,
@@ -1845,7 +2075,8 @@
     "name2": "イシュメール",
     "season": "恒常",
     "rank": 3,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 20004,
@@ -1853,7 +2084,8 @@
     "name2": "イシュメール",
     "season": "SEASON 2",
     "rank": 2,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 20005,
@@ -1861,7 +2093,8 @@
     "name2": "イシュメール",
     "season": "SEASON 3",
     "rank": 4,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 20006,
@@ -1869,7 +2102,8 @@
     "name2": "イシュメール",
     "season": "WALPURGISNACHT-III",
     "rank": 3,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 20007,
@@ -1877,7 +2111,8 @@
     "name2": "イシュメール",
     "season": "恒常",
     "rank": 2,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 20008,
@@ -1885,7 +2120,8 @@
     "name2": "イシュメール",
     "season": "SEASON 5 [EVENT]",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 20009,
@@ -1893,7 +2129,8 @@
     "name2": "イシュメール",
     "season": "SEASON 6",
     "rank": 1,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 20010,
@@ -1901,7 +2138,8 @@
     "name2": "イシュメール",
     "season": "COLLABORATION-LIMITED",
     "rank": 3,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 21001,
@@ -1909,7 +2147,8 @@
     "name2": "ロージャ",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 21002,
@@ -1917,7 +2156,8 @@
     "name2": "ロージャ",
     "season": "SEASON 1",
     "rank": 3,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 21003,
@@ -1925,7 +2165,8 @@
     "name2": "ロージャ",
     "season": "SEASON 1",
     "rank": 2,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 21004,
@@ -1933,7 +2174,8 @@
     "name2": "ロージャ",
     "season": "SEASON 3",
     "rank": 2,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 21005,
@@ -1941,7 +2183,8 @@
     "name2": "ロージャ",
     "season": "恒常",
     "rank": 3,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 21006,
@@ -1949,7 +2192,8 @@
     "name2": "ロージャ",
     "season": "WALPURGISNACHT-III",
     "rank": 4,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 21007,
@@ -1957,7 +2201,8 @@
     "name2": "ロージャ",
     "season": "SEASON 5",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 21008,
@@ -1965,7 +2210,8 @@
     "name2": "ロージャ",
     "season": "SEASON 5",
     "rank": 4,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 22001,
@@ -1973,7 +2219,8 @@
     "name2": "シンクレア",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 22002,
@@ -1981,7 +2228,8 @@
     "name2": "シンクレア",
     "season": "SEASON 1",
     "rank": 2,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 22003,
@@ -1989,7 +2237,8 @@
     "name2": "シンクレア",
     "season": "SEASON 1 [EVENT]",
     "rank": 2,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 22004,
@@ -1997,7 +2246,8 @@
     "name2": "シンクレア",
     "season": "恒常",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 22005,
@@ -2005,7 +2255,8 @@
     "name2": "シンクレア",
     "season": "SEASON 3",
     "rank": 3,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 22006,
@@ -2013,7 +2264,8 @@
     "name2": "シンクレア",
     "season": "恒常",
     "rank": 1,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 22007,
@@ -2021,7 +2273,8 @@
     "name2": "シンクレア",
     "season": "SEASON 5",
     "rank": 2,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 22008,
@@ -2029,7 +2282,8 @@
     "name2": "シンクレア",
     "season": "SEASON 6",
     "rank": 4,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   },
   {
     "id": 23001,
@@ -2037,7 +2291,8 @@
     "name2": "ウーティス",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 23002,
@@ -2045,7 +2300,8 @@
     "name2": "ウーティス",
     "season": "SEASON 1",
     "rank": 3,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 23003,
@@ -2053,7 +2309,8 @@
     "name2": "ウーティス",
     "season": "恒常",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 23004,
@@ -2061,7 +2318,8 @@
     "name2": "ウーティス",
     "season": "SEASON 2",
     "rank": 2,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 23005,
@@ -2069,7 +2327,8 @@
     "name2": "ウーティス",
     "season": "SEASON 3 [EVENT]",
     "rank": 3,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 23006,
@@ -2077,7 +2336,8 @@
     "name2": "ウーティス",
     "season": "SEASON 4",
     "rank": 4,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 23007,
@@ -2085,7 +2345,8 @@
     "name2": "ウーティス",
     "season": "SEASON 4 [EVENT]",
     "rank": 3,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 23008,
@@ -2093,7 +2354,8 @@
     "name2": "ウーティス",
     "season": "WALPURGISNACHT-V",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 23009,
@@ -2101,7 +2363,8 @@
     "name2": "ウーティス",
     "season": "SEASON 7",
     "rank": 1,
-    "time": 7
+    "time": 7,
+    "maxState": 4
   },
   {
     "id": 24001,
@@ -2109,7 +2372,8 @@
     "name2": "グレゴール",
     "season": "恒常",
     "rank": 1,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 24002,
@@ -2117,7 +2381,8 @@
     "name2": "グレゴール",
     "season": "SEASON 1",
     "rank": 1,
-    "time": 1
+    "time": 1,
+    "maxState": 4
   },
   {
     "id": 24003,
@@ -2125,7 +2390,8 @@
     "name2": "グレゴール",
     "season": "恒常",
     "rank": 2,
-    "time": 0
+    "time": 0,
+    "maxState": 4
   },
   {
     "id": 24004,
@@ -2133,7 +2399,8 @@
     "name2": "グレゴール",
     "season": "SEASON 2",
     "rank": 3,
-    "time": 2
+    "time": 2,
+    "maxState": 4
   },
   {
     "id": 24005,
@@ -2141,7 +2408,8 @@
     "name2": "グレゴール",
     "season": "SEASON 3",
     "rank": 4,
-    "time": 3
+    "time": 3,
+    "maxState": 4
   },
   {
     "id": 24006,
@@ -2149,7 +2417,8 @@
     "name2": "グレゴール",
     "season": "SEASON 4",
     "rank": 2,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 24007,
@@ -2157,7 +2426,8 @@
     "name2": "グレゴール",
     "season": "WALPURGISNACHT-IV",
     "rank": 3,
-    "time": 4
+    "time": 4,
+    "maxState": 4
   },
   {
     "id": 24008,
@@ -2165,7 +2435,8 @@
     "name2": "グレゴール",
     "season": "SEASON 5 [EVENT]",
     "rank": 3,
-    "time": 5
+    "time": 5,
+    "maxState": 4
   },
   {
     "id": 24009,
@@ -2173,6 +2444,7 @@
     "name2": "グレゴール",
     "season": "COLLABORATION-LIMITED",
     "rank": 4,
-    "time": 6
+    "time": 6,
+    "maxState": 4
   }
 ]
