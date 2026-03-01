@@ -1664,6 +1664,7 @@
       const tableParam = params.get('T');
       const xParam = params.get('X');
       const changeParam = params.get('S');
+      const tableDataKey = params.get('tableDataKey');
       const hasCompressedParam = params.has('C');
       const compressedParam = changeParam === '1' ? null : params.get('C');
 
@@ -1679,9 +1680,40 @@
       return {
         tableIndex: Number.isInteger(tableIndex) && tableIndex >= 0 ? tableIndex : DEFAULT_T,
         xValue,
+        tableDataKey,
         compressedParam,
         hasCompressedParam,
       };
+    }
+
+    async function loadTierlist(tableIndex, tableDataKey) {
+      if (tableDataKey) {
+        const cached = sessionStorage.getItem(tableDataKey);
+        if (!cached) {
+          throw new Error('埋め込み用JSONが見つかりません。aggregation.htmlで再生成してください');
+        }
+
+        let parsed;
+        try {
+          parsed = JSON.parse(cached);
+        } catch {
+          throw new Error('埋め込み用JSONの形式が不正です');
+        }
+
+        if (!Array.isArray(parsed)) {
+          throw new Error('埋め込み用JSONは配列である必要があります');
+        }
+
+        return parsed;
+      }
+
+      const tableResponse = await fetch(`data/table${tableIndex}.json`, { cache: 'no-store' });
+
+      if (!tableResponse.ok) {
+        throw new Error(`data/table${tableIndex}.json の取得に失敗しました (HTTP ${tableResponse.status})`);
+      }
+
+      return tableResponse.json();
     }
 
     function expandSharetoolGroup(group, wideRunLength) {
@@ -1789,7 +1821,7 @@
     }
 
     async function loadAndRender() {
-      const { tableIndex, xValue, compressedParam, hasCompressedParam } = getQuerySettings();
+      const { tableIndex, xValue, tableDataKey, compressedParam, hasCompressedParam } = getQuerySettings();
       const x = xValue;
 
       if (!Number.isFinite(x)) {
@@ -1804,23 +1836,16 @@
       applyTierMoveUiState();
 
       try {
-        const [tableResponse, namelistResponse] = await Promise.all([
-          fetch(`data/table${tableIndex}.json`, { cache: 'no-store' }),
+        const [tierlist, namelistResponse] = await Promise.all([
+          loadTierlist(tableIndex, tableDataKey),
           fetch('namelist.json', { cache: 'no-store' }),
         ]);
-
-        if (!tableResponse.ok) {
-          throw new Error(`data/table${tableIndex}.json の取得に失敗しました (HTTP ${tableResponse.status})`);
-        }
 
         if (!namelistResponse.ok) {
           throw new Error(`namelist.json の取得に失敗しました (HTTP ${namelistResponse.status})`);
         }
 
-        const [tierlist, namelist] = await Promise.all([
-          tableResponse.json(),
-          namelistResponse.json(),
-        ]);
+        const namelist = await namelistResponse.json();
 
         const nameDataById = new Map();
         const idMetaById = new Map();

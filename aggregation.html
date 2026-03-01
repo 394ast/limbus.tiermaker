@@ -19,6 +19,16 @@ pre {
   padding: 10px;
   overflow-x: auto;
 }
+
+#previewStatus {
+  margin: 8px 0;
+}
+
+#previewFrame {
+  width: 100%;
+  min-height: 720px;
+  border: 1px solid #ccc;
+}
 </style>
 </head>
 <body>
@@ -44,6 +54,10 @@ pre {
   <pre id="output"></pre>
 </details>
 
+<h2>埋め込みプレビュー（index.html）</h2>
+<p id="previewStatus"></p>
+<iframe id="previewFrame" title="index preview"></iframe>
+
 <script>
 function addUrl() {
   const container = document.getElementById("urlContainer");
@@ -57,6 +71,8 @@ function addUrl() {
 
 async function generate() {
   const num = document.getElementById("tableNumber").value;
+  const previewStatus = document.getElementById("previewStatus");
+  const previewFrame = document.getElementById("previewFrame");
 
   if (!num) {
     alert("数値を入力してください");
@@ -77,9 +93,17 @@ async function generate() {
     const formatted = JSON.stringify(data, null, 2);
     document.getElementById("output").textContent = formatted;
 
+    const cacheKey = `aggregation-preview-table-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    sessionStorage.setItem(cacheKey, JSON.stringify(data));
+
+    previewFrame.src = `index.html?T=${encodeURIComponent(num)}&tableDataKey=${encodeURIComponent(cacheKey)}`;
+    previewStatus.textContent = "生成したJSONを使ってindex.htmlを埋め込み表示しています。";
+
   } catch (error) {
     document.getElementById("output").textContent =
       "エラー: ファイルが存在しないか取得できません";
+    previewStatus.textContent = "エラーにより埋め込みプレビューを更新できませんでした。";
+    previewFrame.removeAttribute("src");
   }
 }
 
