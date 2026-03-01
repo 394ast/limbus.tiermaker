@@ -39,6 +39,7 @@
       .error { color: #b00020; }
       .id-items { display: flex; flex-wrap: wrap; gap: 2px; justify-content: flex-start; }
       .id-item { display: flex; align-items: center; gap: 6px; border: 1px solid #ddd; border-radius: 4px; padding: 2px; background: #fff; }
+      .id-item.diff-alert { background: #ff5b5b; border-color: #c80000; }
       .id-item[draggable="true"] { cursor: grab; }
       .id-item.dragging { opacity: 0.5; cursor: grabbing; }
       .tier-dropzone.drag-over { background: rgba(66, 133, 244, 0.14); outline: 2px dashed #4285f4; outline-offset: -2px; }
@@ -461,6 +462,24 @@
       return { name1, name2, season };
     }
 
+    function shouldHighlightDiffAlert(id, type) {
+      if (!shouldShowDiffOnly()) {
+        return false;
+      }
+
+      const manualGroup = state.manualGroupById.get(id);
+      if (!Number.isInteger(manualGroup) || manualGroup === 0) {
+        return false;
+      }
+
+      const baseGroup = getBaseGroupForId(type, id);
+      if (!Number.isInteger(baseGroup)) {
+        return false;
+      }
+
+      return Math.abs(baseGroup - manualGroup) >= 3;
+    }
+
     function renderImageCells(ids, groupValue, type) {
       const items = ids.map((id) => {
         const src = type === 'identity' ? getIdentityImageUrl(id) : getEgoImageUrl(id);
@@ -470,7 +489,7 @@
         const showSeason = Boolean(toggleSeasonInput?.checked && season);
 
         return `
-          <div class="id-item" draggable="true" data-id="${id}" data-type="${type}" data-group="${groupValue}">
+          <div class="id-item${shouldHighlightDiffAlert(id, type) ? " diff-alert" : ""}" draggable="true" data-id="${id}" data-type="${type}" data-group="${groupValue}">
             <div class="id-main">
               <img src="${src}" alt="${id}" loading="lazy">
               ${showName1 ? `<div class="id-name id-name-primary">${escapeHtml(name1)}</div>` : ''}
