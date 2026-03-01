@@ -60,6 +60,9 @@
       .hidden-prisoner-actions { display: grid; gap: 8px; }
       .hidden-prisoner-actions button { font-size: 14px; padding: 7px 10px; text-align: left; }
       #openLatestTierButton { margin: 4px 0 12px; font-size: 13px; padding: 4px 10px; }
+      .latest-tier-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 4px 0 12px; }
+      .latest-tier-meta { font-size: 16px; font-weight: 700; color: #d93025; }
+      .latest-tier-meta-date { color: #111; }
       .tier-move-disabled .id-item[draggable="true"] { cursor: default; }
       .tier-move-disabled .id-item.dragging { cursor: default; }
       .scroll-zone {
@@ -123,7 +126,10 @@
       <button type="button" id="applySharetoolExceptButton" hidden>未所持の人格、E.G.Oを除外ランクに移動</button>
     </div>
   </details>
-  <button type="button" id="openLatestTierButton">現在のみんなでつくったTier表を表示</button>
+  <div class="latest-tier-row">
+    <button type="button" id="openLatestTierButton">現在のみんなでつくったTier表を表示</button>
+    <span id="latestTierMeta" class="latest-tier-meta" hidden></span>
+  </div>
   <div id="topScrollZone" class="scroll-zone" aria-hidden="true">画面を上にスクロール</div>
   <div id="bottomScrollZone" class="scroll-zone" aria-hidden="true">画面を下にスクロール</div>
 
@@ -218,6 +224,7 @@
     const generateUrlButton = document.getElementById('generateUrlButton');
     const generatedUrlInput = document.getElementById('generatedUrl');
     const openLatestTierButton = document.getElementById('openLatestTierButton');
+    const latestTierMetaEl = document.getElementById('latestTierMeta');
     const openShareToolButton = document.getElementById('openShareToolButton');
     const sharetoolUrlInput = document.getElementById('sharetoolUrlInput');
     const sharetoolUrlWarning = document.getElementById('sharetoolUrlWarning');
@@ -1936,6 +1943,52 @@
     }
 
 
+    async function loadLatestTierMeta() {
+      if (!latestTierMetaEl) {
+        return;
+      }
+
+      latestTierMetaEl.hidden = true;
+
+      try {
+        const response = await fetch('Number of voters.json', { cache: 'no-store' });
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = await response.json();
+        if (!Array.isArray(payload)) {
+          return;
+        }
+
+        const matched = payload.find((item) => {
+          if (!item || typeof item !== 'object') {
+            return false;
+          }
+
+          const tValue = Number.parseInt(String(item.T ?? item.t ?? item.tableIndex ?? item.table ?? ''), 10);
+          return Number.isInteger(tValue) && tValue === DEFAULT_T;
+        });
+
+        if (!matched) {
+          return;
+        }
+
+        const voters = Number.parseInt(String(matched.voters ?? matched.Voters ?? ''), 10);
+        const dateText = String(matched.Date ?? matched.date ?? '').trim();
+
+        if (!Number.isFinite(voters) || dateText === '') {
+          return;
+        }
+
+        latestTierMetaEl.innerHTML = `（現在${voters}人でつくったTier表です）<span class="latest-tier-meta-date">（最終更新${dateText}）</span>`;
+        latestTierMetaEl.hidden = false;
+      } catch {
+        latestTierMetaEl.hidden = true;
+      }
+    }
+
+
     function openShareToolWithCushion() {
       const ok = window.confirm('https://394ast.github.io/limbus.sharetool/top に移動します。\nよろしいですか？');
       if (!ok) {
@@ -1955,6 +2008,7 @@
       window.location.href = 'https://394ast.github.io/limbus.tiermaker/';
     }
 
+    loadLatestTierMeta();
     loadAndRender();
   </script>
 </body>
