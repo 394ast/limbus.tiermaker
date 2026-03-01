@@ -93,9 +93,8 @@
   </div>
 
 
-  <div id="idRangeFilters" class="id-range-filters"></div>
-
   <div class="share-url-tools">
+
     <button type="button" id="generateUrlButton">URLを生成する</button>
     <textarea id="generatedUrl" readonly rows="2" placeholder="生成されたURLがここに表示されます"></textarea>
   </div>
@@ -110,11 +109,19 @@
   </dialog>
 
   <h3>人格Tier</h3>
+  <details id="identityFilterDetails" class="id-range-filters">
+    <summary>フィルター</summary>
+    <div id="identityRangeFilters"></div>
+  </details>
   <table>
     <tbody id="resultBodyIdentity"></tbody>
   </table>
 
   <h3>E.G.O.Tier</h3>
+  <details id="egoFilterDetails" class="id-range-filters">
+    <summary>フィルター</summary>
+    <div id="egoRangeFilters"></div>
+  </details>
   <table>
     <tbody id="resultBodyEgo"></tbody>
   </table>
@@ -130,7 +137,8 @@
     const toggleName1Input = document.getElementById('toggleName1');
     const toggleName2Input = document.getElementById('toggleName2');
     const toggleSeasonInput = document.getElementById('toggleSeason');
-    const idRangeFiltersEl = document.getElementById('idRangeFilters');
+    const identityRangeFiltersEl = document.getElementById('identityRangeFilters');
+    const egoRangeFiltersEl = document.getElementById('egoRangeFilters');
     const generateUrlButton = document.getElementById('generateUrlButton');
     const generatedUrlInput = document.getElementById('generatedUrl');
     const openLatestTierButton = document.getElementById('openLatestTierButton');
@@ -393,37 +401,18 @@
       return GROUP_META[groupValue]?.className ?? '';
     }
 
-    function getIdRangeFilters() {
+    function getPrisonerOptions(type) {
       const displayNames = [
         'イサン', 'ファウスト', 'ドンキホーテ', '良秀', 'ムルソー', 'ホンル',
         'ヒースクリフ', 'イシュメール', 'ロージャ', 'シンクレア', 'ウーティス', 'グレゴール'
       ];
 
-      const identity = displayNames.map((name, i) => ({ bucket: i + 1, name }));
-      const ego = displayNames.map((name, i) => ({ bucket: i + 13, name }));
-
-      return { identity, ego };
+      const offset = type === 'identity' ? 1 : 13;
+      return displayNames.map((name, i) => ({ key: String(i + offset), label: name }));
     }
 
-    function renderIdRangeFilters() {
-      if (!idRangeFiltersEl) {
-        return;
-      }
-
-      const { identity, ego } = getIdRangeFilters();
-      const identityRankOptions = [
-        { key: 'i-1', label: '<span class="digit-zero">0</span>(星1)' },
-        { key: 'i-2', label: '<span class="digit-zero">00</span>(星2)' },
-        { key: 'i-3', label: '<span class="digit-zero">000</span>(星3)' },
-      ];
-      const egoRankOptions = [
-        { key: 'e-1', label: 'ZAYIN' },
-        { key: 'e-2', label: 'TETH' },
-        { key: 'e-3', label: 'HE' },
-        { key: 'e-4', label: 'WAW' },
-        { key: 'e-5', label: 'ALEPH' },
-      ];
-      const seasonOptions = [
+    function getCommonSeasonOptions() {
+      return [
         { key: '恒常', label: '恒常' },
         { key: 'SEASON 1', label: 'シーズン1' },
         { key: 'SEASON 2', label: 'シ－ズン2' },
@@ -435,7 +424,10 @@
         { key: 'WALPURGISNACHT', label: 'ヴァルプルギスの夜' },
         { key: 'COLLABORATION-LIMITED', label: 'コラボ限定' },
       ];
-      const timeOptions = [
+    }
+
+    function getCommonTimeOptions() {
+      return [
         { key: '0,1', label: 'シーズン1' },
         { key: '2', label: 'シーズン2' },
         { key: '3', label: 'シーズン3' },
@@ -444,22 +436,49 @@
         { key: '6', label: 'シーズン6' },
         { key: '7', label: 'シーズン7' },
       ];
+    }
 
-      const renderOptions = (items, filterType) => items.map((item) => {
-        const key = filterType === 'bucket' ? item.bucket : item.key;
-        const label = filterType === 'bucket' ? item.name : item.label;
-        return `<label class="id-range-filter"><input type="checkbox" data-action="toggle-id-range" data-filter-type="${filterType}" data-key="${key}" checked> ${label}</label>`;
-      }).join('');
+    function getRankOptions(type) {
+      if (type === 'identity') {
+        return [
+          { key: 'i-1', label: '<span class="digit-zero">0</span>(星1)' },
+          { key: 'i-2', label: '<span class="digit-zero">00</span>(星2)' },
+          { key: 'i-3', label: '<span class="digit-zero">000</span>(星3)' },
+        ];
+      }
 
-      const renderGroupActions = () => '<div class="id-range-actions"><button type="button" data-action="check-group-ranges">全て☑に</button><button type="button" data-action="clear-group-ranges">全て☐に</button></div>';
+      return [
+        { key: 'e-1', label: 'ZAYIN' },
+        { key: 'e-2', label: 'TETH' },
+        { key: 'e-3', label: 'HE' },
+        { key: 'e-4', label: 'WAW' },
+        { key: 'e-5', label: 'ALEPH' },
+      ];
+    }
 
-      idRangeFiltersEl.innerHTML = [
-        `<div class="id-range-group"><p class="id-range-title">表示する人格</p><div class="id-range-options">${renderOptions(identity, 'bucket')}</div>${renderGroupActions()}</div>`,
-        `<div class="id-range-group"><p class="id-range-title">表示するE.G.O.</p><div class="id-range-options">${renderOptions(ego, 'bucket')}</div>${renderGroupActions()}</div>`,
-        `<div class="id-range-group-row"><div class="id-range-group"><p class="id-range-title">星</p><div class="id-range-options">${renderOptions(identityRankOptions, 'rank')}</div>${renderGroupActions()}</div><div class="id-range-group"><p class="id-range-title">危険ランク</p><div class="id-range-options">${renderOptions(egoRankOptions, 'rank')}</div>${renderGroupActions()}</div></div>`,
-        `<div class="id-range-group"><p class="id-range-title">区分</p><div class="id-range-options">${renderOptions(seasonOptions, 'season')}</div>${renderGroupActions()}</div>`,
-        `<div class="id-range-group"><p class="id-range-title">実装時期</p><div class="id-range-options">${renderOptions(timeOptions, 'time')}</div>${renderGroupActions()}</div>`
-      ].join('');
+    function renderFilterGroup(title, options, filterType) {
+      const optionHtml = options.map((item) => `<label class="id-range-filter"><input type="checkbox" data-action="toggle-id-range" data-filter-type="${filterType}" data-key="${item.key}" checked> ${item.label}</label>`).join('');
+      return `<div class="id-range-group"><p class="id-range-title">${title}</p><div class="id-range-options">${optionHtml}</div><div class="id-range-actions"><button type="button" data-action="check-group-ranges">全て☑に</button><button type="button" data-action="clear-group-ranges">全て☐に</button></div></div>`;
+    }
+
+    function renderIdRangeFilters() {
+      if (identityRangeFiltersEl) {
+        identityRangeFiltersEl.innerHTML = [
+          renderFilterGroup('囚人', getPrisonerOptions('identity'), 'bucket'),
+          renderFilterGroup('星', getRankOptions('identity'), 'rank'),
+          renderFilterGroup('区分', getCommonSeasonOptions(), 'season'),
+          renderFilterGroup('実装時期', getCommonTimeOptions(), 'time'),
+        ].join('');
+      }
+
+      if (egoRangeFiltersEl) {
+        egoRangeFiltersEl.innerHTML = [
+          renderFilterGroup('囚人', getPrisonerOptions('ego'), 'bucket'),
+          renderFilterGroup('危険ランク', getRankOptions('ego'), 'rank'),
+          renderFilterGroup('区分', getCommonSeasonOptions(), 'season'),
+          renderFilterGroup('実装時期', getCommonTimeOptions(), 'time'),
+        ].join('');
+      }
     }
 
     function setRangeFiltersInContainer(container, checked) {
@@ -481,16 +500,17 @@
 
 
     function setAllRangeFilters(checked) {
-      setRangeFiltersInContainer(idRangeFiltersEl, checked);
+      setRangeFiltersInContainer(identityRangeFiltersEl, checked);
+      setRangeFiltersInContainer(egoRangeFiltersEl, checked);
     }
 
-    function getActiveFilterKeys(filterType) {
-      if (!idRangeFiltersEl) {
+    function getActiveFilterKeys(container, filterType) {
+      if (!container) {
         return null;
       }
 
       const selected = new Set();
-      const checkboxes = idRangeFiltersEl.querySelectorAll(`input[data-action="toggle-id-range"][data-filter-type="${filterType}"]:checked`);
+      const checkboxes = container.querySelectorAll(`input[data-action="toggle-id-range"][data-filter-type="${filterType}"]:checked`);
       checkboxes.forEach((checkbox) => {
         const key = checkbox.dataset.key;
         if (typeof key === 'string' && key !== '') {
@@ -501,13 +521,30 @@
       return selected;
     }
 
+    function getFilterContainerByType(type) {
+      return type === 'identity' ? identityRangeFiltersEl : egoRangeFiltersEl;
+    }
+
+    function getFiltersByType(type) {
+      const container = getFilterContainerByType(type);
+      return {
+        buckets: getActiveFilterKeys(container, 'bucket'),
+        seasons: getActiveFilterKeys(container, 'season'),
+        ranks: getActiveFilterKeys(container, 'rank'),
+        times: getActiveFilterKeys(container, 'time'),
+      };
+    }
+
     function hasUncheckedRangeFilters() {
-      if (!idRangeFiltersEl) {
+      const containers = [identityRangeFiltersEl, egoRangeFiltersEl].filter(Boolean);
+      if (!containers.length) {
         return false;
       }
 
-      const checkboxes = idRangeFiltersEl.querySelectorAll('input[data-action="toggle-id-range"]');
-      return Array.from(checkboxes).some((checkbox) => !checkbox.checked);
+      return containers.some((container) => {
+        const checkboxes = container.querySelectorAll('input[data-action="toggle-id-range"]');
+        return Array.from(checkboxes).some((checkbox) => !checkbox.checked);
+      });
     }
 
     function getHiddenPrisonerIds() {
@@ -515,20 +552,17 @@
         return [];
       }
 
-      const filters = {
-        buckets: getActiveFilterKeys('bucket'),
-        seasons: getActiveFilterKeys('season'),
-        ranks: getActiveFilterKeys('rank'),
-        times: getActiveFilterKeys('time'),
-      };
-
-      if (!filters.buckets || !filters.seasons || !filters.ranks || !filters.times) {
-        return [];
-      }
-
       return state.tierlist
         .map((row) => row[0])
-        .filter((id) => !isIdVisibleByFilters(id, filters));
+        .filter((id) => {
+          const type = belongsToType(id, 'identity') ? 'identity' : 'ego';
+          const filters = getFiltersByType(type);
+          if (!filters.buckets || !filters.seasons || !filters.ranks || !filters.times) {
+            return false;
+          }
+
+          return !isIdVisibleByFilters(id, filters);
+        });
     }
 
     function getCurrentGroupOfId(id, type) {
@@ -738,15 +772,11 @@
       }
 
       const showExceptRows = shouldShowExceptRows();
-      const filters = {
-        buckets: getActiveFilterKeys('bucket'),
-        seasons: getActiveFilterKeys('season'),
-        ranks: getActiveFilterKeys('rank'),
-        times: getActiveFilterKeys('time'),
-      };
+      const identityFilters = getFiltersByType('identity');
+      const egoFilters = getFiltersByType('ego');
 
-      bodyIdentityEl.innerHTML = renderTypeRows('identity', state.baseGroupedByType.identity, showExceptRows, filters);
-      bodyEgoEl.innerHTML = renderTypeRows('ego', state.baseGroupedByType.ego, showExceptRows, filters);
+      bodyIdentityEl.innerHTML = renderTypeRows('identity', state.baseGroupedByType.identity, showExceptRows, identityFilters);
+      bodyEgoEl.innerHTML = renderTypeRows('ego', state.baseGroupedByType.ego, showExceptRows, egoFilters);
     }
 
     function clearGeneratedUrl() {
@@ -942,8 +972,8 @@
 
     renderIdRangeFilters();
 
-    if (idRangeFiltersEl) {
-      idRangeFiltersEl.addEventListener('change', (event) => {
+    [identityRangeFiltersEl, egoRangeFiltersEl].filter(Boolean).forEach((filterRoot) => {
+      filterRoot.addEventListener('change', (event) => {
         const target = event.target;
         if (!(target instanceof HTMLInputElement) || target.dataset.action !== 'toggle-id-range') {
           return;
@@ -954,7 +984,7 @@
         }
       });
 
-      idRangeFiltersEl.addEventListener('click', (event) => {
+      filterRoot.addEventListener('click', (event) => {
         const button = event.target.closest('button[data-action]');
         if (!button) {
           return;
@@ -968,7 +998,7 @@
         const container = button.closest('.id-range-group');
         setRangeFiltersInContainer(container, action === 'check-group-ranges');
       });
-    }
+    });
 
     function encodeDiffId(id) {
       const high = Math.floor(id / 1000);
