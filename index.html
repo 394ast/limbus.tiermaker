@@ -1063,11 +1063,43 @@
       clearDropHighlights();
     }
 
+
+    function onItemDoubleClick(event) {
+      if (!isTierMoveEnabled()) {
+        return;
+      }
+
+      const item = event.target.closest('.id-item[draggable="true"]');
+      if (!item) {
+        return;
+      }
+
+      const payload = parseItemPayload(item);
+      if (!payload) {
+        return;
+      }
+
+      if (payload.group === 0) {
+        const restoreGroup = state.exceptRestoreGroupById.get(payload.id);
+        if (!Number.isInteger(restoreGroup) || restoreGroup < 1 || restoreGroup > 9) {
+          return;
+        }
+
+        moveToGroup(payload.id, payload.type, 0, restoreGroup);
+        return;
+      }
+
+      if (payload.group >= 1 && payload.group <= 9) {
+        moveToGroup(payload.id, payload.type, payload.group, 0);
+      }
+    }
+
     [bodyIdentityEl, bodyEgoEl].forEach((el) => {
       el.addEventListener('dragstart', onDragStart);
       el.addEventListener('dragend', onDragEnd);
       el.addEventListener('dragover', onDragOver);
       el.addEventListener('drop', onDrop);
+      el.addEventListener('dblclick', onItemDoubleClick);
       el.addEventListener('dragleave', (event) => {
         const dropzone = event.target.closest('.tier-dropzone[data-dropzone="1"]');
         if (dropzone && !dropzone.contains(event.relatedTarget)) {
