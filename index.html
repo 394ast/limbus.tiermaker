@@ -90,7 +90,22 @@
         font-size: 14px;
         padding: 0;
       }
-      .sharetool-link-block { margin-top: 8px; display: grid; gap: 6px; }
+      details.intro-details {
+        margin: 8px 0 10px;
+        padding: 8px 10px 10px;
+        border: 2px solid #5b8cff;
+        border-radius: 8px;
+        background: #f8faff;
+      }
+      details.intro-details > summary {
+        font-weight: 700;
+        color: #174ea6;
+        cursor: pointer;
+      }
+      details.intro-details[open] > summary {
+        margin-bottom: 8px;
+      }
+      .sharetool-link-block { display: grid; gap: 6px; }
       #sharetoolUrlInput { width: min(100%, 980px); min-height: 2.8em; }
       #sharetoolUrlWarning { color: #b00020; font-size: 13px; }
       #applySharetoolExceptButton { width: fit-content; font-size: 13px; padding: 4px 10px; }
@@ -98,7 +113,7 @@
 </head>
 <body>
   <h2>みんなでつくる　リンバスTier表</h2>
-  <details>
+  <details class="intro-details">
     <summary>説明（最初に読んでね）</summary>
     <div class="sharetool-link-block">
       <div><button type="button" id="openShareToolButton" class="inline-link-button">リンバス所持人格E.G.O共有ツール</button>と連携して、未所持の人格、E.G.Oを除外ランクに移動しておくことができます。</div>
