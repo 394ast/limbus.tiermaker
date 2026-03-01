@@ -1704,12 +1704,12 @@
         const expanded = expandSharetoolGroup(group, wideRunLength);
         for (let x = 0; x < expanded.length; x += 1) {
           if (expanded[x] === '0') {
-            exceptIds.push(x + 1 + 1000 * n);
+            exceptIds.push(x + 1 + 1000 * (n + 1));
           }
         }
 
-        const firstTrailingId = 1 + expanded.length + 1000 * n;
-        const lastId = 1000 * (n + 1);
+        const firstTrailingId = 1 + expanded.length + 1000 * (n + 1);
+        const lastId = 1000 * (n + 2);
         for (let id = firstTrailingId; id <= lastId; id += 1) {
           exceptIds.push(id);
         }
