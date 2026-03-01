@@ -1061,6 +1061,38 @@
       moveToGroup(payload.id, payload.type, payload.group, targetGroup);
       state.draggingPayload = null;
       clearDropHighlights();
+      setScrollZonesVisible(false);
+    }
+
+
+    function onItemDoubleClick(event) {
+      if (!isTierMoveEnabled()) {
+        return;
+      }
+
+      const item = event.target.closest('.id-item[draggable="true"]');
+      if (!item) {
+        return;
+      }
+
+      const payload = parseItemPayload(item);
+      if (!payload) {
+        return;
+      }
+
+      if (payload.group === 0) {
+        const restoreGroup = state.exceptRestoreGroupById.get(payload.id);
+        if (!Number.isInteger(restoreGroup) || restoreGroup < 1 || restoreGroup > 9) {
+          return;
+        }
+
+        moveToGroup(payload.id, payload.type, 0, restoreGroup);
+        return;
+      }
+
+      if (payload.group >= 1 && payload.group <= 9) {
+        moveToGroup(payload.id, payload.type, payload.group, 0);
+      }
     }
 
 
