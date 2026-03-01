@@ -266,6 +266,8 @@
 
     const GENERATED_URL_BASE_WIDTH_PX = 900;
     const GENERATED_URL_BASE_ROWS = 2;
+    const DEFAULT_T = 0;
+    const DEFAULT_X = 1;
     const changecodingDIffID = 0; // 下位idが36を超えるとき手動で1に変更する
     const DRAG_PAYLOAD_TYPE = 'application/x-tier-item';
     const AUTO_SCROLL_STEP_PX = 18;
@@ -1655,9 +1657,6 @@
     });
 
     applyCustomSize(80);
-
-    const DEFAULT_T = 0;
-    const DEFAULT_X = 1;
 
     function getQuerySettings() {
       const params = new URLSearchParams(window.location.search);
