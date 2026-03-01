@@ -106,6 +106,10 @@
   </div>
 
   <div class="sync-mode">
+    <label><input type="checkbox" id="toggleTierMove"> Tierの移動を有効にする</label>
+  </div>
+
+  <div class="sync-mode">
     <label><input type="checkbox" id="toggleExceptRows" checked> 除外ランクを表示する</label>
   </div>
   <div class="sync-mode">
@@ -155,6 +159,7 @@
     const syncModeInputs = document.querySelectorAll('input[name="syncMode"]');
     const imgSizeForm = document.getElementById('imgSizeForm');
     const customWidthInput = document.getElementById('customWidth');
+    const toggleTierMoveInput = document.getElementById('toggleTierMove');
     const toggleExceptRowsInput = document.getElementById('toggleExceptRows');
     const toggleName1Input = document.getElementById('toggleName1');
     const toggleName2Input = document.getElementById('toggleName2');
@@ -965,7 +970,17 @@
       });
     }
 
+
+    function isTierMoveEnabled() {
+      return !toggleTierMoveInput || toggleTierMoveInput.checked;
+    }
+
     function onDragStart(event) {
+      if (!isTierMoveEnabled()) {
+        event.preventDefault();
+        return;
+      }
+
       const item = event.target.closest('.id-item[draggable="true"]');
       if (!item || !event.dataTransfer) {
         return;
@@ -996,6 +1011,10 @@
     }
 
     function onDragOver(event) {
+      if (!isTierMoveEnabled()) {
+        return;
+      }
+
       const dropzone = event.target.closest('.tier-dropzone[data-dropzone="1"]');
       if (!dropzone) {
         return;
@@ -1017,6 +1036,10 @@
     }
 
     function onDrop(event) {
+      if (!isTierMoveEnabled()) {
+        return;
+      }
+
       const dropzone = event.target.closest('.tier-dropzone[data-dropzone="1"]');
       if (!dropzone) {
         return;
@@ -1067,6 +1090,17 @@
         setAutoScrollDirection(0);
       }
     });
+
+
+    if (toggleTierMoveInput) {
+      toggleTierMoveInput.addEventListener('change', () => {
+        if (!toggleTierMoveInput.checked) {
+          state.draggingPayload = null;
+          clearDropHighlights();
+          setScrollZonesVisible(false);
+        }
+      });
+    }
 
     if (toggleExceptRowsInput) {
       toggleExceptRowsInput.addEventListener('change', () => {
@@ -1456,6 +1490,7 @@
       const tableParam = params.get('T');
       const xParam = params.get('X');
       const changeParam = params.get('S');
+      const hasCompressedParam = params.has('C');
       const compressedParam = changeParam === '1' ? null : params.get('C');
 
       state.changeParam = changeParam;
@@ -1471,17 +1506,22 @@
         tableIndex: Number.isInteger(tableIndex) && tableIndex >= 0 ? tableIndex : DEFAULT_T,
         xValue,
         compressedParam,
+        hasCompressedParam,
       };
     }
 
     async function loadAndRender() {
-      const { tableIndex, xValue, compressedParam } = getQuerySettings();
+      const { tableIndex, xValue, compressedParam, hasCompressedParam } = getQuerySettings();
       const x = xValue;
 
       if (!Number.isFinite(x)) {
         statusEl.textContent = 'URLクエリ X は数値で指定してください。例: ?T=0&X=1';
         statusEl.className = 'error';
         return;
+      }
+
+      if (toggleTierMoveInput) {
+        toggleTierMoveInput.checked = !hasCompressedParam;
       }
 
       try {
