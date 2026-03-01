@@ -51,12 +51,16 @@
       #generateUrlButton { width: fit-content; font-size: 13px; padding: 4px 10px; }
       #generatedUrl { width: 100%; max-width: 900px; resize: vertical; white-space: pre-wrap; word-break: break-all; overflow-wrap: anywhere; line-height: 1.35; min-height: 3.2em; }
       #generatedUrl.dynamic-width { width: min(98vw, var(--generated-url-width, 900px)); }
-      #hiddenPrisonerDialog { width: min(520px, calc(100vw - 32px)); border: none; border-radius: 8px; padding: 16px; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24); }
-      #hiddenPrisonerDialog::backdrop { background: rgba(0, 0, 0, 0.45); }
+      #hiddenPrisonerDialog,
+      #tierMoveDisabledDialog { width: min(520px, calc(100vw - 32px)); border: none; border-radius: 8px; padding: 16px; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24); }
+      #hiddenPrisonerDialog::backdrop,
+      #tierMoveDisabledDialog::backdrop { background: rgba(0, 0, 0, 0.45); }
       .hidden-prisoner-title { margin: 0 0 12px; font-size: 18px; }
       .hidden-prisoner-actions { display: grid; gap: 8px; }
       .hidden-prisoner-actions button { font-size: 14px; padding: 7px 10px; text-align: left; }
       #openLatestTierButton { margin: 4px 0 12px; font-size: 13px; padding: 4px 10px; }
+      .tier-move-disabled .id-item[draggable="true"] { cursor: default; }
+      .tier-move-disabled .id-item.dragging { cursor: default; }
       .scroll-zone {
         position: fixed;
         left: 0;
@@ -134,6 +138,15 @@
     </div>
   </dialog>
 
+  <dialog id="tierMoveDisabledDialog">
+    <h3 class="hidden-prisoner-title">現在Tierの移動は無効になっています</h3>
+    <div class="hidden-prisoner-actions">
+      <button type="button" data-action="enable-tier-move">有効にする</button>
+      <button type="button" data-action="keep-disabled">無効のまま</button>
+      <button type="button" data-action="keep-disabled-suppress">無効のままにして、以降この警告を表示しない</button>
+    </div>
+  </dialog>
+
   <h3>人格Tier</h3>
   <details id="identityFilterDetails" class="id-range-filters">
     <summary>フィルター</summary>
@@ -170,6 +183,7 @@
     const generatedUrlInput = document.getElementById('generatedUrl');
     const openLatestTierButton = document.getElementById('openLatestTierButton');
     const hiddenPrisonerDialog = document.getElementById('hiddenPrisonerDialog');
+    const tierMoveDisabledDialog = document.getElementById('tierMoveDisabledDialog');
     const topScrollZone = document.getElementById('topScrollZone');
     const bottomScrollZone = document.getElementById('bottomScrollZone');
 
@@ -216,8 +230,11 @@
     const AUTO_SCROLL_STEP_PX = 18;
     const AUTO_SCROLL_INTERVAL_MS = 16;
 
+    
     let autoScrollDirection = 0;
     let autoScrollTimer = null;
+    let suppressTierMoveWarning = false;
+    let tierMoveWarningOpen = false;
 
 
     function calcValue(row, x) {
@@ -975,9 +992,72 @@
       return !toggleTierMoveInput || toggleTierMoveInput.checked;
     }
 
+    function applyTierMoveUiState() {
+      if (isTierMoveEnabled()) {
+        document.body.classList.remove('tier-move-disabled');
+        return;
+      }
+
+      document.body.classList.add('tier-move-disabled');
+    }
+
+    function promptTierMoveDisabledChoice() {
+      if (suppressTierMoveWarning || tierMoveWarningOpen) {
+        return;
+      }
+
+      if (!tierMoveDisabledDialog || typeof tierMoveDisabledDialog.showModal !== 'function') {
+        return;
+      }
+
+      tierMoveWarningOpen = true;
+
+      const closeWith = (action) => {
+        cleanup();
+        tierMoveDisabledDialog.close();
+        tierMoveWarningOpen = false;
+
+        if (action === 'enable-tier-move') {
+          if (toggleTierMoveInput) {
+            toggleTierMoveInput.checked = true;
+          }
+          applyTierMoveUiState();
+          return;
+        }
+
+        if (action === 'keep-disabled-suppress') {
+          suppressTierMoveWarning = true;
+        }
+      };
+
+      const onClick = (event) => {
+        const button = event.target.closest('button[data-action]');
+        if (!button) {
+          return;
+        }
+
+        closeWith(button.dataset.action);
+      };
+
+      const onCancel = (event) => {
+        event.preventDefault();
+        closeWith('keep-disabled');
+      };
+
+      const cleanup = () => {
+        tierMoveDisabledDialog.removeEventListener('click', onClick);
+        tierMoveDisabledDialog.removeEventListener('cancel', onCancel);
+      };
+
+      tierMoveDisabledDialog.addEventListener('click', onClick);
+      tierMoveDisabledDialog.addEventListener('cancel', onCancel);
+      tierMoveDisabledDialog.showModal();
+    }
+
     function onDragStart(event) {
       if (!isTierMoveEnabled()) {
         event.preventDefault();
+        promptTierMoveDisabledChoice();
         return;
       }
 
@@ -1095,37 +1175,6 @@
       }
     }
 
-
-    function onItemDoubleClick(event) {
-      if (!isTierMoveEnabled()) {
-        return;
-      }
-
-      const item = event.target.closest('.id-item[draggable="true"]');
-      if (!item) {
-        return;
-      }
-
-      const payload = parseItemPayload(item);
-      if (!payload) {
-        return;
-      }
-
-      if (payload.group === 0) {
-        const restoreGroup = state.exceptRestoreGroupById.get(payload.id);
-        if (!Number.isInteger(restoreGroup) || restoreGroup < 1 || restoreGroup > 9) {
-          return;
-        }
-
-        moveToGroup(payload.id, payload.type, 0, restoreGroup);
-        return;
-      }
-
-      if (payload.group >= 1 && payload.group <= 9) {
-        moveToGroup(payload.id, payload.type, payload.group, 0);
-      }
-    }
-
     [bodyIdentityEl, bodyEgoEl].forEach((el) => {
       el.addEventListener('dragstart', onDragStart);
       el.addEventListener('dragend', onDragEnd);
@@ -1163,6 +1212,8 @@
           clearDropHighlights();
           setScrollZonesVisible(false);
         }
+
+        applyTierMoveUiState();
       });
     }
 
@@ -1587,6 +1638,7 @@
       if (toggleTierMoveInput) {
         toggleTierMoveInput.checked = !hasCompressedParam;
       }
+      applyTierMoveUiState();
 
       try {
         const [tableResponse, namelistResponse] = await Promise.all([
