@@ -47,13 +47,8 @@
       .id-name { font-size: 13px; line-height: 1.2; text-align: center; word-break: break-word; }
       .id-name-primary { white-space: nowrap; word-break: normal; }
       .digit-zero { font-family: Consolas, "Courier New", monospace; }
-      .id-controls { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
-      .id-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
-      .id-controls label { font-size: 12px; }
-      .hide-adjust-controls .id-controls { display: none; }
       .share-url-tools { margin: 8px 0 12px; display: grid; gap: 6px; }
       #generateUrlButton { width: fit-content; font-size: 13px; padding: 4px 10px; }
-      .hide-except-move-controls button[data-action="toggle-except"][data-include="0"] { display: none; }
       #generatedUrl { width: 100%; max-width: 900px; resize: vertical; white-space: pre-wrap; word-break: break-all; overflow-wrap: anywhere; line-height: 1.35; min-height: 3.2em; }
       #generatedUrl.dynamic-width { width: min(98vw, var(--generated-url-width, 900px)); }
       #hiddenPrisonerDialog { width: min(520px, calc(100vw - 32px)); border: none; border-radius: 8px; padding: 16px; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24); }
@@ -89,10 +84,6 @@
   </div>
 
   <div class="sync-mode">
-    <label><input type="checkbox" id="toggleAdjustControls" checked> Tierの移動ボタンを表示する</label>
-    <label><input type="checkbox" id="toggleExceptMoveControls" checked> 除外ランクへの移動ボタンを表示する</label>
-  </div>
-  <div class="sync-mode">
     <label><input type="checkbox" id="toggleExceptRows" checked> 除外ランクを表示する</label>
   </div>
   <div class="sync-mode">
@@ -101,11 +92,6 @@
     <label><input type="checkbox" id="toggleSeason"> シーズン区分を表示する</label>
   </div>
 
-  <div class="scroll-fix-options">
-    <span class="indent">Tierの移動ボタンを押した後のカーソルの位置:</span>
-    <label><input type="radio" name="scrollFixMode" value="group-relative" checked> 移動前のランク</label>
-    <label><input type="radio" name="scrollFixMode" value="item-delta"> 移動後のランク</label>
-  </div>
 
   <div id="idRangeFilters" class="id-range-filters"></div>
 
@@ -140,18 +126,15 @@
     const syncModeInputs = document.querySelectorAll('input[name="syncMode"]');
     const imgSizeForm = document.getElementById('imgSizeForm');
     const customWidthInput = document.getElementById('customWidth');
-    const toggleAdjustControlsInput = document.getElementById('toggleAdjustControls');
     const toggleExceptRowsInput = document.getElementById('toggleExceptRows');
     const toggleName1Input = document.getElementById('toggleName1');
     const toggleName2Input = document.getElementById('toggleName2');
     const toggleSeasonInput = document.getElementById('toggleSeason');
-    const toggleExceptMoveControlsInput = document.getElementById('toggleExceptMoveControls');
     const idRangeFiltersEl = document.getElementById('idRangeFilters');
     const generateUrlButton = document.getElementById('generateUrlButton');
     const generatedUrlInput = document.getElementById('generatedUrl');
     const openLatestTierButton = document.getElementById('openLatestTierButton');
     const hiddenPrisonerDialog = document.getElementById('hiddenPrisonerDialog');
-    const scrollFixModeInputs = document.querySelectorAll('input[name="scrollFixMode"]');
 
     const state = {
       tierlist: null,
@@ -173,7 +156,6 @@
       nameDataById: new Map(),
       idMetaById: new Map(),
       changeParam: null,
-      scrollFixMode: 'group-relative',
       draggingPayload: null,
     };
 
@@ -380,28 +362,7 @@
       return { name1, name2, season };
     }
 
-    function renderControlButtons(id, groupValue, isExcept, type) {
-      if (isExcept) {
-        return `<button type="button" data-action="toggle-except" data-include="1" data-id="${id}" data-type="${type}" data-group="${groupValue}">戻す</button>`;
-      }
-
-      const disablePlus2 = groupValue >= 8;
-      const disablePlus1 = groupValue >= 9;
-      const disableMinus1 = groupValue <= 1;
-      const disableMinus2 = groupValue <= 2;
-
-      return [
-        `<button type="button" data-action="move" data-delta="2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus2 ? 'disabled' : ''}>+2</button>`,
-        `<button type="button" data-action="move" data-delta="1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus1 ? 'disabled' : ''}>+1</button>`,
-        `<button type="button" data-action="toggle-except" data-include="0" data-id="${id}" data-type="${type}" data-group="${groupValue}">除外</button>`,
-        `<button type="button" data-action="move" data-delta="-1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus1 ? 'disabled' : ''}>-1</button>`,
-        `<button type="button" data-action="move" data-delta="-2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus2 ? 'disabled' : ''}> -2</button>`
-      ].join('');
-    }
-
     function renderImageCells(ids, groupValue, type) {
-      const isExcept = groupValue === 0;
-
       const items = ids.map((id) => {
         const src = type === 'identity' ? getIdentityImageUrl(id) : getEgoImageUrl(id);
         const { name1, name2, season } = getDisplayNames(id);
@@ -416,9 +377,6 @@
               ${showName1 ? `<div class="id-name id-name-primary">${escapeHtml(name1)}</div>` : ''}
               ${showName2 ? `<div class="id-name">${escapeHtml(name2)}</div>` : ''}
               ${showSeason ? `<div class="id-name">${escapeHtml(season)}</div>` : ''}
-            </div>
-            <div class="id-controls">
-              ${renderControlButtons(id, groupValue, isExcept, type)}
             </div>
           </div>
         `;
@@ -801,106 +759,6 @@
       }
     }
 
-    function getSelectedScrollFixMode() {
-      const checked = document.querySelector('input[name="scrollFixMode"]:checked');
-      return checked ? checked.value : 'group-relative';
-    }
-
-    function renderRowsWithScrollFix(targetId, sourceGroup, type, cursorY) {
-      if (!state.tierlist || !Number.isFinite(state.x)) {
-        return;
-      }
-
-      const beforeImg = document.querySelector(`img[alt="${targetId}"]`);
-      if (!beforeImg) {
-        renderRows(state.tierlist, state.x);
-        return;
-      }
-
-      const mode = getSelectedScrollFixMode();
-      state.scrollFixMode = mode;
-
-      if (mode === 'group-relative') {
-        const beforeRow = beforeImg.closest('tr');
-        if (beforeRow && Number.isFinite(cursorY) && Number.isInteger(sourceGroup)) {
-          const beforeCursorOffset = cursorY - beforeRow.getBoundingClientRect().top;
-
-          renderRows(state.tierlist, state.x);
-
-          const tbody = type === 'identity' ? bodyIdentityEl : bodyEgoEl;
-          const sourceLabel = getGroupLabel(sourceGroup);
-          const afterSourceRow = tbody
-            ? Array.from(tbody.querySelectorAll('tr')).find((row) => row.querySelector('td')?.textContent === sourceLabel)
-            : null;
-
-          if (afterSourceRow) {
-            const afterRowTop = afterSourceRow.getBoundingClientRect().top;
-            const desiredTop = cursorY - beforeCursorOffset;
-            window.scrollBy(0, afterRowTop - desiredTop);
-            return;
-          }
-        }
-      }
-
-      const beforeTop = beforeImg.getBoundingClientRect().top;
-      renderRows(state.tierlist, state.x);
-      setTimeout(() => {
-        const afterImg = document.querySelector(`img[alt="${targetId}"]`);
-        if (!afterImg) {
-          return;
-        }
-
-        const afterTop = afterImg.getBoundingClientRect().top;
-        window.scrollBy(0, afterTop - beforeTop);
-      }, 0);
-    }
-
-    function handleMove(id, type, currentGroup, delta, cursorY) {
-      if (!Number.isInteger(id) || !Number.isInteger(currentGroup) || !Number.isInteger(delta)) {
-        return;
-      }
-
-      const target = currentGroup + delta;
-      if (target < 1 || target > 9) {
-        return;
-      }
-
-      getExceptSet(type).delete(id);
-      state.exceptRestoreGroupById.delete(id);
-      setManualGroupOverride(id, type, target);
-      clearGeneratedUrl();
-
-      renderRowsWithScrollFix(id, currentGroup, type, cursorY);
-    }
-
-    function handleExceptToggle(id, type, currentGroup, include, cursorY) {
-      if (!Number.isInteger(id) || !Number.isInteger(currentGroup)) {
-        return;
-      }
-
-      const exceptIds = getExceptSet(type);
-
-      if (include) {
-        exceptIds.delete(id);
-
-        const restoreGroup = state.exceptRestoreGroupById.get(id);
-        if (Number.isInteger(restoreGroup) && restoreGroup >= 1 && restoreGroup <= 9) {
-          setManualGroupOverride(id, type, restoreGroup);
-        }
-      } else {
-        if (currentGroup > 0) {
-          state.exceptRestoreGroupById.set(id, currentGroup);
-        }
-
-        exceptIds.add(id);
-      }
-
-      clearGeneratedUrl();
-
-      if (state.tierlist && Number.isFinite(state.x)) {
-        renderRowsWithScrollFix(id, currentGroup, type, cursorY);
-      }
-    }
 
     function moveToGroup(id, type, currentGroup, targetGroup) {
       if (!Number.isInteger(id) || !Number.isInteger(currentGroup) || !Number.isInteger(targetGroup)) {
@@ -915,6 +773,7 @@
         if (currentGroup > 0) {
           state.exceptRestoreGroupById.set(id, currentGroup);
         }
+
         getExceptSet(type).add(id);
       } else {
         getExceptSet(type).delete(id);
@@ -923,13 +782,15 @@
       }
 
       clearGeneratedUrl();
-      renderRows(state.tierlist, state.x);
+      if (state.tierlist && Number.isFinite(state.x)) {
+        renderRows(state.tierlist, state.x);
+      }
     }
 
-    function parseControlPayload(el) {
-      const id = Number.parseInt(el.dataset.id ?? '', 10);
-      const type = el.dataset.type;
-      const group = Number.parseInt(el.dataset.group ?? '', 10);
+    function parseItemPayload(el) {
+      const id = Number.parseInt(el?.dataset?.id ?? '', 10);
+      const type = el?.dataset?.type;
+      const group = Number.parseInt(el?.dataset?.group ?? '', 10);
 
       if (!Number.isInteger(id) || !Number.isInteger(group) || (type !== 'identity' && type !== 'ego')) {
         return null;
@@ -937,32 +798,6 @@
 
       return { id, type, group };
     }
-
-    function onControlClick(event) {
-      const controlButton = event.target.closest('button[data-action]');
-      if (!controlButton) {
-        return;
-      }
-
-      const payload = parseControlPayload(controlButton);
-      if (!payload) {
-        return;
-      }
-
-      if (controlButton.dataset.action === 'move') {
-        const delta = Number.parseInt(controlButton.dataset.delta ?? '', 10);
-        handleMove(payload.id, payload.type, payload.group, delta, event.clientY);
-        return;
-      }
-
-      if (controlButton.dataset.action === 'toggle-except') {
-        const include = controlButton.dataset.include === '1';
-        handleExceptToggle(payload.id, payload.type, payload.group, include, event.clientY);
-      }
-    }
-
-    bodyIdentityEl.addEventListener('click', onControlClick);
-    bodyEgoEl.addEventListener('click', onControlClick);
 
     function parseDragPayload(event) {
       const payloadRaw = event.dataTransfer?.getData(DRAG_PAYLOAD_TYPE)
@@ -1006,7 +841,7 @@
         return;
       }
 
-      const payload = parseControlPayload(item);
+      const payload = parseItemPayload(item);
       if (!payload) {
         return;
       }
@@ -1084,30 +919,6 @@
         }
       });
     });
-
-    function applyAdjustControlVisibility(show) {
-      document.body.classList.toggle('hide-adjust-controls', !show);
-    }
-
-    function applyExceptMoveControlVisibility(show) {
-      document.body.classList.toggle('hide-except-move-controls', !show);
-    }
-
-    if (toggleAdjustControlsInput) {
-      toggleAdjustControlsInput.addEventListener('change', () => {
-        applyAdjustControlVisibility(toggleAdjustControlsInput.checked);
-      });
-
-      applyAdjustControlVisibility(toggleAdjustControlsInput.checked);
-    }
-
-    if (toggleExceptMoveControlsInput) {
-      toggleExceptMoveControlsInput.addEventListener('change', () => {
-        applyExceptMoveControlVisibility(toggleExceptMoveControlsInput.checked);
-      });
-
-      applyExceptMoveControlVisibility(toggleExceptMoveControlsInput.checked);
-    }
 
     if (toggleExceptRowsInput) {
       toggleExceptRowsInput.addEventListener('change', () => {
@@ -1501,11 +1312,6 @@
 
       state.changeParam = changeParam;
 
-      if (toggleAdjustControlsInput && (changeParam === '1' || changeParam === '2')) {
-        toggleAdjustControlsInput.checked = false;
-        applyAdjustControlVisibility(false);
-      }
-
       if (statusEl) {
         statusEl.hidden = !(changeParam !== null && changeParam !== '');
       }
@@ -1610,12 +1416,6 @@
         if (state.tierlist && Number.isFinite(state.x)) {
           renderRows(state.tierlist, state.x);
         }
-      });
-    });
-
-    scrollFixModeInputs.forEach((input) => {
-      input.addEventListener('change', () => {
-        state.scrollFixMode = input.value;
       });
     });
 
