@@ -39,18 +39,16 @@
       .error { color: #b00020; }
       .id-items { display: flex; flex-wrap: wrap; gap: 2px; justify-content: flex-start; }
       .id-item { display: flex; align-items: center; gap: 6px; border: 1px solid #ddd; border-radius: 4px; padding: 2px; background: #fff; }
+      .id-item[draggable="true"] { cursor: grab; }
+      .id-item.dragging { opacity: 0.5; cursor: grabbing; }
+      .tier-dropzone.drag-over { background: rgba(66, 133, 244, 0.14); outline: 2px dashed #4285f4; outline-offset: -2px; }
       .id-item img { width: var(--img-size, 56px); height: var(--img-size, 56px); object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
       .id-main { display: grid; gap: 2px; justify-items: center; }
       .id-name { font-size: 13px; line-height: 1.2; text-align: center; word-break: break-word; }
       .id-name-primary { white-space: nowrap; word-break: normal; }
       .digit-zero { font-family: Consolas, "Courier New", monospace; }
-      .id-controls { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
-      .id-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
-      .id-controls label { font-size: 12px; }
-      .hide-adjust-controls .id-controls { display: none; }
       .share-url-tools { margin: 8px 0 12px; display: grid; gap: 6px; }
       #generateUrlButton { width: fit-content; font-size: 13px; padding: 4px 10px; }
-      .hide-except-move-controls button[data-action="toggle-except"][data-include="0"] { display: none; }
       #generatedUrl { width: 100%; max-width: 900px; resize: vertical; white-space: pre-wrap; word-break: break-all; overflow-wrap: anywhere; line-height: 1.35; min-height: 3.2em; }
       #generatedUrl.dynamic-width { width: min(98vw, var(--generated-url-width, 900px)); }
       #hiddenPrisonerDialog { width: min(520px, calc(100vw - 32px)); border: none; border-radius: 8px; padding: 16px; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24); }
@@ -59,6 +57,11 @@
       .hidden-prisoner-actions { display: grid; gap: 8px; }
       .hidden-prisoner-actions button { font-size: 14px; padding: 7px 10px; text-align: left; }
       #openLatestTierButton { margin: 4px 0 12px; font-size: 13px; padding: 4px 10px; }
+      .drag-scroll-zone { position: fixed; left: 0; width: 100%; height: 56px; display: none; align-items: center; justify-content: center; z-index: 1200; font-weight: 700; color: #fff; pointer-events: auto; user-select: none; }
+      .drag-scroll-zone-top { top: 0; background: linear-gradient(to bottom, rgba(33, 33, 33, 0.9), rgba(33, 33, 33, 0.65)); }
+      .drag-scroll-zone-bottom { bottom: 0; background: linear-gradient(to top, rgba(33, 33, 33, 0.9), rgba(33, 33, 33, 0.65)); }
+      .drag-scroll-zone.active { background: rgba(33, 33, 33, 0.95); }
+      body.dragging-item .drag-scroll-zone { display: flex; }
     </style>
 </head>
 <body>
@@ -66,6 +69,9 @@
   <button type="button" id="openLatestTierButton">現在のみんなでつくったTier表を表示</button>
 
   <div id="status" aria-live="polite" hidden></div>
+
+  <div id="dragScrollZoneTop" class="drag-scroll-zone drag-scroll-zone-top">画面を上にスクロール</div>
+  <div id="dragScrollZoneBottom" class="drag-scroll-zone drag-scroll-zone-bottom">画面を下にスクロール</div>
 
   
 
@@ -86,10 +92,6 @@
   </div>
 
   <div class="sync-mode">
-    <label><input type="checkbox" id="toggleAdjustControls" checked> Tierの移動ボタンを表示する</label>
-    <label><input type="checkbox" id="toggleExceptMoveControls" checked> 除外ランクへの移動ボタンを表示する</label>
-  </div>
-  <div class="sync-mode">
     <label><input type="checkbox" id="toggleExceptRows" checked> 除外ランクを表示する</label>
   </div>
   <div class="sync-mode">
@@ -98,15 +100,9 @@
     <label><input type="checkbox" id="toggleSeason"> シーズン区分を表示する</label>
   </div>
 
-  <div class="scroll-fix-options">
-    <span class="indent">Tierの移動ボタンを押した後のカーソルの位置:</span>
-    <label><input type="radio" name="scrollFixMode" value="group-relative" checked> 移動前のランク</label>
-    <label><input type="radio" name="scrollFixMode" value="item-delta"> 移動後のランク</label>
-  </div>
-
-  <div id="idRangeFilters" class="id-range-filters"></div>
 
   <div class="share-url-tools">
+
     <button type="button" id="generateUrlButton">URLを生成する</button>
     <textarea id="generatedUrl" readonly rows="2" placeholder="生成されたURLがここに表示されます"></textarea>
   </div>
@@ -121,11 +117,19 @@
   </dialog>
 
   <h3>人格Tier</h3>
+  <details id="identityFilterDetails" class="id-range-filters">
+    <summary>フィルター</summary>
+    <div id="identityRangeFilters"></div>
+  </details>
   <table>
     <tbody id="resultBodyIdentity"></tbody>
   </table>
 
   <h3>E.G.O.Tier</h3>
+  <details id="egoFilterDetails" class="id-range-filters">
+    <summary>フィルター</summary>
+    <div id="egoRangeFilters"></div>
+  </details>
   <table>
     <tbody id="resultBodyEgo"></tbody>
   </table>
@@ -137,18 +141,18 @@
     const syncModeInputs = document.querySelectorAll('input[name="syncMode"]');
     const imgSizeForm = document.getElementById('imgSizeForm');
     const customWidthInput = document.getElementById('customWidth');
-    const toggleAdjustControlsInput = document.getElementById('toggleAdjustControls');
     const toggleExceptRowsInput = document.getElementById('toggleExceptRows');
     const toggleName1Input = document.getElementById('toggleName1');
     const toggleName2Input = document.getElementById('toggleName2');
     const toggleSeasonInput = document.getElementById('toggleSeason');
-    const toggleExceptMoveControlsInput = document.getElementById('toggleExceptMoveControls');
-    const idRangeFiltersEl = document.getElementById('idRangeFilters');
+    const identityRangeFiltersEl = document.getElementById('identityRangeFilters');
+    const egoRangeFiltersEl = document.getElementById('egoRangeFilters');
     const generateUrlButton = document.getElementById('generateUrlButton');
     const generatedUrlInput = document.getElementById('generatedUrl');
     const openLatestTierButton = document.getElementById('openLatestTierButton');
     const hiddenPrisonerDialog = document.getElementById('hiddenPrisonerDialog');
-    const scrollFixModeInputs = document.querySelectorAll('input[name="scrollFixMode"]');
+    const dragScrollZoneTop = document.getElementById('dragScrollZoneTop');
+    const dragScrollZoneBottom = document.getElementById('dragScrollZoneBottom');
 
     const state = {
       tierlist: null,
@@ -170,7 +174,9 @@
       nameDataById: new Map(),
       idMetaById: new Map(),
       changeParam: null,
-      scrollFixMode: 'group-relative',
+      draggingPayload: null,
+      dragScrollDirection: 0,
+      dragScrollAnimationId: null,
     };
 
     const GROUP_META = {
@@ -189,6 +195,7 @@
     const GENERATED_URL_BASE_WIDTH_PX = 900;
     const GENERATED_URL_BASE_ROWS = 2;
     const changecodingDIffID = 0; // 下位idが36を超えるとき手動で1に変更する
+    const DRAG_PAYLOAD_TYPE = 'application/x-tier-item';
 
 
     function calcValue(row, x) {
@@ -375,28 +382,7 @@
       return { name1, name2, season };
     }
 
-    function renderControlButtons(id, groupValue, isExcept, type) {
-      if (isExcept) {
-        return `<button type="button" data-action="toggle-except" data-include="1" data-id="${id}" data-type="${type}" data-group="${groupValue}">戻す</button>`;
-      }
-
-      const disablePlus2 = groupValue >= 8;
-      const disablePlus1 = groupValue >= 9;
-      const disableMinus1 = groupValue <= 1;
-      const disableMinus2 = groupValue <= 2;
-
-      return [
-        `<button type="button" data-action="move" data-delta="2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus2 ? 'disabled' : ''}>+2</button>`,
-        `<button type="button" data-action="move" data-delta="1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disablePlus1 ? 'disabled' : ''}>+1</button>`,
-        `<button type="button" data-action="toggle-except" data-include="0" data-id="${id}" data-type="${type}" data-group="${groupValue}">除外</button>`,
-        `<button type="button" data-action="move" data-delta="-1" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus1 ? 'disabled' : ''}>-1</button>`,
-        `<button type="button" data-action="move" data-delta="-2" data-id="${id}" data-type="${type}" data-group="${groupValue}" ${disableMinus2 ? 'disabled' : ''}> -2</button>`
-      ].join('');
-    }
-
     function renderImageCells(ids, groupValue, type) {
-      const isExcept = groupValue === 0;
-
       const items = ids.map((id) => {
         const src = type === 'identity' ? getIdentityImageUrl(id) : getEgoImageUrl(id);
         const { name1, name2, season } = getDisplayNames(id);
@@ -405,15 +391,12 @@
         const showSeason = Boolean(toggleSeasonInput?.checked && season);
 
         return `
-          <div class="id-item">
+          <div class="id-item" draggable="true" data-id="${id}" data-type="${type}" data-group="${groupValue}">
             <div class="id-main">
               <img src="${src}" alt="${id}" loading="lazy">
               ${showName1 ? `<div class="id-name id-name-primary">${escapeHtml(name1)}</div>` : ''}
               ${showName2 ? `<div class="id-name">${escapeHtml(name2)}</div>` : ''}
               ${showSeason ? `<div class="id-name">${escapeHtml(season)}</div>` : ''}
-            </div>
-            <div class="id-controls">
-              ${renderControlButtons(id, groupValue, isExcept, type)}
             </div>
           </div>
         `;
@@ -430,37 +413,18 @@
       return GROUP_META[groupValue]?.className ?? '';
     }
 
-    function getIdRangeFilters() {
+    function getPrisonerOptions(type) {
       const displayNames = [
         'イサン', 'ファウスト', 'ドンキホーテ', '良秀', 'ムルソー', 'ホンル',
         'ヒースクリフ', 'イシュメール', 'ロージャ', 'シンクレア', 'ウーティス', 'グレゴール'
       ];
 
-      const identity = displayNames.map((name, i) => ({ bucket: i + 1, name }));
-      const ego = displayNames.map((name, i) => ({ bucket: i + 13, name }));
-
-      return { identity, ego };
+      const offset = type === 'identity' ? 1 : 13;
+      return displayNames.map((name, i) => ({ key: String(i + offset), label: name }));
     }
 
-    function renderIdRangeFilters() {
-      if (!idRangeFiltersEl) {
-        return;
-      }
-
-      const { identity, ego } = getIdRangeFilters();
-      const identityRankOptions = [
-        { key: 'i-1', label: '<span class="digit-zero">0</span>(星1)' },
-        { key: 'i-2', label: '<span class="digit-zero">00</span>(星2)' },
-        { key: 'i-3', label: '<span class="digit-zero">000</span>(星3)' },
-      ];
-      const egoRankOptions = [
-        { key: 'e-1', label: 'ZAYIN' },
-        { key: 'e-2', label: 'TETH' },
-        { key: 'e-3', label: 'HE' },
-        { key: 'e-4', label: 'WAW' },
-        { key: 'e-5', label: 'ALEPH' },
-      ];
-      const seasonOptions = [
+    function getCommonSeasonOptions() {
+      return [
         { key: '恒常', label: '恒常' },
         { key: 'SEASON 1', label: 'シーズン1' },
         { key: 'SEASON 2', label: 'シ－ズン2' },
@@ -472,7 +436,10 @@
         { key: 'WALPURGISNACHT', label: 'ヴァルプルギスの夜' },
         { key: 'COLLABORATION-LIMITED', label: 'コラボ限定' },
       ];
-      const timeOptions = [
+    }
+
+    function getCommonTimeOptions() {
+      return [
         { key: '0,1', label: 'シーズン1' },
         { key: '2', label: 'シーズン2' },
         { key: '3', label: 'シーズン3' },
@@ -481,22 +448,49 @@
         { key: '6', label: 'シーズン6' },
         { key: '7', label: 'シーズン7' },
       ];
+    }
 
-      const renderOptions = (items, filterType) => items.map((item) => {
-        const key = filterType === 'bucket' ? item.bucket : item.key;
-        const label = filterType === 'bucket' ? item.name : item.label;
-        return `<label class="id-range-filter"><input type="checkbox" data-action="toggle-id-range" data-filter-type="${filterType}" data-key="${key}" checked> ${label}</label>`;
-      }).join('');
+    function getRankOptions(type) {
+      if (type === 'identity') {
+        return [
+          { key: 'i-1', label: '<span class="digit-zero">0</span>(星1)' },
+          { key: 'i-2', label: '<span class="digit-zero">00</span>(星2)' },
+          { key: 'i-3', label: '<span class="digit-zero">000</span>(星3)' },
+        ];
+      }
 
-      const renderGroupActions = () => '<div class="id-range-actions"><button type="button" data-action="check-group-ranges">全て☑に</button><button type="button" data-action="clear-group-ranges">全て☐に</button></div>';
+      return [
+        { key: 'e-1', label: 'ZAYIN' },
+        { key: 'e-2', label: 'TETH' },
+        { key: 'e-3', label: 'HE' },
+        { key: 'e-4', label: 'WAW' },
+        { key: 'e-5', label: 'ALEPH' },
+      ];
+    }
 
-      idRangeFiltersEl.innerHTML = [
-        `<div class="id-range-group"><p class="id-range-title">表示する人格</p><div class="id-range-options">${renderOptions(identity, 'bucket')}</div>${renderGroupActions()}</div>`,
-        `<div class="id-range-group"><p class="id-range-title">表示するE.G.O.</p><div class="id-range-options">${renderOptions(ego, 'bucket')}</div>${renderGroupActions()}</div>`,
-        `<div class="id-range-group-row"><div class="id-range-group"><p class="id-range-title">星</p><div class="id-range-options">${renderOptions(identityRankOptions, 'rank')}</div>${renderGroupActions()}</div><div class="id-range-group"><p class="id-range-title">危険ランク</p><div class="id-range-options">${renderOptions(egoRankOptions, 'rank')}</div>${renderGroupActions()}</div></div>`,
-        `<div class="id-range-group"><p class="id-range-title">区分</p><div class="id-range-options">${renderOptions(seasonOptions, 'season')}</div>${renderGroupActions()}</div>`,
-        `<div class="id-range-group"><p class="id-range-title">実装時期</p><div class="id-range-options">${renderOptions(timeOptions, 'time')}</div>${renderGroupActions()}</div>`
-      ].join('');
+    function renderFilterGroup(title, options, filterType) {
+      const optionHtml = options.map((item) => `<label class="id-range-filter"><input type="checkbox" data-action="toggle-id-range" data-filter-type="${filterType}" data-key="${item.key}" checked> ${item.label}</label>`).join('');
+      return `<div class="id-range-group"><p class="id-range-title">${title}</p><div class="id-range-options">${optionHtml}</div><div class="id-range-actions"><button type="button" data-action="check-group-ranges">全て☑に</button><button type="button" data-action="clear-group-ranges">全て☐に</button></div></div>`;
+    }
+
+    function renderIdRangeFilters() {
+      if (identityRangeFiltersEl) {
+        identityRangeFiltersEl.innerHTML = [
+          renderFilterGroup('囚人', getPrisonerOptions('identity'), 'bucket'),
+          renderFilterGroup('星', getRankOptions('identity'), 'rank'),
+          renderFilterGroup('区分', getCommonSeasonOptions(), 'season'),
+          renderFilterGroup('実装時期', getCommonTimeOptions(), 'time'),
+        ].join('');
+      }
+
+      if (egoRangeFiltersEl) {
+        egoRangeFiltersEl.innerHTML = [
+          renderFilterGroup('囚人', getPrisonerOptions('ego'), 'bucket'),
+          renderFilterGroup('危険ランク', getRankOptions('ego'), 'rank'),
+          renderFilterGroup('区分', getCommonSeasonOptions(), 'season'),
+          renderFilterGroup('実装時期', getCommonTimeOptions(), 'time'),
+        ].join('');
+      }
     }
 
     function setRangeFiltersInContainer(container, checked) {
@@ -518,16 +512,17 @@
 
 
     function setAllRangeFilters(checked) {
-      setRangeFiltersInContainer(idRangeFiltersEl, checked);
+      setRangeFiltersInContainer(identityRangeFiltersEl, checked);
+      setRangeFiltersInContainer(egoRangeFiltersEl, checked);
     }
 
-    function getActiveFilterKeys(filterType) {
-      if (!idRangeFiltersEl) {
+    function getActiveFilterKeys(container, filterType) {
+      if (!container) {
         return null;
       }
 
       const selected = new Set();
-      const checkboxes = idRangeFiltersEl.querySelectorAll(`input[data-action="toggle-id-range"][data-filter-type="${filterType}"]:checked`);
+      const checkboxes = container.querySelectorAll(`input[data-action="toggle-id-range"][data-filter-type="${filterType}"]:checked`);
       checkboxes.forEach((checkbox) => {
         const key = checkbox.dataset.key;
         if (typeof key === 'string' && key !== '') {
@@ -538,13 +533,30 @@
       return selected;
     }
 
+    function getFilterContainerByType(type) {
+      return type === 'identity' ? identityRangeFiltersEl : egoRangeFiltersEl;
+    }
+
+    function getFiltersByType(type) {
+      const container = getFilterContainerByType(type);
+      return {
+        buckets: getActiveFilterKeys(container, 'bucket'),
+        seasons: getActiveFilterKeys(container, 'season'),
+        ranks: getActiveFilterKeys(container, 'rank'),
+        times: getActiveFilterKeys(container, 'time'),
+      };
+    }
+
     function hasUncheckedRangeFilters() {
-      if (!idRangeFiltersEl) {
+      const containers = [identityRangeFiltersEl, egoRangeFiltersEl].filter(Boolean);
+      if (!containers.length) {
         return false;
       }
 
-      const checkboxes = idRangeFiltersEl.querySelectorAll('input[data-action="toggle-id-range"]');
-      return Array.from(checkboxes).some((checkbox) => !checkbox.checked);
+      return containers.some((container) => {
+        const checkboxes = container.querySelectorAll('input[data-action="toggle-id-range"]');
+        return Array.from(checkboxes).some((checkbox) => !checkbox.checked);
+      });
     }
 
     function getHiddenPrisonerIds() {
@@ -552,20 +564,17 @@
         return [];
       }
 
-      const filters = {
-        buckets: getActiveFilterKeys('bucket'),
-        seasons: getActiveFilterKeys('season'),
-        ranks: getActiveFilterKeys('rank'),
-        times: getActiveFilterKeys('time'),
-      };
-
-      if (!filters.buckets || !filters.seasons || !filters.ranks || !filters.times) {
-        return [];
-      }
-
       return state.tierlist
         .map((row) => row[0])
-        .filter((id) => !isIdVisibleByFilters(id, filters));
+        .filter((id) => {
+          const type = belongsToType(id, 'identity') ? 'identity' : 'ego';
+          const filters = getFiltersByType(type);
+          if (!filters.buckets || !filters.seasons || !filters.ranks || !filters.times) {
+            return false;
+          }
+
+          return !isIdVisibleByFilters(id, filters);
+        });
     }
 
     function getCurrentGroupOfId(id, type) {
@@ -758,7 +767,7 @@
           const orderedIds = orderVisibleIds(visibleIds);
           const label = getGroupLabel(groupValue);
           const tierClass = getGroupClass(groupValue);
-          return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(orderedIds, groupValue, type)}</td></tr>`;
+          return `<tr><td class="tier-label ${tierClass}">${label}</td><td class="tier-dropzone" data-dropzone="1" data-type="${type}" data-group="${groupValue}">${renderImageCells(orderedIds, groupValue, type)}</td></tr>`;
         }).join('');
     }
 
@@ -775,15 +784,11 @@
       }
 
       const showExceptRows = shouldShowExceptRows();
-      const filters = {
-        buckets: getActiveFilterKeys('bucket'),
-        seasons: getActiveFilterKeys('season'),
-        ranks: getActiveFilterKeys('rank'),
-        times: getActiveFilterKeys('time'),
-      };
+      const identityFilters = getFiltersByType('identity');
+      const egoFilters = getFiltersByType('ego');
 
-      bodyIdentityEl.innerHTML = renderTypeRows('identity', state.baseGroupedByType.identity, showExceptRows, filters);
-      bodyEgoEl.innerHTML = renderTypeRows('ego', state.baseGroupedByType.ego, showExceptRows, filters);
+      bodyIdentityEl.innerHTML = renderTypeRows('identity', state.baseGroupedByType.identity, showExceptRows, identityFilters);
+      bodyEgoEl.innerHTML = renderTypeRows('ego', state.baseGroupedByType.ego, showExceptRows, egoFilters);
     }
 
     function clearGeneratedUrl() {
@@ -796,111 +801,38 @@
       }
     }
 
-    function getSelectedScrollFixMode() {
-      const checked = document.querySelector('input[name="scrollFixMode"]:checked');
-      return checked ? checked.value : 'group-relative';
-    }
 
-    function renderRowsWithScrollFix(targetId, sourceGroup, type, cursorY) {
-      if (!state.tierlist || !Number.isFinite(state.x)) {
+    function moveToGroup(id, type, currentGroup, targetGroup) {
+      if (!Number.isInteger(id) || !Number.isInteger(currentGroup) || !Number.isInteger(targetGroup)) {
         return;
       }
 
-      const beforeImg = document.querySelector(`img[alt="${targetId}"]`);
-      if (!beforeImg) {
-        renderRows(state.tierlist, state.x);
+      if (targetGroup < 0 || targetGroup > 9 || currentGroup === targetGroup) {
         return;
       }
 
-      const mode = getSelectedScrollFixMode();
-      state.scrollFixMode = mode;
-
-      if (mode === 'group-relative') {
-        const beforeRow = beforeImg.closest('tr');
-        if (beforeRow && Number.isFinite(cursorY) && Number.isInteger(sourceGroup)) {
-          const beforeCursorOffset = cursorY - beforeRow.getBoundingClientRect().top;
-
-          renderRows(state.tierlist, state.x);
-
-          const tbody = type === 'identity' ? bodyIdentityEl : bodyEgoEl;
-          const sourceLabel = getGroupLabel(sourceGroup);
-          const afterSourceRow = tbody
-            ? Array.from(tbody.querySelectorAll('tr')).find((row) => row.querySelector('td')?.textContent === sourceLabel)
-            : null;
-
-          if (afterSourceRow) {
-            const afterRowTop = afterSourceRow.getBoundingClientRect().top;
-            const desiredTop = cursorY - beforeCursorOffset;
-            window.scrollBy(0, afterRowTop - desiredTop);
-            return;
-          }
-        }
-      }
-
-      const beforeTop = beforeImg.getBoundingClientRect().top;
-      renderRows(state.tierlist, state.x);
-      setTimeout(() => {
-        const afterImg = document.querySelector(`img[alt="${targetId}"]`);
-        if (!afterImg) {
-          return;
-        }
-
-        const afterTop = afterImg.getBoundingClientRect().top;
-        window.scrollBy(0, afterTop - beforeTop);
-      }, 0);
-    }
-
-    function handleMove(id, type, currentGroup, delta, cursorY) {
-      if (!Number.isInteger(id) || !Number.isInteger(currentGroup) || !Number.isInteger(delta)) {
-        return;
-      }
-
-      const target = currentGroup + delta;
-      if (target < 1 || target > 9) {
-        return;
-      }
-
-      getExceptSet(type).delete(id);
-      state.exceptRestoreGroupById.delete(id);
-      setManualGroupOverride(id, type, target);
-      clearGeneratedUrl();
-
-      renderRowsWithScrollFix(id, currentGroup, type, cursorY);
-    }
-
-    function handleExceptToggle(id, type, currentGroup, include, cursorY) {
-      if (!Number.isInteger(id) || !Number.isInteger(currentGroup)) {
-        return;
-      }
-
-      const exceptIds = getExceptSet(type);
-
-      if (include) {
-        exceptIds.delete(id);
-
-        const restoreGroup = state.exceptRestoreGroupById.get(id);
-        if (Number.isInteger(restoreGroup) && restoreGroup >= 1 && restoreGroup <= 9) {
-          setManualGroupOverride(id, type, restoreGroup);
-        }
-      } else {
+      if (targetGroup === 0) {
         if (currentGroup > 0) {
           state.exceptRestoreGroupById.set(id, currentGroup);
         }
 
-        exceptIds.add(id);
+        getExceptSet(type).add(id);
+      } else {
+        getExceptSet(type).delete(id);
+        state.exceptRestoreGroupById.delete(id);
+        setManualGroupOverride(id, type, targetGroup);
       }
 
       clearGeneratedUrl();
-
       if (state.tierlist && Number.isFinite(state.x)) {
-        renderRowsWithScrollFix(id, currentGroup, type, cursorY);
+        renderRows(state.tierlist, state.x);
       }
     }
 
-    function parseControlPayload(el) {
-      const id = Number.parseInt(el.dataset.id ?? '', 10);
-      const type = el.dataset.type;
-      const group = Number.parseInt(el.dataset.group ?? '', 10);
+    function parseItemPayload(el) {
+      const id = Number.parseInt(el?.dataset?.id ?? '', 10);
+      const type = el?.dataset?.type;
+      const group = Number.parseInt(el?.dataset?.group ?? '', 10);
 
       if (!Number.isInteger(id) || !Number.isInteger(group) || (type !== 'identity' && type !== 'ego')) {
         return null;
@@ -909,55 +841,209 @@
       return { id, type, group };
     }
 
-    function onControlClick(event) {
-      const controlButton = event.target.closest('button[data-action]');
-      if (!controlButton) {
+    function parseDragPayload(event) {
+      const payloadRaw = event.dataTransfer?.getData(DRAG_PAYLOAD_TYPE)
+        || event.dataTransfer?.getData('text/plain');
+
+      if (payloadRaw) {
+        try {
+          const payload = JSON.parse(payloadRaw);
+          const { id, type, group } = payload;
+
+          if (Number.isInteger(id) && Number.isInteger(group) && (type === 'identity' || type === 'ego')) {
+            return payload;
+          }
+        } catch {
+          // no-op
+        }
+      }
+
+      const fallback = state.draggingPayload;
+      if (!fallback) {
+        return null;
+      }
+
+      const { id, type, group } = fallback;
+      if (!Number.isInteger(id) || !Number.isInteger(group) || (type !== 'identity' && type !== 'ego')) {
+        return null;
+      }
+
+      return fallback;
+    }
+
+    function clearDropHighlights() {
+      document.querySelectorAll('.tier-dropzone.drag-over').forEach((dropzone) => {
+        dropzone.classList.remove('drag-over');
+      });
+    }
+
+    function setDragScrollDirection(direction) {
+      state.dragScrollDirection = direction;
+      if (dragScrollZoneTop) {
+        dragScrollZoneTop.classList.toggle('active', direction < 0);
+      }
+      if (dragScrollZoneBottom) {
+        dragScrollZoneBottom.classList.toggle('active', direction > 0);
+      }
+    }
+
+    function stopDragAutoScroll() {
+      setDragScrollDirection(0);
+      if (state.dragScrollAnimationId !== null) {
+        window.cancelAnimationFrame(state.dragScrollAnimationId);
+        state.dragScrollAnimationId = null;
+      }
+    }
+
+    function startDragAutoScroll(direction) {
+      setDragScrollDirection(direction);
+      if (state.dragScrollAnimationId !== null) {
         return;
       }
 
-      const payload = parseControlPayload(controlButton);
+      const step = () => {
+        if (!state.draggingPayload || state.dragScrollDirection === 0) {
+          state.dragScrollAnimationId = null;
+          return;
+        }
+
+        window.scrollBy(0, state.dragScrollDirection * 18);
+        state.dragScrollAnimationId = window.requestAnimationFrame(step);
+      };
+
+      state.dragScrollAnimationId = window.requestAnimationFrame(step);
+    }
+
+    function onDragStart(event) {
+      const item = event.target.closest('.id-item[draggable="true"]');
+      if (!item || !event.dataTransfer) {
+        return;
+      }
+
+      const payload = parseItemPayload(item);
       if (!payload) {
         return;
       }
 
-      if (controlButton.dataset.action === 'move') {
-        const delta = Number.parseInt(controlButton.dataset.delta ?? '', 10);
-        handleMove(payload.id, payload.type, payload.group, delta, event.clientY);
+      const payloadText = JSON.stringify(payload);
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData(DRAG_PAYLOAD_TYPE, payloadText);
+      event.dataTransfer.setData('text/plain', payloadText);
+      state.draggingPayload = payload;
+      document.body.classList.add('dragging-item');
+      stopDragAutoScroll();
+      item.classList.add('dragging');
+    }
+
+    function onDragEnd() {
+      document.querySelectorAll('.id-item.dragging').forEach((item) => {
+        item.classList.remove('dragging');
+      });
+      state.draggingPayload = null;
+      document.body.classList.remove('dragging-item');
+      stopDragAutoScroll();
+      clearDropHighlights();
+    }
+
+    function onDragOver(event) {
+      const dropzone = event.target.closest('.tier-dropzone[data-dropzone="1"]');
+      if (!dropzone) {
         return;
       }
 
-      if (controlButton.dataset.action === 'toggle-except') {
-        const include = controlButton.dataset.include === '1';
-        handleExceptToggle(payload.id, payload.type, payload.group, include, event.clientY);
+      const payload = parseDragPayload(event);
+      if (!payload) {
+        return;
       }
+
+      if (dropzone.dataset.type !== payload.type) {
+        return;
+      }
+
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+      stopDragAutoScroll();
+      clearDropHighlights();
+      dropzone.classList.add('drag-over');
     }
 
-    bodyIdentityEl.addEventListener('click', onControlClick);
-    bodyEgoEl.addEventListener('click', onControlClick);
+    function onDrop(event) {
+      const dropzone = event.target.closest('.tier-dropzone[data-dropzone="1"]');
+      if (!dropzone) {
+        return;
+      }
 
-    function applyAdjustControlVisibility(show) {
-      document.body.classList.toggle('hide-adjust-controls', !show);
+      const payload = parseDragPayload(event);
+      if (!payload) {
+        return;
+      }
+
+      const targetGroup = Number.parseInt(dropzone.dataset.group ?? '', 10);
+      const targetType = dropzone.dataset.type;
+
+      if (!Number.isInteger(targetGroup) || targetType !== payload.type) {
+        return;
+      }
+
+      event.preventDefault();
+      moveToGroup(payload.id, payload.type, payload.group, targetGroup);
+      state.draggingPayload = null;
+      document.body.classList.remove('dragging-item');
+      stopDragAutoScroll();
+      clearDropHighlights();
     }
 
-    function applyExceptMoveControlVisibility(show) {
-      document.body.classList.toggle('hide-except-move-controls', !show);
-    }
+    [bodyIdentityEl, bodyEgoEl].forEach((el) => {
+      el.addEventListener('dragstart', onDragStart);
+      el.addEventListener('dragend', onDragEnd);
+      el.addEventListener('dragover', onDragOver);
+      el.addEventListener('drop', onDrop);
+      el.addEventListener('dragleave', (event) => {
+        const dropzone = event.target.closest('.tier-dropzone[data-dropzone="1"]');
+        if (dropzone && !dropzone.contains(event.relatedTarget)) {
+          dropzone.classList.remove('drag-over');
+        }
+      });
+    });
 
-    if (toggleAdjustControlsInput) {
-      toggleAdjustControlsInput.addEventListener('change', () => {
-        applyAdjustControlVisibility(toggleAdjustControlsInput.checked);
+
+    function bindDragScrollZone(zoneEl, direction) {
+      if (!zoneEl) {
+        return;
+      }
+
+      zoneEl.addEventListener('dragover', (event) => {
+        if (!state.draggingPayload) {
+          return;
+        }
+
+        event.preventDefault();
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = 'move';
+        }
+        startDragAutoScroll(direction);
       });
 
-      applyAdjustControlVisibility(toggleAdjustControlsInput.checked);
-    }
+      zoneEl.addEventListener('dragenter', (event) => {
+        if (!state.draggingPayload) {
+          return;
+        }
 
-    if (toggleExceptMoveControlsInput) {
-      toggleExceptMoveControlsInput.addEventListener('change', () => {
-        applyExceptMoveControlVisibility(toggleExceptMoveControlsInput.checked);
+        event.preventDefault();
+        startDragAutoScroll(direction);
       });
 
-      applyExceptMoveControlVisibility(toggleExceptMoveControlsInput.checked);
+      zoneEl.addEventListener('dragleave', () => {
+        stopDragAutoScroll();
+      });
+
+      zoneEl.addEventListener('drop', (event) => {
+        event.preventDefault();
+      });
     }
+
+    bindDragScrollZone(dragScrollZoneTop, -1);
+    bindDragScrollZone(dragScrollZoneBottom, 1);
 
     if (toggleExceptRowsInput) {
       toggleExceptRowsInput.addEventListener('change', () => {
@@ -981,8 +1067,8 @@
 
     renderIdRangeFilters();
 
-    if (idRangeFiltersEl) {
-      idRangeFiltersEl.addEventListener('change', (event) => {
+    [identityRangeFiltersEl, egoRangeFiltersEl].filter(Boolean).forEach((filterRoot) => {
+      filterRoot.addEventListener('change', (event) => {
         const target = event.target;
         if (!(target instanceof HTMLInputElement) || target.dataset.action !== 'toggle-id-range') {
           return;
@@ -993,7 +1079,7 @@
         }
       });
 
-      idRangeFiltersEl.addEventListener('click', (event) => {
+      filterRoot.addEventListener('click', (event) => {
         const button = event.target.closest('button[data-action]');
         if (!button) {
           return;
@@ -1007,7 +1093,7 @@
         const container = button.closest('.id-range-group');
         setRangeFiltersInContainer(container, action === 'check-group-ranges');
       });
-    }
+    });
 
     function encodeDiffId(id) {
       const high = Math.floor(id / 1000);
@@ -1351,11 +1437,6 @@
 
       state.changeParam = changeParam;
 
-      if (toggleAdjustControlsInput && (changeParam === '1' || changeParam === '2')) {
-        toggleAdjustControlsInput.checked = false;
-        applyAdjustControlVisibility(false);
-      }
-
       if (statusEl) {
         statusEl.hidden = !(changeParam !== null && changeParam !== '');
       }
@@ -1460,12 +1541,6 @@
         if (state.tierlist && Number.isFinite(state.x)) {
           renderRows(state.tierlist, state.x);
         }
-      });
-    });
-
-    scrollFixModeInputs.forEach((input) => {
-      input.addEventListener('change', () => {
-        state.scrollFixMode = input.value;
       });
     });
 
