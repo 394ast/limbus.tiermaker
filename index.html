@@ -81,10 +81,23 @@
       .scroll-zone.hovered { background: rgba(40, 116, 240, 0.72); }
       #topScrollZone { top: 0; }
       #bottomScrollZone { bottom: 0; }
+      .inline-link-button {
+        border: none;
+        background: none;
+        color: #1a73e8;
+        text-decoration: underline;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 0;
+      }
     </style>
 </head>
 <body>
   <h2>みんなでつくる　リンバスTier表</h2>
+  <details>
+    <summary>説明（最初に読んでね）</summary>
+    <button type="button" id="openShareToolButton" class="inline-link-button">リンバス所持人格E.G.O共有ツール</button>
+  </details>
   <button type="button" id="openLatestTierButton">現在のみんなでつくったTier表を表示</button>
   <div id="topScrollZone" class="scroll-zone" aria-hidden="true">画面を上にスクロール</div>
   <div id="bottomScrollZone" class="scroll-zone" aria-hidden="true">画面を下にスクロール</div>
@@ -182,6 +195,7 @@
     const generateUrlButton = document.getElementById('generateUrlButton');
     const generatedUrlInput = document.getElementById('generatedUrl');
     const openLatestTierButton = document.getElementById('openLatestTierButton');
+    const openShareToolButton = document.getElementById('openShareToolButton');
     const hiddenPrisonerDialog = document.getElementById('hiddenPrisonerDialog');
     const tierMoveDisabledDialog = document.getElementById('tierMoveDisabledDialog');
     const topScrollZone = document.getElementById('topScrollZone');
@@ -1729,6 +1743,20 @@
 
     if (openLatestTierButton) {
       openLatestTierButton.addEventListener('click', openLatestTierWithCushion);
+    }
+
+    if (openShareToolButton) {
+      openShareToolButton.addEventListener('click', openShareToolWithCushion);
+    }
+
+
+    function openShareToolWithCushion() {
+      const ok = window.confirm('https://394ast.github.io/limbus.sharetool/top に移動します。\nよろしいですか？');
+      if (!ok) {
+        return;
+      }
+
+      window.location.href = 'https://394ast.github.io/limbus.sharetool/top';
     }
 
 
