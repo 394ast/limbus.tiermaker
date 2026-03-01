@@ -1981,7 +1981,7 @@
           return;
         }
 
-        latestTierMetaEl.innerHTML = `（現在${voters}人でつくったTier表です）<span class="latest-tier-meta-date">（最終更新${dateText}）</span>`;
+        latestTierMetaEl.innerHTML = `（現在${voters}人でつくったTier表です）<span class="latest-tier-meta-date">（最終更新:${dateText}）</span>`;
         latestTierMetaEl.hidden = false;
       } catch {
         latestTierMetaEl.hidden = true;
