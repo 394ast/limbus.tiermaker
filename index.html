@@ -42,6 +42,7 @@
       .id-item.diff-alert { background: #ff5b5b; border-color: #c80000; }
       .id-item[draggable="true"] { cursor: grab; }
       .id-item.dragging { opacity: 0.5; cursor: grabbing; }
+      .id-item[draggable="true"] { touch-action: none; }
       .tier-dropzone.drag-over { background: rgba(66, 133, 244, 0.14); outline: 2px dashed #4285f4; outline-offset: -2px; }
       .id-item img { width: var(--img-size, 56px); height: var(--img-size, 56px); object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
       .id-main { display: grid; gap: 2px; justify-items: center; }
@@ -256,6 +257,7 @@
       changeParam: null,
       draggingPayload: null,
       sharetoolExceptIds: null,
+      pointerDragging: null,
     };
 
     const GROUP_META = {
@@ -1243,18 +1245,122 @@
       }
     }
 
+    function extractDropzoneFromPoint(clientX, clientY) {
+      const pointTarget = document.elementFromPoint(clientX, clientY);
+      const dropzone = pointTarget?.closest?.('.tier-dropzone[data-dropzone="1"]');
+      const topZoneHovered = Boolean(pointTarget?.closest?.('#topScrollZone'));
+      const bottomZoneHovered = Boolean(pointTarget?.closest?.('#bottomScrollZone'));
+
+      return { dropzone, topZoneHovered, bottomZoneHovered };
+    }
+
+    function onPointerDown(event) {
+      if (event.pointerType === 'mouse') {
+        return;
+      }
+
+      if (!isTierMoveEnabled()) {
+        promptTierMoveDisabledChoice();
+        return;
+      }
+
+      const item = event.target.closest('.id-item[draggable="true"]');
+      if (!item) {
+        return;
+      }
+
+      const payload = parseItemPayload(item);
+      if (!payload) {
+        return;
+      }
+
+      state.pointerDragging = {
+        pointerId: event.pointerId,
+        payload,
+      };
+      state.draggingPayload = payload;
+      item.classList.add('dragging');
+      item.setPointerCapture?.(event.pointerId);
+      setScrollZonesVisible(true);
+      startAutoScrollLoop();
+      event.preventDefault();
+    }
+
+    function onPointerMove(event) {
+      const pointerDragging = state.pointerDragging;
+      if (!pointerDragging || pointerDragging.pointerId !== event.pointerId) {
+        return;
+      }
+
+      const { dropzone, topZoneHovered, bottomZoneHovered } = extractDropzoneFromPoint(event.clientX, event.clientY);
+
+      if (topZoneHovered) {
+        setAutoScrollDirection(-1);
+      } else if (bottomZoneHovered) {
+        setAutoScrollDirection(1);
+      } else {
+        setAutoScrollDirection(0);
+      }
+
+      clearDropHighlights();
+      if (dropzone && dropzone.dataset.type === pointerDragging.payload.type) {
+        dropzone.classList.add('drag-over');
+      }
+
+      event.preventDefault();
+    }
+
+    function finishPointerDrag(event, options = {}) {
+      const pointerDragging = state.pointerDragging;
+      if (!pointerDragging || pointerDragging.pointerId !== event.pointerId) {
+        return;
+      }
+
+      const shouldDrop = options.shouldDrop !== false;
+      if (shouldDrop && isTierMoveEnabled()) {
+        const { dropzone } = extractDropzoneFromPoint(event.clientX, event.clientY);
+        if (dropzone) {
+          const targetGroup = Number.parseInt(dropzone.dataset.group ?? '', 10);
+          const targetType = dropzone.dataset.type;
+          const payload = pointerDragging.payload;
+
+          if (Number.isInteger(targetGroup) && targetType === payload.type) {
+            moveToGroup(payload.id, payload.type, payload.group, targetGroup);
+          }
+        }
+      }
+
+      document.querySelectorAll('.id-item.dragging').forEach((item) => {
+        item.classList.remove('dragging');
+      });
+      state.pointerDragging = null;
+      state.draggingPayload = null;
+      clearDropHighlights();
+      setScrollZonesVisible(false);
+      setAutoScrollDirection(0);
+    }
+
     [bodyIdentityEl, bodyEgoEl].forEach((el) => {
       el.addEventListener('dragstart', onDragStart);
       el.addEventListener('dragend', onDragEnd);
       el.addEventListener('dragover', onDragOver);
       el.addEventListener('drop', onDrop);
       el.addEventListener('dblclick', onItemDoubleClick);
+      el.addEventListener('pointerdown', onPointerDown);
       el.addEventListener('dragleave', (event) => {
         const dropzone = event.target.closest('.tier-dropzone[data-dropzone="1"]');
         if (dropzone && !dropzone.contains(event.relatedTarget)) {
           dropzone.classList.remove('drag-over');
         }
       });
+    });
+
+    document.addEventListener('pointermove', onPointerMove, { passive: false });
+    document.addEventListener('pointerup', (event) => {
+      finishPointerDrag(event);
+    });
+    document.addEventListener('pointercancel', (event) => {
+      finishPointerDrag(event, { shouldDrop: false });
     });
 
     setupScrollZone(topScrollZone, -1);
