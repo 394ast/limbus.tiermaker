@@ -39,6 +39,9 @@
       .error { color: #b00020; }
       .id-items { display: flex; flex-wrap: wrap; gap: 2px; justify-content: flex-start; }
       .id-item { display: flex; align-items: center; gap: 6px; border: 1px solid #ddd; border-radius: 4px; padding: 2px; background: #fff; }
+      .id-item[draggable="true"] { cursor: grab; }
+      .id-item.dragging { opacity: 0.5; cursor: grabbing; }
+      .tier-dropzone.drag-over { background: rgba(66, 133, 244, 0.14); outline: 2px dashed #4285f4; outline-offset: -2px; }
       .id-item img { width: var(--img-size, 56px); height: var(--img-size, 56px); object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
       .id-main { display: grid; gap: 2px; justify-items: center; }
       .id-name { font-size: 13px; line-height: 1.2; text-align: center; word-break: break-word; }
@@ -189,6 +192,7 @@
     const GENERATED_URL_BASE_WIDTH_PX = 900;
     const GENERATED_URL_BASE_ROWS = 2;
     const changecodingDIffID = 0; // 下位idが36を超えるとき手動で1に変更する
+    const DRAG_PAYLOAD_TYPE = 'application/x-tier-item';
 
 
     function calcValue(row, x) {
@@ -405,7 +409,7 @@
         const showSeason = Boolean(toggleSeasonInput?.checked && season);
 
         return `
-          <div class="id-item">
+          <div class="id-item" draggable="true" data-id="${id}" data-type="${type}" data-group="${groupValue}">
             <div class="id-main">
               <img src="${src}" alt="${id}" loading="lazy">
               ${showName1 ? `<div class="id-name id-name-primary">${escapeHtml(name1)}</div>` : ''}
@@ -758,7 +762,7 @@
           const orderedIds = orderVisibleIds(visibleIds);
           const label = getGroupLabel(groupValue);
           const tierClass = getGroupClass(groupValue);
-          return `<tr><td class="tier-label ${tierClass}">${label}</td><td>${renderImageCells(orderedIds, groupValue, type)}</td></tr>`;
+          return `<tr><td class="tier-label ${tierClass}">${label}</td><td class="tier-dropzone" data-dropzone="1" data-type="${type}" data-group="${groupValue}">${renderImageCells(orderedIds, groupValue, type)}</td></tr>`;
         }).join('');
     }
 
@@ -897,6 +901,30 @@
       }
     }
 
+    function moveToGroup(id, type, currentGroup, targetGroup) {
+      if (!Number.isInteger(id) || !Number.isInteger(currentGroup) || !Number.isInteger(targetGroup)) {
+        return;
+      }
+
+      if (targetGroup < 0 || targetGroup > 9 || currentGroup === targetGroup) {
+        return;
+      }
+
+      if (targetGroup === 0) {
+        if (currentGroup > 0) {
+          state.exceptRestoreGroupById.set(id, currentGroup);
+        }
+        getExceptSet(type).add(id);
+      } else {
+        getExceptSet(type).delete(id);
+        state.exceptRestoreGroupById.delete(id);
+        setManualGroupOverride(id, type, targetGroup);
+      }
+
+      clearGeneratedUrl();
+      renderRows(state.tierlist, state.x);
+    }
+
     function parseControlPayload(el) {
       const id = Number.parseInt(el.dataset.id ?? '', 10);
       const type = el.dataset.type;
@@ -934,6 +962,115 @@
 
     bodyIdentityEl.addEventListener('click', onControlClick);
     bodyEgoEl.addEventListener('click', onControlClick);
+
+    function parseDragPayload(event) {
+      const payloadRaw = event.dataTransfer?.getData(DRAG_PAYLOAD_TYPE)
+        || event.dataTransfer?.getData('text/plain');
+      if (!payloadRaw) {
+        return null;
+      }
+
+      try {
+        const payload = JSON.parse(payloadRaw);
+        const { id, type, group } = payload;
+
+        if (!Number.isInteger(id) || !Number.isInteger(group) || (type !== 'identity' && type !== 'ego')) {
+          return null;
+        }
+
+        return payload;
+      } catch {
+        return null;
+      }
+    }
+
+    function clearDropHighlights() {
+      document.querySelectorAll('.tier-dropzone.drag-over').forEach((dropzone) => {
+        dropzone.classList.remove('drag-over');
+      });
+    }
+
+    function onDragStart(event) {
+      const item = event.target.closest('.id-item[draggable="true"]');
+      if (!item || !event.dataTransfer) {
+        return;
+      }
+
+      const payload = parseControlPayload(item);
+      if (!payload) {
+        return;
+      }
+
+      const payloadText = JSON.stringify(payload);
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData(DRAG_PAYLOAD_TYPE, payloadText);
+      event.dataTransfer.setData('text/plain', payloadText);
+      item.classList.add('dragging');
+    }
+
+    function onDragEnd() {
+      document.querySelectorAll('.id-item.dragging').forEach((item) => {
+        item.classList.remove('dragging');
+      });
+      clearDropHighlights();
+    }
+
+    function onDragOver(event) {
+      const dropzone = event.target.closest('.tier-dropzone[data-dropzone="1"]');
+      if (!dropzone) {
+        return;
+      }
+
+      const payload = parseDragPayload(event);
+      if (!payload) {
+        return;
+      }
+
+      if (dropzone.dataset.type !== payload.type) {
+        return;
+      }
+
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+      clearDropHighlights();
+      dropzone.classList.add('drag-over');
+    }
+
+    function onDrop(event) {
+      const dropzone = event.target.closest('.tier-dropzone[data-dropzone="1"]');
+      if (!dropzone) {
+        return;
+      }
+
+      const payload = parseDragPayload(event);
+      if (!payload) {
+        return;
+      }
+
+      const targetGroup = Number.parseInt(dropzone.dataset.group ?? '', 10);
+      const targetType = dropzone.dataset.type;
+
+      if (!Number.isInteger(targetGroup) || targetType !== payload.type) {
+        return;
+      }
+
+      event.preventDefault();
+      moveToGroup(payload.id, payload.type, payload.group, targetGroup);
+      clearDropHighlights();
+    }
+
+    [bodyIdentityEl, bodyEgoEl].forEach((el) => {
+      el.addEventListener('dragstart', onDragStart);
+      el.addEventListener('dragend', onDragEnd);
+      el.addEventListener('dragover', onDragOver);
+      el.addEventListener('drop', onDrop);
+      el.addEventListener('dragleave', (event) => {
+        const dropzone = event.target.closest('.tier-dropzone[data-dropzone="1"]');
+        if (dropzone && !dropzone.contains(event.relatedTarget)) {
+          dropzone.classList.remove('drag-over');
+        }
+      });
+    });
 
     function applyAdjustControlVisibility(show) {
       document.body.classList.toggle('hide-adjust-controls', !show);
