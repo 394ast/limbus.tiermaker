@@ -57,6 +57,11 @@
       .hidden-prisoner-actions { display: grid; gap: 8px; }
       .hidden-prisoner-actions button { font-size: 14px; padding: 7px 10px; text-align: left; }
       #openLatestTierButton { margin: 4px 0 12px; font-size: 13px; padding: 4px 10px; }
+      .drag-scroll-zone { position: fixed; left: 0; width: 100%; height: 56px; display: none; align-items: center; justify-content: center; z-index: 1200; font-weight: 700; color: #fff; pointer-events: auto; user-select: none; }
+      .drag-scroll-zone-top { top: 0; background: linear-gradient(to bottom, rgba(33, 33, 33, 0.9), rgba(33, 33, 33, 0.65)); }
+      .drag-scroll-zone-bottom { bottom: 0; background: linear-gradient(to top, rgba(33, 33, 33, 0.9), rgba(33, 33, 33, 0.65)); }
+      .drag-scroll-zone.active { background: rgba(33, 33, 33, 0.95); }
+      body.dragging-item .drag-scroll-zone { display: flex; }
     </style>
 </head>
 <body>
@@ -64,6 +69,9 @@
   <button type="button" id="openLatestTierButton">現在のみんなでつくったTier表を表示</button>
 
   <div id="status" aria-live="polite" hidden></div>
+
+  <div id="dragScrollZoneTop" class="drag-scroll-zone drag-scroll-zone-top">画面を上にスクロール</div>
+  <div id="dragScrollZoneBottom" class="drag-scroll-zone drag-scroll-zone-bottom">画面を下にスクロール</div>
 
   
 
@@ -143,6 +151,8 @@
     const generatedUrlInput = document.getElementById('generatedUrl');
     const openLatestTierButton = document.getElementById('openLatestTierButton');
     const hiddenPrisonerDialog = document.getElementById('hiddenPrisonerDialog');
+    const dragScrollZoneTop = document.getElementById('dragScrollZoneTop');
+    const dragScrollZoneBottom = document.getElementById('dragScrollZoneBottom');
 
     const state = {
       tierlist: null,
@@ -165,6 +175,8 @@
       idMetaById: new Map(),
       changeParam: null,
       draggingPayload: null,
+      dragScrollDirection: 0,
+      dragScrollAnimationId: null,
     };
 
     const GROUP_META = {
@@ -844,7 +856,6 @@
         } catch {
           // no-op
         }
-      }
 
       const fallback = state.draggingPayload;
       if (!fallback) {
@@ -865,6 +876,43 @@
       });
     }
 
+    function setDragScrollDirection(direction) {
+      state.dragScrollDirection = direction;
+      if (dragScrollZoneTop) {
+        dragScrollZoneTop.classList.toggle('active', direction < 0);
+      }
+      if (dragScrollZoneBottom) {
+        dragScrollZoneBottom.classList.toggle('active', direction > 0);
+      }
+    }
+
+    function stopDragAutoScroll() {
+      setDragScrollDirection(0);
+      if (state.dragScrollAnimationId !== null) {
+        window.cancelAnimationFrame(state.dragScrollAnimationId);
+        state.dragScrollAnimationId = null;
+      }
+    }
+
+    function startDragAutoScroll(direction) {
+      setDragScrollDirection(direction);
+      if (state.dragScrollAnimationId !== null) {
+        return;
+      }
+
+      const step = () => {
+        if (!state.draggingPayload || state.dragScrollDirection === 0) {
+          state.dragScrollAnimationId = null;
+          return;
+        }
+
+        window.scrollBy(0, state.dragScrollDirection * 18);
+        state.dragScrollAnimationId = window.requestAnimationFrame(step);
+      };
+
+      state.dragScrollAnimationId = window.requestAnimationFrame(step);
+    }
+
     function onDragStart(event) {
       const item = event.target.closest('.id-item[draggable="true"]');
       if (!item || !event.dataTransfer) {
@@ -881,6 +929,8 @@
       event.dataTransfer.setData(DRAG_PAYLOAD_TYPE, payloadText);
       event.dataTransfer.setData('text/plain', payloadText);
       state.draggingPayload = payload;
+      document.body.classList.add('dragging-item');
+      stopDragAutoScroll();
       item.classList.add('dragging');
     }
 
@@ -889,6 +939,8 @@
         item.classList.remove('dragging');
       });
       state.draggingPayload = null;
+      document.body.classList.remove('dragging-item');
+      stopDragAutoScroll();
       clearDropHighlights();
     }
 
@@ -909,6 +961,7 @@
 
       event.preventDefault();
       event.dataTransfer.dropEffect = 'move';
+      stopDragAutoScroll();
       clearDropHighlights();
       dropzone.classList.add('drag-over');
     }
@@ -934,6 +987,8 @@
       event.preventDefault();
       moveToGroup(payload.id, payload.type, payload.group, targetGroup);
       state.draggingPayload = null;
+      document.body.classList.remove('dragging-item');
+      stopDragAutoScroll();
       clearDropHighlights();
     }
 
@@ -949,6 +1004,45 @@
         }
       });
     });
+
+
+    function bindDragScrollZone(zoneEl, direction) {
+      if (!zoneEl) {
+        return;
+      }
+
+      zoneEl.addEventListener('dragover', (event) => {
+        if (!state.draggingPayload) {
+          return;
+        }
+
+        event.preventDefault();
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = 'move';
+        }
+        startDragAutoScroll(direction);
+      });
+
+      zoneEl.addEventListener('dragenter', (event) => {
+        if (!state.draggingPayload) {
+          return;
+        }
+
+        event.preventDefault();
+        startDragAutoScroll(direction);
+      });
+
+      zoneEl.addEventListener('dragleave', () => {
+        stopDragAutoScroll();
+      });
+
+      zoneEl.addEventListener('drop', (event) => {
+        event.preventDefault();
+      });
+    }
+
+    bindDragScrollZone(dragScrollZoneTop, -1);
+    bindDragScrollZone(dragScrollZoneBottom, 1);
 
     if (toggleExceptRowsInput) {
       toggleExceptRowsInput.addEventListener('change', () => {
