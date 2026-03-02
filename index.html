@@ -40,12 +40,8 @@
       .id-items { display: flex; flex-wrap: wrap; gap: 2px; justify-content: flex-start; }
       .id-item { display: flex; align-items: center; gap: 6px; border: 1px solid #ddd; border-radius: 4px; padding: 2px; background: #fff; }
       .id-item.diff-alert { background: #ff5b5b; border-color: #c80000; }
-<<<<<<< codex-8urazh
       .id-item.selected-for-move { border-color: #005fcc; box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.55); background: #e8f1ff; }
       .tier-dropzone.target-selectable { outline: 3px dotted #1a73e8; outline-offset: -4px; }
-=======
-      .id-item.selected-for-move { border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.25); }
->>>>>>> main
       .id-item[draggable="true"] { cursor: grab; }
       .id-item.dragging { opacity: 0.5; cursor: grabbing; }
       .tier-dropzone.drag-over { background: rgba(66, 133, 244, 0.14); outline: 2px dashed #4285f4; outline-offset: -2px; }
@@ -508,10 +504,7 @@
           && state.selectedMovePayload.id === id
           && state.selectedMovePayload.type === type
         );
-<<<<<<< codex-8urazh
-=======
-
->>>>>>> main
+          
         return `
           <div class="id-item${shouldHighlightDiffAlert(id, type) ? " diff-alert" : ""}${isSelectedForMove ? " selected-for-move" : ""}" draggable="true" data-id="${id}" data-type="${type}" data-group="${groupValue}">
             <div class="id-main">
@@ -1255,7 +1248,6 @@
       state.selectedMovePayload = payload;
       renderRows(state.tierlist, state.x);
     }
-<<<<<<< codex-8urazh
 
     function onDropzoneClick(event) {
       if (!isTierMoveEnabled()) {
@@ -1288,34 +1280,6 @@
         return;
       }
 
-=======
-
-    function onDropzoneClick(event) {
-      if (!isTierMoveEnabled()) {
-        return;
-      }
-
-      if (!state.selectedMovePayload) {
-        return;
-      }
-
-      const dropzone = event.target.closest('.tier-dropzone[data-dropzone="1"]');
-      if (!dropzone) {
-        return;
-      }
-
-      const targetGroup = Number.parseInt(dropzone.dataset.group ?? '', 10);
-      const targetType = dropzone.dataset.type;
-      if (!Number.isInteger(targetGroup) || targetType !== state.selectedMovePayload.type) {
-        return;
-      }
-
-      const currentGroup = getCurrentGroupOfId(state.selectedMovePayload.id, state.selectedMovePayload.type);
-      if (!Number.isInteger(currentGroup) || currentGroup === targetGroup) {
-        return;
-      }
-
->>>>>>> main
       moveToGroup(state.selectedMovePayload.id, state.selectedMovePayload.type, currentGroup, targetGroup);
       state.selectedMovePayload = null;
       renderRows(state.tierlist, state.x);
