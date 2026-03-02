@@ -40,6 +40,8 @@
       .id-items { display: flex; flex-wrap: wrap; gap: 2px; justify-content: flex-start; }
       .id-item { display: flex; align-items: center; gap: 6px; border: 1px solid #ddd; border-radius: 4px; padding: 2px; background: #fff; }
       .id-item.diff-alert { background: #ff5b5b; border-color: #c80000; }
+      .id-item.selected-for-move { border-color: #005fcc; box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.55); background: #e8f1ff; }
+      .tier-dropzone.target-selectable { outline: 3px dotted #1a73e8; outline-offset: -4px; }
       .id-item[draggable="true"] { cursor: grab; }
       .id-item.dragging { opacity: 0.5; cursor: grabbing; }
       .tier-dropzone.drag-over { background: rgba(66, 133, 244, 0.14); outline: 2px dashed #4285f4; outline-offset: -2px; }
@@ -255,6 +257,7 @@
       idMetaById: new Map(),
       changeParam: null,
       draggingPayload: null,
+      selectedMovePayload: null,
       sharetoolExceptIds: null,
     };
 
@@ -496,9 +499,13 @@
         const showName1 = Boolean(toggleName1Input?.checked && name1);
         const showName2 = Boolean(toggleName2Input?.checked && name2);
         const showSeason = Boolean(toggleSeasonInput?.checked && season);
-
+        const isSelectedForMove = (
+          state.selectedMovePayload
+          && state.selectedMovePayload.id === id
+          && state.selectedMovePayload.type === type
+        );
         return `
-          <div class="id-item${shouldHighlightDiffAlert(id, type) ? " diff-alert" : ""}" draggable="true" data-id="${id}" data-type="${type}" data-group="${groupValue}">
+          <div class="id-item${shouldHighlightDiffAlert(id, type) ? " diff-alert" : ""}${isSelectedForMove ? " selected-for-move" : ""}" draggable="true" data-id="${id}" data-type="${type}" data-group="${groupValue}">
             <div class="id-main">
               <img src="${src}" alt="${id}" loading="lazy">
               ${showName1 ? `<div class="id-name id-name-primary">${escapeHtml(name1)}</div>` : ''}
@@ -867,6 +874,11 @@
         grouped = workingData.grouped;
       }
 
+      const selectedCurrentGroup = (
+        state.selectedMovePayload
+        && state.selectedMovePayload.type === type
+      ) ? getCurrentGroupOfId(state.selectedMovePayload.id, state.selectedMovePayload.type) : null;
+
       return Array.from(grouped.entries())
         .filter(([groupValue]) => showExceptRows || groupValue !== 0)
         .map(([groupValue, ids]) => {
@@ -874,7 +886,11 @@
           const orderedIds = orderVisibleIds(visibleIds);
           const label = getGroupLabel(groupValue);
           const tierClass = getGroupClass(groupValue);
-          return `<tr><td class="tier-label ${tierClass}">${label}</td><td class="tier-dropzone" data-dropzone="1" data-type="${type}" data-group="${groupValue}">${renderImageCells(orderedIds, groupValue, type)}</td></tr>`;
+          const targetSelectableClass = (
+            Number.isInteger(selectedCurrentGroup)
+            && selectedCurrentGroup !== groupValue
+          ) ? " target-selectable" : "";
+          return `<tr><td class="tier-label ${tierClass}">${label}</td><td class="tier-dropzone${targetSelectableClass}" data-dropzone="1" data-type="${type}" data-group="${groupValue}">${renderImageCells(orderedIds, groupValue, type)}</td></tr>`;
         }).join('');
     }
 
@@ -1228,19 +1244,47 @@
         return;
       }
 
-      if (payload.group === 0) {
-        const restoreGroup = state.exceptRestoreGroupById.get(payload.id);
-        if (!Number.isInteger(restoreGroup) || restoreGroup < 1 || restoreGroup > 9) {
-          return;
-        }
+      state.selectedMovePayload = payload;
+      if (state.tierlist && Number.isFinite(state.x)) {
+        renderRows(state.tierlist, state.x);
+      }
+    }
 
-        moveToGroup(payload.id, payload.type, 0, restoreGroup);
+    function onDropzoneClick(event) {
+      if (!isTierMoveEnabled()) {
         return;
       }
 
-      if (payload.group >= 1 && payload.group <= 9) {
-        moveToGroup(payload.id, payload.type, payload.group, 0);
+      if (!state.selectedMovePayload) {
+        return;
       }
+
+      const dropzone = event.target.closest('.tier-dropzone[data-dropzone="1"]');
+      if (!dropzone) {
+        return;
+      }
+
+      const targetGroup = Number.parseInt(dropzone.dataset.group ?? '', 10);
+      const targetType = dropzone.dataset.type;
+      if (!Number.isInteger(targetGroup) || targetType !== state.selectedMovePayload.type) {
+        return;
+      }
+
+      const currentGroup = getCurrentGroupOfId(state.selectedMovePayload.id, state.selectedMovePayload.type);
+      if (!Number.isInteger(currentGroup)) {
+        return;
+      }
+
+      if (currentGroup === targetGroup) {
+        state.selectedMovePayload = null;
+        renderRows(state.tierlist, state.x);
+        return;
+      }
+
+      moveToGroup(state.selectedMovePayload.id, state.selectedMovePayload.type, currentGroup, targetGroup);
+      state.selectedMovePayload = null;
+      renderRows(state.tierlist, state.x);
+      return;
     }
 
     [bodyIdentityEl, bodyEgoEl].forEach((el) => {
@@ -1249,6 +1293,7 @@
       el.addEventListener('dragover', onDragOver);
       el.addEventListener('drop', onDrop);
       el.addEventListener('dblclick', onItemDoubleClick);
+      el.addEventListener('click', onDropzoneClick);
       el.addEventListener('dragleave', (event) => {
         const dropzone = event.target.closest('.tier-dropzone[data-dropzone="1"]');
         if (dropzone && !dropzone.contains(event.relatedTarget)) {
@@ -1277,6 +1322,7 @@
       toggleTierMoveInput.addEventListener('change', () => {
         if (!toggleTierMoveInput.checked) {
           state.draggingPayload = null;
+          state.selectedMovePayload = null;
           clearDropHighlights();
           setScrollZonesVisible(false);
         }
