@@ -504,6 +504,15 @@
     "maxState": 4
   },
   {
+    "id": 4014,
+    "name1": "ロボトミーE.G.O:: 残香・寂しさ",
+    "name2": "良秀",
+    "season": "WALPURGISNACHT-VIII",
+    "rank": 3,
+    "time": 7,
+    "maxState": 4
+  },
+  {
     "id": 5001,
     "name1": "LCB 囚人",
     "name2": "ムルソー",
@@ -618,6 +627,15 @@
     "season": "SEASON 6 [EVENT]",
     "rank": 3,
     "time": 6,
+    "maxState": 4
+  },
+  {
+    "id": 5014,
+    "name1": "ロボトミーE.G.O:: ホーネット【改造】",
+    "name2": "ムルソー",
+    "season": "WALPURGISNACHT-VIII",
+    "rank": 3,
+    "time": 7,
     "maxState": 4
   },
   {
@@ -2283,6 +2301,15 @@
     "season": "SEASON 6",
     "rank": 4,
     "time": 6,
+    "maxState": 4
+  },
+  {
+    "id": 22009,
+    "name1": "ハーモニー",
+    "name2": "シンクレア",
+    "season": "WALPURGISNACHT-VIII",
+    "rank": 3,
+    "time": 7,
     "maxState": 4
   },
   {
