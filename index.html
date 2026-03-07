@@ -52,7 +52,9 @@
       .id-name-primary { white-space: nowrap; word-break: normal; }
       .digit-zero { font-family: Consolas, "Courier New", monospace; }
       .share-url-tools { margin: 8px 0 12px; display: grid; gap: 6px; }
+      .share-url-actions { display: flex; flex-wrap: wrap; gap: 8px; }
       #generateUrlButton { width: fit-content; font-size: 13px; padding: 4px 10px; }
+      #openVoteFormButton { width: fit-content; font-size: 13px; padding: 4px 10px; }
       #generatedUrl { width: 100%; max-width: 900px; resize: vertical; white-space: pre-wrap; word-break: break-all; overflow-wrap: anywhere; line-height: 1.35; min-height: 3.2em; }
       #generatedUrl.dynamic-width { width: min(98vw, var(--generated-url-width, 900px)); }
       #hiddenPrisonerDialog,
@@ -263,8 +265,10 @@
 
 
   <div class="share-url-tools">
-
-    <button type="button" id="generateUrlButton">URLを生成する</button>
+    <div class="share-url-actions">
+      <button type="button" id="generateUrlButton">URLを生成する</button>
+      <button type="button" id="openVoteFormButton">投票フォームを開く</button>
+    </div>
     <textarea id="generatedUrl" readonly rows="2" placeholder="生成されたURLがここに表示されます"></textarea>
   </div>
 
@@ -319,6 +323,7 @@
     const identityRangeFiltersEl = document.getElementById('identityRangeFilters');
     const egoRangeFiltersEl = document.getElementById('egoRangeFilters');
     const generateUrlButton = document.getElementById('generateUrlButton');
+    const openVoteFormButton = document.getElementById('openVoteFormButton');
     const generatedUrlInput = document.getElementById('generatedUrl');
     const openLatestTierButton = document.getElementById('openLatestTierButton');
     const latestTierMetaEl = document.getElementById('latestTierMeta');
@@ -2059,6 +2064,12 @@
 
     if (generateUrlButton) {
       generateUrlButton.addEventListener('click', generateShareUrl);
+    }
+
+    if (openVoteFormButton) {
+      openVoteFormButton.addEventListener('click', () => {
+        window.open('https://docs.google.com/forms/d/e/1FAIpQLSc_VPagI6zgSwdmNSRMPg-mZxmPqw9AntTzDpcVQ0Nhnd4wfw/viewform', '_blank', 'noopener,noreferrer');
+      });
     }
 
     if (openLatestTierButton) {
