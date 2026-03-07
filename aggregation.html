@@ -104,23 +104,27 @@ async function generate() {
     for (const rawUrl of rawUrls) {
       const { xValue, compressedParam } = parseTiermakerUrl(rawUrl);
       const defaultGroups = buildDefaultGroupById(data, xValue);
-      const manualGroups = new Map(defaultGroups);
-      applyCompressedDiffParam(compressedParam, manualGroups);
+      const manualGroupsByC = decodeManualGroupsByC(compressedParam);
 
-      manualGroups.forEach((group, id) => {
-        if (group !== 0 && group === GROUP_A) {
-          const row = rowById.get(id);
-          if (!row) return;
-          row[1] += group;
-          row[2] += 1;
+      data.forEach((sourceRow) => {
+        const id = sourceRow[0];
+        const row = rowById.get(id);
+        if (!row) return;
+
+        const defaultGroup = defaultGroups.get(id);
+        const manualGroup = manualGroupsByC.get(id);
+
+        if (manualGroup !== undefined) {
+          if (manualGroup !== 0) {
+            if (manualGroup === GROUP_A) {
+              row[1] += manualGroup;
+              row[2] += 1;
+            }
+          }
         }
-      });
 
-      defaultGroups.forEach((group, id) => {
-        if (group === GROUP_A) {
-          const row = rowById.get(id);
-          if (!row) return;
-          row[3] += group;
+        if (defaultGroup === GROUP_A) {
+          row[3] += defaultGroup;
           row[4] += 1;
         }
       });
@@ -252,9 +256,10 @@ function parseCompressedDiffParam(cParam) {
   return { codingDiffId: 0, payload: cParam };
 }
 
-function applyCompressedDiffParam(cParam, manualGroupById) {
+function decodeManualGroupsByC(cParam) {
+  const result = new Map();
   const { codingDiffId, payload } = parseCompressedDiffParam(cParam);
-  if (!payload) return;
+  if (!payload) return result;
 
   const decoded = fromBase64Url(payload);
   const sections = decoded.split(".");
@@ -266,9 +271,11 @@ function applyCompressedDiffParam(cParam, manualGroupById) {
     const group = 9 - sectionIndex;
     const ids = decodeSection(sections[sectionIndex], codingDiffId);
     ids.forEach((id) => {
-      manualGroupById.set(id, group);
+      result.set(id, group);
     });
   }
+
+  return result;
 }
 </script>
 
