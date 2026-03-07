@@ -59,8 +59,6 @@ pre {
 <iframe id="previewFrame" title="index preview"></iframe>
 
 <script>
-const GROUP_A = 5;
-
 function addUrl() {
   const container = document.getElementById("urlContainer");
   const div = document.createElement("div");
@@ -116,14 +114,11 @@ async function generate() {
 
         if (manualGroup !== undefined) {
           if (manualGroup !== 0) {
-            if (manualGroup === GROUP_A) {
               row[1] += manualGroup;
               row[2] += 1;
-            }
           }
         }
-
-        if (defaultGroup === GROUP_A) {
+        else{
           row[3] += defaultGroup;
           row[4] += 1;
         }
