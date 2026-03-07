@@ -59,6 +59,8 @@ pre {
 <iframe id="previewFrame" title="index preview"></iframe>
 
 <script>
+const GROUP_A = 5;
+
 function addUrl() {
   const container = document.getElementById("urlContainer");
   const div = document.createElement("div");
@@ -73,9 +75,16 @@ async function generate() {
   const num = document.getElementById("tableNumber").value;
   const previewStatus = document.getElementById("previewStatus");
   const previewFrame = document.getElementById("previewFrame");
+  const urlInputs = Array.from(document.querySelectorAll(".urlInput"));
+  const rawUrls = urlInputs.map((input) => input.value.trim()).filter(Boolean);
 
   if (!num) {
     alert("数値を入力してください");
+    return;
+  }
+
+  if (rawUrls.length === 0) {
+    alert("URLを1件以上入力してください");
     return;
   }
 
@@ -89,12 +98,39 @@ async function generate() {
     }
 
     const data = await response.json();
+    const aggregatedRows = data.map((row) => [...row]);
+    const rowById = new Map(aggregatedRows.map((row) => [row[0], row]));
 
-    const formatted = JSON.stringify(data, null, 2);
+    for (const rawUrl of rawUrls) {
+      const { xValue, compressedParam } = parseTiermakerUrl(rawUrl);
+      const defaultGroups = buildDefaultGroupById(data, xValue);
+      const manualGroups = new Map(defaultGroups);
+      applyCompressedDiffParam(compressedParam, manualGroups);
+
+      manualGroups.forEach((group, id) => {
+        if (group !== 0 && group === GROUP_A) {
+          const row = rowById.get(id);
+          if (!row) return;
+          row[1] = String(row[1]) + "A";
+          row[2] += 1;
+        }
+      });
+
+      defaultGroups.forEach((group, id) => {
+        if (group === GROUP_A) {
+          const row = rowById.get(id);
+          if (!row) return;
+          row[3] = String(row[3]) + "A";
+          row[4] += 1;
+        }
+      });
+    }
+
+    const formatted = JSON.stringify(aggregatedRows, null, 2);
     document.getElementById("output").textContent = formatted;
 
     const cacheKey = `aggregation-preview-table-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    sessionStorage.setItem(cacheKey, JSON.stringify(data));
+    sessionStorage.setItem(cacheKey, JSON.stringify(aggregatedRows));
 
     previewFrame.src = `index.html?T=${encodeURIComponent(num)}&tableDataKey=${encodeURIComponent(cacheKey)}`;
     previewStatus.textContent = "生成したJSONを使ってindex.htmlを埋め込み表示しています。";
@@ -111,6 +147,128 @@ function copyJson() {
   const text = document.getElementById("output").textContent;
   navigator.clipboard.writeText(text);
   alert("コピーしました");
+}
+
+function calcValue(row, x) {
+  const numerator = row[1] + 0.01 * x * row[3];
+  const denominator = row[2] + 0.01 * x * row[4];
+  return denominator === 0 ? NaN : numerator / denominator;
+}
+
+function buildDefaultGroupById(rows, x) {
+  const result = new Map();
+  rows.forEach((row) => {
+    const id = row[0];
+    const value = calcValue(row, x);
+    if (!Number.isFinite(value)) {
+      throw new Error(`ID ${id} の計算結果が不正です`);
+    }
+    const rounded = Math.round(value);
+    if (rounded < 1 || rounded > 9) {
+      throw new Error(`ID ${id} の丸め後グループが範囲外です: ${rounded}`);
+    }
+    result.set(id, rounded);
+  });
+  return result;
+}
+
+function parseTiermakerUrl(rawUrl) {
+  const parsed = new URL(rawUrl);
+  const tParam = parsed.searchParams.get("T");
+  const xParam = parsed.searchParams.get("X");
+  const cParam = parsed.searchParams.get("C");
+  if (tParam === null || xParam === null || cParam === null) {
+    throw new Error("URLは ?T=...&X=...&C=... 形式で入力してください");
+  }
+  const xValue = Number(xParam);
+  if (!Number.isFinite(xValue)) {
+    throw new Error("URLのXパラメータが数値ではありません");
+  }
+  return {
+    tableIndex: Number.parseInt(tParam, 10),
+    xValue,
+    compressedParam: cParam,
+  };
+}
+
+function fromBase64Url(input) {
+  const normalized = input.replace(/-/g, "+").replace(/_/g, "/");
+  const padLength = (4 - (normalized.length % 4)) % 4;
+  return atob(`${normalized}${"=".repeat(padLength)}`);
+}
+
+function decodeSection(section, codingDiffId = 0) {
+  if (!section) return [];
+
+  const ids = [];
+  let i = 0;
+
+  while (i < section.length) {
+    const highChar = section[i];
+    const lowCharLength = codingDiffId === 1 ? 2 : 1;
+    const lowStartRaw = section.slice(i + 1, i + 1 + lowCharLength);
+    if (!highChar || lowStartRaw.length !== lowCharLength) {
+      throw new Error("Cパラメータの形式が不正です（ID桁不足）");
+    }
+
+    const high = Number.parseInt(highChar, 36);
+    const lowStart = Number.parseInt(lowStartRaw, codingDiffId === 1 ? 10 : 36);
+    if (!Number.isInteger(high) || !Number.isInteger(lowStart)) {
+      throw new Error("Cパラメータの形式が不正です（base36変換失敗）");
+    }
+
+    const rangeMark = section[i + 1 + lowCharLength];
+    if (rangeMark === "~") {
+      const lowEndRaw = section.slice(i + 2 + lowCharLength, i + 2 + (lowCharLength * 2));
+      const lowEnd = Number.parseInt(lowEndRaw ?? "", codingDiffId === 1 ? 10 : 36);
+      if (!Number.isInteger(lowEnd) || lowEnd < lowStart) {
+        throw new Error("Cパラメータの形式が不正です（範囲指定）");
+      }
+
+      for (let low = lowStart; low <= lowEnd; low += 1) {
+        ids.push(high * 1000 + low);
+      }
+
+      i += 2 + (lowCharLength * 2);
+      continue;
+    }
+
+    ids.push(high * 1000 + lowStart);
+    i += 1 + lowCharLength;
+  }
+
+  return ids;
+}
+
+function parseCompressedDiffParam(cParam) {
+  if (!cParam) {
+    return { codingDiffId: 0, payload: cParam };
+  }
+
+  if (cParam.startsWith("1:")) {
+    return { codingDiffId: 1, payload: cParam.slice(2) };
+  }
+
+  return { codingDiffId: 0, payload: cParam };
+}
+
+function applyCompressedDiffParam(cParam, manualGroupById) {
+  const { codingDiffId, payload } = parseCompressedDiffParam(cParam);
+  if (!payload) return;
+
+  const decoded = fromBase64Url(payload);
+  const sections = decoded.split(".");
+  if (sections.length !== 10) {
+    throw new Error("Cパラメータの形式が不正です（セクション数）");
+  }
+
+  for (let sectionIndex = 0; sectionIndex < sections.length; sectionIndex += 1) {
+    const group = 9 - sectionIndex;
+    const ids = decodeSection(sections[sectionIndex], codingDiffId);
+    ids.forEach((id) => {
+      manualGroupById.set(id, group);
+    });
+  }
 }
 </script>
 
