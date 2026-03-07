@@ -213,8 +213,12 @@
     却下の基準はどうしても主観的になってしまいますが、<br>
     Tier表の内容に対して<b>恣意的な操作を行うことは決してありません。</b>
     </p>
-    <div class="close-row" onclick="this.closest('details').open=false">
-     説明を閉じる▲
+    <div class="close-row" onclick="
+      const d = this.closest('details');
+      d.open = false;
+      window.scrollTo({top:0, behavior:'smooth'});
+    ">
+      説明を閉じる▲
     </div>
   </details>
   <div class="latest-tier-row">
