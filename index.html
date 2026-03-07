@@ -116,6 +116,7 @@
       #sharetoolUrlInput { width: min(100%, 980px); min-height: 2.8em; }
       #sharetoolUrlWarning { color: #b00020; font-size: 13px; }
       #applySharetoolExceptButton { width: fit-content; font-size: 13px; padding: 4px 10px; }
+    .close-row{ cursor: pointer; color: blue; text-decoration: underline; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -168,9 +169,7 @@
     </p>
     <p>
     例えば、私の好きなウーティスの人格Tierはこんな感じです。<br>
-    <a href="https://394ast.github.io/limbus.tiermaker/?T=0&X=30&C=YjQuYjViNmI4LmIyYjdiOS5iMWJiYmRiZS5iM2JjLi4uLi4xMX5mMjF-ZTMxfmU0MX5kNTF-ZDYxfmQ3MX5lODF-ZTkxfmVhMX5mYzF-ZWQxfjhlMX45ZjF-OWcxfjloMX44aTF-OWoxfjlrMX5hbDF-OG0xfjhuMX45bzF-OQ">
-    Tier表の例を見る
-    </a>
+    https://394ast.github.io/limbus.tiermaker/?T=0&X=30&C=YjQuYjViNmI4LmIyYjdiOS5iMWJiYmRiZS5iM2JjLi4uLi4xMX5mMjF-ZTMxfmU0MX5kNTF-ZDYxfmQ3MX5lODF-ZTkxfmVhMX5mYzF-ZWQxfjhlMX45ZjF-OWcxfjloMX44aTF-OWoxfjlrMX5hbDF-OG0xfjhuMX45bzF-OQ
     </p>
     <p>
     ※グーグルフォームに送るURLは「強さを基準にしたTier表」である必要がありますが、<br>
@@ -204,8 +203,11 @@
     </ul>
     <p>
     却下の基準はどうしても主観的になってしまいますが、<br>
-    Tier表の順位に対して<b>恣意的な操作を行うことは決してありません。</b>
+    Tier表の内容に対して<b>恣意的な操作を行うことは決してありません。</b>
     </p>
+    <div class="close-row" onclick="document.getElementById('info').open=false">
+    ▲説明欄を閉じる
+    </div>
   </details>
   <div class="latest-tier-row">
     <button type="button" id="openLatestTierButton">現在のみんなでつくったTier表を表示</button>
