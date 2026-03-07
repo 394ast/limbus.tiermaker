@@ -111,7 +111,7 @@ async function generate() {
         if (group !== 0 && group === GROUP_A) {
           const row = rowById.get(id);
           if (!row) return;
-          row[1] = String(row[1]) + "A";
+          row[1] += group;
           row[2] += 1;
         }
       });
@@ -120,7 +120,7 @@ async function generate() {
         if (group === GROUP_A) {
           const row = rowById.get(id);
           if (!row) return;
-          row[3] = String(row[3]) + "A";
+          row[3] += group;
           row[4] += 1;
         }
       });
