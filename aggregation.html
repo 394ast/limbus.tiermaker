@@ -54,6 +54,11 @@ pre {
   <pre id="output"></pre>
 </details>
 
+<details>
+  <summary>デバッグ情報（URLごとの処理回数）</summary>
+  <pre id="debugOutput"></pre>
+</details>
+
 <h2>埋め込みプレビュー（index.html）</h2>
 <p id="previewStatus"></p>
 <iframe id="previewFrame" title="index preview"></iframe>
@@ -73,6 +78,7 @@ async function generate() {
   const num = document.getElementById("tableNumber").value;
   const previewStatus = document.getElementById("previewStatus");
   const previewFrame = document.getElementById("previewFrame");
+  const debugOutput = document.getElementById("debugOutput");
   const urlInputs = Array.from(document.querySelectorAll(".urlInput"));
   const rawUrls = urlInputs.map((input) => input.value.trim()).filter(Boolean);
 
@@ -98,11 +104,13 @@ async function generate() {
     const data = await response.json();
     const aggregatedRows = data.map((row) => [...row]);
     const rowById = new Map(aggregatedRows.map((row) => [row[0], row]));
+    const debugCounts = [];
 
     for (const rawUrl of rawUrls) {
       const { xValue, compressedParam } = parseTiermakerUrl(rawUrl);
       const defaultGroups = buildDefaultGroupById(data, xValue);
       const manualGroupsByC = decodeManualGroupsByC(compressedParam);
+      const counts = { manual: 0, default: 0 };
 
       data.forEach((sourceRow) => {
         const id = sourceRow[0];
@@ -116,17 +124,22 @@ async function generate() {
           if (manualGroup !== 0) {
               row[1] += manualGroup;
               row[2] += 1;
+              counts.manual += 1;
           }
         }
         else{
           row[3] += defaultGroup;
           row[4] += 1;
+          counts.default += 1;
         }
       });
+
+      debugCounts.push(`${rawUrl}\n  マニュアル: ${counts.manual}回\n  デフォルト: ${counts.default}回`);
     }
 
     const formatted = JSON.stringify(aggregatedRows, null, 2);
     document.getElementById("output").textContent = formatted;
+    debugOutput.textContent = debugCounts.join("\n\n");
 
     const cacheKey = `aggregation-preview-table-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     sessionStorage.setItem(cacheKey, JSON.stringify(aggregatedRows));
@@ -137,6 +150,7 @@ async function generate() {
   } catch (error) {
     document.getElementById("output").textContent =
       "エラー: ファイルが存在しないか取得できません";
+    debugOutput.textContent = "";
     previewStatus.textContent = "エラーにより埋め込みプレビューを更新できませんでした。";
     previewFrame.removeAttribute("src");
   }
