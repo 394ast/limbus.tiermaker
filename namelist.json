@@ -631,7 +631,7 @@
   },
   {
     "id": 5014,
-    "name1": "ロボトミーE.G.O:: ホーネット【改造】",
+    "name1": "ロボトミーE.G.O:: ホーネット【変調】",
     "name2": "ムルソー",
     "season": "WALPURGISNACHT-VIII",
     "rank": 3,
@@ -1520,6 +1520,15 @@
     "time": 7,
     "maxState": 4
   },
+    {
+    "id": 12015,
+    "name1": "LCE E.G.O:: AEDD",
+    "name2": "グレゴール",
+    "season": "SEASON 7 [EVENT]",
+    "rank": 3,
+    "time": 7,
+    "maxState": 4
+  },
   {
     "id": 13001,
     "name1": "烏瞰刀",
@@ -1671,6 +1680,15 @@
     "season": "COLLABORATION-LIMITED",
     "rank": 3,
     "time": 6,
+    "maxState": 4
+  },
+    {
+    "id": 14010,
+    "name1": "紅炎殺",
+    "name2": "ファウスト",
+    "season": "SEASON 7 [EVENT]",
+    "rank": 3,
+    "time": 7,
     "maxState": 4
   },
   {
