@@ -40,7 +40,10 @@
       .error { color: #b00020; }
       .id-items { display: flex; flex-wrap: wrap; gap: 2px; justify-content: flex-start; }
       .id-item { display: flex; align-items: center; gap: 6px; border: 1px solid #ddd; border-radius: 4px; padding: 2px; background: #fff; }
-      .id-item.diff-alert { background: #ff5b5b; border-color: #c80000; }
+      .id-item.diff-alert-plus-light { background: #ffe5e5; border-color: #ff9f9f; border-width: 3px; }
+      .id-item.diff-alert-plus-strong { background: #ffb3b3; border-color: #c80000; border-width: 3px; }
+      .id-item.diff-alert-minus-light { background: #e5f0ff; border-color: #8bb8ff; border-width: 3px; }
+      .id-item.diff-alert-minus-strong { background: #bcd7ff; border-color: #005fcc; border-width: 3px; }
       .id-item.selected-for-move { border-color: #005fcc; box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.9); background: #e8f1ff; }
       .tier-dropzone.target-selectable { outline: 3px solid rgba(26, 115, 232, 0.4); outline-offset: -4px; }
       .id-item[draggable="true"] { cursor: grab; }
@@ -615,22 +618,36 @@
       return { name1, name2, season };
     }
 
-    function shouldHighlightDiffAlert(id, type) {
+    function getDiffAlertClass(id, type) {
       if (!shouldShowDiffOnly()) {
-        return false;
+        return '';
       }
 
       const manualGroup = state.manualGroupById.get(id);
       if (!Number.isInteger(manualGroup) || manualGroup === 0) {
-        return false;
+        return '';
       }
 
       const baseGroup = getBaseGroupForId(type, id);
       if (!Number.isInteger(baseGroup)) {
-        return false;
+        return '';
       }
 
-      return Math.abs(baseGroup - manualGroup) >= 3;
+      const groupDiff = manualGroup - baseGroup;
+      if (groupDiff >= 3) {
+        return ' diff-alert-plus-strong';
+      }
+      if (groupDiff >= 1) {
+        return ' diff-alert-plus-light';
+      }
+      if (groupDiff <= -3) {
+        return ' diff-alert-minus-strong';
+      }
+      if (groupDiff <= -1) {
+        return ' diff-alert-minus-light';
+      }
+
+      return '';
     }
 
     function renderImageCells(ids, groupValue, type) {
@@ -647,7 +664,7 @@
         );
           
         return `
-          <div class="id-item${shouldHighlightDiffAlert(id, type) ? " diff-alert" : ""}${isSelectedForMove ? " selected-for-move" : ""}" draggable="true" data-id="${id}" data-type="${type}" data-group="${groupValue}">
+          <div class="id-item${getDiffAlertClass(id, type)}${isSelectedForMove ? " selected-for-move" : ""}" draggable="true" data-id="${id}" data-type="${type}" data-group="${groupValue}">
             <div class="id-main">
               <img src="${src}" alt="${id}" loading="lazy">
               ${showName1 ? `<div class="id-name id-name-primary">${escapeHtml(name1)}</div>` : ''}
