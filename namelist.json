@@ -260,6 +260,15 @@
     "time": 7,
     "maxState": 4
   },
+    {
+    "id": 2015,
+    "name1": "蜘蛛の巣 薬指の子方",
+    "name2": "ファウスト",
+    "season": "SEASON 7",
+    "rank": 3,
+    "time": 7,
+    "maxState": 4
+  },
   {
     "id": 3001,
     "name1": "LCB 囚人",
@@ -753,6 +762,15 @@
     "season": "SEASON 6",
     "rank": 3,
     "time": 6,
+    "maxState": 4
+  },
+    {
+    "id": 6014,
+    "name1": "蜘蛛の巣 薬指の親方",
+    "name2": "ホンル",
+    "season": "SEASON 7",
+    "rank": 3,
+    "time": 7,
     "maxState": 4
   },
   {
