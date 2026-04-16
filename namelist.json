@@ -647,6 +647,15 @@
     "time": 7,
     "maxState": 4
   },
+    {
+    "id": 5015,
+    "name1": "薬指 野獣派 スチューデント",
+    "name2": "ムルソー",
+    "season": "SEASON 7 [EVENT]",
+    "rank": 3,
+    "time": 7,
+    "maxState": 4
+  },
   {
     "id": 6001,
     "name1": "LCB 囚人",
@@ -1149,6 +1158,15 @@
     "season": "恒常",
     "rank": 3,
     "time": 6,
+    "maxState": 4
+  },
+    {
+    "id": 9015,
+    "name1": "薬指 野獣派 ドーセント",
+    "name2": "ロージャ",
+    "season": "SEASON 7 [EVENT]",
+    "rank": 3,
+    "time": 7,
     "maxState": 4
   },
   {
