@@ -908,6 +908,15 @@
     "time": 6,
     "maxState": 4
   },
+    {
+    "id": 7015,
+    "name1": "中指 末兄",
+    "name2": "ヒースクリフ",
+    "season": "SEASON 7 [EVENT]",
+    "rank": 3,
+    "time": 7,
+    "maxState": 4
+  },
   {
     "id": 8001,
     "name1": "LCB 囚人",
@@ -2283,6 +2292,15 @@
     "season": "SEASON 5",
     "rank": 4,
     "time": 5,
+    "maxState": 4
+  },
+    {
+    "id": 21009,
+    "name1": "夕焼けの中へ",
+    "name2": "ロージャ",
+    "season": "SEASON 7 [EVENT]",
+    "rank": 1,
+    "time": 7,
     "maxState": 4
   },
   {
