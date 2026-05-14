@@ -521,6 +521,15 @@
     "time": 7,
     "maxState": 4
   },
+    {
+    "id": 4015,
+    "name1": "蜘蛛の巣の刀",
+    "name2": "良秀",
+    "season": "SEASON 7",
+    "rank": 3,
+    "time": 7,
+    "maxState": 4
+  },
   {
     "id": 5001,
     "name1": "LCB 囚人",
@@ -1833,7 +1842,7 @@
     "season": "SEASON 1",
     "rank": 3,
     "time": 1,
-    "maxState": 4
+    "maxState": 5
   },
   {
     "id": 16003,
