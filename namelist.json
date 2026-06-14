@@ -800,6 +800,15 @@
     "time": 0,
     "maxState": 4
   },
+    {
+    "id": 6015,
+    "name1": "S社 チュノックン",
+    "name2": "ホンル",
+    "season": "SEASON 7 [EVENT]",
+    "rank": 3,
+    "time": 7,
+    "maxState": 4
+  },
   {
     "id": 7002,
     "name1": "南部シ協会 5課",
@@ -1048,6 +1057,15 @@
     "name1": "蜘蛛の巣 中指の子方",
     "name2": "イシュメール",
     "season": "SEASON 7",
+    "rank": 3,
+    "time": 7,
+    "maxState": 4
+  },
+    {
+    "id": 8015,
+    "name1": "LCD 現場推理チーム",
+    "name2": "イシュメール",
+    "season": "SEASON 7 [EVENT]",
     "rank": 3,
     "time": 7,
     "maxState": 4
@@ -1986,6 +2004,15 @@
     "season": "SEASON 6 [EVENT]",
     "rank": 4,
     "time": 6,
+    "maxState": 4
+  },
+    {
+    "id": 17009,
+    "name1": "着影揮刀",
+    "name2": "ムルソー",
+    "season": "SEASON 7 [EVENT]",
+    "rank": 3,
+    "time": 7,
     "maxState": 4
   },
   {
