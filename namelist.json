@@ -935,6 +935,15 @@
     "time": 7,
     "maxState": 4
   },
+    {
+    "id": 7016,
+    "name1": "蜘蛛の巣 親指の子方",
+    "name2": "ヒースクリフ",
+    "season": "SEASON 7",
+    "rank": 3,
+    "time": 7,
+    "maxState": 4
+  },
   {
     "id": 8001,
     "name1": "LCB 囚人",
@@ -1201,6 +1210,15 @@
     "name1": "薬指 野獣派 ドーセント",
     "name2": "ロージャ",
     "season": "SEASON 7 [EVENT]",
+    "rank": 3,
+    "time": 7,
+    "maxState": 4
+  },
+    {
+    "id": 9016,
+    "name1": "蜘蛛の巣 親指の親方",
+    "name2": "ロージャ",
+    "season": "SEASON 7",
     "rank": 3,
     "time": 7,
     "maxState": 4
