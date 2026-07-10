@@ -269,6 +269,15 @@
     "time": 7,
     "maxState": 4
   },
+    {
+    "id": 2016,
+    "name1": "夜明事務所 フィクサー",
+    "name2": "ファウスト",
+    "season": "WALPURGISNACHT IX",
+    "rank": 3,
+    "time": 7,
+    "maxState": 4
+  },
   {
     "id": 3001,
     "name1": "LCB 囚人",
@@ -1628,6 +1637,15 @@
     "time": 7,
     "maxState": 4
   },
+    {
+    "id": 12016,
+    "name1": "夜明事務所 代表",
+    "name2": "グレゴール",
+    "season": "WALPURGISNACHT IX",
+    "rank": 3,
+    "time": 7,
+    "maxState": 4
+  },
   {
     "id": 13001,
     "name1": "烏瞰刀",
@@ -1697,6 +1715,15 @@
     "name2": "イサン",
     "season": "SEASON 7",
     "rank": 4,
+    "time": 7,
+    "maxState": 4
+  },
+    {
+    "id": 13009,
+    "name1": "厳粛な哀悼",
+    "name2": "イサン",
+    "season": "WALPURGISNACHT IX",
+    "rank": 3,
     "time": 7,
     "maxState": 4
   },
