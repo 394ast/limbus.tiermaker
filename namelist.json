@@ -134,6 +134,15 @@
     "time": 7,
     "maxState": 4
   },
+    {
+    "id": 1016,
+    "name1": "LCE E.G.O:: 次元裂き",
+    "name2": "イサン",
+    "season": "SEASON 7",
+    "rank": 3,
+    "time": 7,
+    "maxState": 4
+  },
   {
     "id": 2001,
     "name1": "LCB 囚人",
@@ -2328,7 +2337,7 @@
     "season": "SEASON 1",
     "rank": 3,
     "time": 1,
-    "maxState": 4
+    "maxState": 5
   },
   {
     "id": 21003,
