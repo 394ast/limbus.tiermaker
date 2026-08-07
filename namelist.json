@@ -1907,6 +1907,15 @@
     "time": 6,
     "maxState": 4
   },
+    {
+    "id": 15010,
+    "name1": "私はチョキを出すね、そっちは？",
+    "name2": "ドンキホーテ",
+    "season": "SEASON 7",
+    "rank": 1,
+    "time": 7,
+    "maxState": 4
+  },
   {
     "id": 16001,
     "name1": "森羅炎象",
