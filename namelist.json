@@ -1671,7 +1671,7 @@
     "season": "SEASON 1",
     "rank": 2,
     "time": 1,
-    "maxState": 4
+    "maxState": 5
   },
   {
     "id": 13003,
@@ -1860,7 +1860,7 @@
     "season": "SEASON 1 [EVENT]",
     "rank": 2,
     "time": 1,
-    "maxState": 4
+    "maxState": 5
   },
   {
     "id": 15005,
@@ -2427,7 +2427,7 @@
     "season": "SEASON 1 [EVENT]",
     "rank": 2,
     "time": 1,
-    "maxState": 4
+    "maxState": 5
   },
   {
     "id": 22004,
