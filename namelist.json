@@ -809,6 +809,24 @@
     "time": 7,
     "maxState": 4
   },
+      {
+    "id": 6015,
+    "name1": "S社 チュノックン",
+    "name2": "ホンル",
+    "season": "SEASON 7 [EVENT]",
+    "rank": 3,
+    "time": 7,
+    "maxState": 4
+  },
+      {
+    "id": 6016,
+    "name1": "東部センク協会 3課",
+    "name2": "ホンル",
+    "season": "恒常",
+    "rank": 3,
+    "time": 7,
+    "maxState": 4
+  },
   {
     "id": 7001,
     "name1": "LCB 囚人",
@@ -818,15 +836,7 @@
     "time": 0,
     "maxState": 4
   },
-    {
-    "id": 6015,
-    "name1": "S社 チュノックン",
-    "name2": "ホンル",
-    "season": "SEASON 7 [EVENT]",
-    "rank": 3,
-    "time": 7,
-    "maxState": 4
-  },
+
   {
     "id": 7002,
     "name1": "南部シ協会 5課",
