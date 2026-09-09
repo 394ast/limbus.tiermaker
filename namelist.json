@@ -1789,7 +1789,7 @@
     "season": "SEASON 3",
     "rank": 2,
     "time": 3,
-    "maxState": 4
+    "maxState": 5
   },
   {
     "id": 14006,
@@ -1969,7 +1969,7 @@
     "season": "SEASON 2 [EVENT]",
     "rank": 1,
     "time": 2,
-    "maxState": 4
+    "maxState": 5
   },
   {
     "id": 16006,
@@ -2662,6 +2662,15 @@
     "season": "COLLABORATION-LIMITED",
     "rank": 4,
     "time": 6,
+    "maxState": 4
+  },
+    {
+    "id": 24010,
+    "name1": "転入届",
+    "name2": "グレゴール",
+    "season": "SEASON 5",
+    "rank": 4,
+    "time": 7,
     "maxState": 4
   }
 ]
