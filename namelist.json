@@ -548,6 +548,15 @@
     "time": 7,
     "maxState": 4
   },
+      {
+    "id": 4016,
+    "name1": "オートクチュール:: ル・ノワール シューズフロア",
+    "name2": "良秀",
+    "season": "SEASON 8",
+    "rank": 3,
+    "time": 8,
+    "maxState": 4
+  },
   {
     "id": 5001,
     "name1": "LCB 囚人",
@@ -1105,6 +1114,15 @@
     "season": "SEASON 7 [EVENT]",
     "rank": 3,
     "time": 7,
+    "maxState": 4
+  },
+      {
+    "id": 8016,
+    "name1": "オートクチュール:: ル・ルージュ ブティーク",
+    "name2": "イシュメール",
+    "season": "SEASON 8",
+    "rank": 3,
+    "time": 8,
     "maxState": 4
   },
   {
